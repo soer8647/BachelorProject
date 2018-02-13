@@ -26,16 +26,26 @@ public class FullNode implements Node {
         BigInteger hardValue = BigInteger.valueOf(2).pow(hashingAlgorithm.getBitSize()).shiftRight(hardness);
 
         //set nonce
-        int nonce = 0;
+        BigInteger nonce = new BigInteger("0");
         BigInteger hash;
         do{
             hash = new BigInteger(String.valueOf(hashingAlgorithm.hash(
                     previousBlockHash.toString()
                             + transactions.hashTransactions().toString()
-                            + nonce)));
-            nonce++;
+                            + nonce.toString())));
+            nonce = nonce.add(new BigInteger("1"));
         } while(hash.compareTo(hardValue)>0);
-        blockChain.addBlock(new StandardBlock(new BigInteger(Integer.toString(nonce)),hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1,hashingAlgorithm ));
+        System.out.println("TRANS\n"+transactions.hashTransactions().toString());
+        Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1,hashingAlgorithm );
+        blockChain.addBlock(newBlock);
+        //TODO MAKE THE TWO HASHES AGREE : seems like hash of transactions is not the same.
+        //TODO Empty ArrayListTransactions does not have same hash!!!!!!!
+        //System.out.println(hash);
+        //System.out.println(newBlock.hash());
+
+
+
+
     }
 
     @Override
