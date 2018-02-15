@@ -1,3 +1,13 @@
+import Impl.ArrayListTransactions;
+import Impl.FullNode;
+import Impl.Hashing.SHA256;
+import Impl.StandardBlock;
+import Impl.StandardBlockChain;
+import Interfaces.Block;
+import Interfaces.BlockChain;
+import Interfaces.Node;
+import com.sun.xml.internal.bind.api.impl.NameConverter;
+
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -9,37 +19,20 @@ public class SuperSimpleBlockChain {
     public static void main(String[] args) {
         //init variables
         int iteration = 0;
-        int nonce = 0;
-        String previous_block_Hash = ""; // maybe this should be something
-        BigInteger hash;
-
-        //make our target (which the hash must be lower than)
-        BigInteger target = BigInteger.valueOf(2).pow(256).shiftRight(20);
-        System.out.println("Target is < " + target);
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new SHA256());
+        BlockChain  myBlockChain = new StandardBlockChain(genesisBlock);
+        Node node = new FullNode(myBlockChain);
+        BigInteger hash = genesisBlock.hash();
 
         while(iteration<10) {
 
             // Attempt to find a "correct" nonce
-            do {
-                hash = hash_SHA256(previous_block_Hash + nonce);
-                nonce++;
-            } while (hash.compareTo(target) > 0);
 
+            Block newBlock = node.mine(hash, new ArrayListTransactions());
+            hash = newBlock.hash();
             System.out.println("new block found!");
-            previous_block_Hash = hash.toString();
             iteration++;
         }
-    }
-
-    public static BigInteger hash_SHA256(String text) {
-        MessageDigest digest = null;
-        try {
-            digest = MessageDigest.getInstance("SHA-256");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        byte[] hash = digest.digest(text.getBytes());
-        return new BigInteger(1,hash);
     }
 
 }

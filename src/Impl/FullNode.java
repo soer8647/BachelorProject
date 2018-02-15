@@ -18,7 +18,7 @@ public class FullNode implements Node {
     }
 
     @Override
-    public void mine(BigInteger previousBlockHash, Transactions transactions) {
+    public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
         //TODO make hardness parameter change
         int hardness = 10;
@@ -38,7 +38,7 @@ public class FullNode implements Node {
 
         Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1,hashingAlgorithm );
         blockChain.addBlock(newBlock);
-
+        return newBlock;
     }
 
     @Override
