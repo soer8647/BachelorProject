@@ -52,4 +52,6 @@ public interface Node {
      * @return The hash as a BigInteger of a block
      */
     BigInteger hashBlock(Block block);
+
+    void interrupt();
 }

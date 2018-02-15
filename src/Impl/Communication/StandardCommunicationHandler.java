@@ -4,6 +4,7 @@ import Impl.Communication.Events.*;
 import Interfaces.Block;
 import Interfaces.Communication.CommunicationHandler;
 import Interfaces.Communication.Event;
+import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
 import Interfaces.Node;
 import Interfaces.Transaction;
@@ -11,29 +12,35 @@ import Interfaces.Transaction;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardCommunicationHandler implements CommunicationHandler{
-    private Node node;
+    private NodeRunner nodeRunner;
     private Publisher publisher;
+    private boolean interrupted;
 
     /**
      *
-     * @param node, The mining node
+     * @param nodeRunner, The mining node's runner
      * @param publisher, The publisher of the network module
      * @param eventQueue, The queue which the SCH takes events from.
      */
-    public StandardCommunicationHandler(Node node, Publisher publisher, BlockingQueue<Event> eventQueue) {
-        this.node = node;
+    public StandardCommunicationHandler(NodeRunner nodeRunner, Publisher publisher, BlockingQueue<Event> eventQueue) {
+        this.nodeRunner = nodeRunner;
         this.publisher = publisher;
 
-        //TODO: maybe this should start a new thread
-        while(true) {
-            Event event = null;
-            try {
-                event = eventQueue.take();
-            } catch (InterruptedException e) {
-                e.printStackTrace();
+        Thread thread = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                while(!interrupted) {
+                    Event event = null;
+                    try {
+                        event = eventQueue.take();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    HandleEvent(event);
+                }
             }
-            HandleEvent(event);
-        }
+        });
+        thread.start();
     }
 
     /**
@@ -52,8 +59,8 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleReceivedBlock(Block block) {
-        if (node.validateBlock(block)) {
-            //node.interruptReceivedBlock(block);
+        if (nodeRunner.validateBlock(block)) {
+            nodeRunner.interruptReceivedBlock(block);
         }
     }
 

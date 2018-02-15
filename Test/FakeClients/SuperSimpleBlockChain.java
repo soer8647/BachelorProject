@@ -1,3 +1,5 @@
+package FakeClients;
+
 import Impl.ArrayListTransactions;
 import Impl.FullNode;
 import Impl.Hashing.SHA256;
