@@ -28,7 +28,6 @@ public class TestArrayListTransactions {
         t1 = new StandardTransaction(new BigInteger("1234"), new BigInteger("4321"), 1, valueProof, new BigInteger("42"));
         t2 = new StandardTransaction(new BigInteger("1234"),new BigInteger("4321"), 1, valueProof, new BigInteger("24"));
         transactions = new ArrayListTransactions();
-
     }
 
     @Test

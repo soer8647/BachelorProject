@@ -1,0 +1,65 @@
+package Crypto.Impl;
+
+import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
+
+import java.math.BigInteger;
+import java.util.Random;
+
+public class RSA implements PublicKeyCryptoSystem {
+
+private int keyBitLength;
+private BigInteger e;
+
+    public RSA(int keyBitLength, BigInteger e) {
+        this.keyBitLength = keyBitLength;
+        this.e = e;
+    }
+
+    @Override
+    public BigInteger encrypt(PublicKey key, BigInteger message) {
+        return message.modPow(key.getE(), key.getN());
+    }
+
+    @Override
+    public BigInteger decrypt(PrivateKey key, BigInteger cipher) {
+        return cipher.modPow(key.getD(), key.getN());
+    }
+
+    @Override
+    public BigInteger sign(PrivateKey key, BigInteger message) {
+        return message.modPow(key.getD(), key.getN());
+    }
+
+    @Override
+    public boolean verify(PublicKey key, BigInteger signature, BigInteger message) {
+        BigInteger candidate = signature.modPow(key.getE(), key.getN());
+        return candidate.equals(message);
+    }
+
+    @Override
+    public RSAKeyPair generateNewKeys() {
+        Random r = new Random();
+
+        BigInteger p = new BigInteger(keyBitLength / 2, 1, r);
+        BigInteger q = new BigInteger(keyBitLength / 2, 1, r);
+
+        while (p.multiply(q).bitLength() != keyBitLength
+                || !p.subtract(BigInteger.ONE).gcd(e).equals(BigInteger.ONE)
+                || !q.subtract(BigInteger.ONE).gcd(e).equals(BigInteger.ONE)) {
+            q = new BigInteger((keyBitLength / 2), 1, r);
+            p = new BigInteger(keyBitLength / 2, 1, r);
+        }
+
+        BigInteger n = p.multiply(q);
+        BigInteger d = e.modInverse(p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
+
+        return new RSAKeyPair(new PublicKey(e,n),new PrivateKey(n,d));
+
+    }
+
+    @Override
+    public int getKeyBitLength() {
+        return keyBitLength;
+    }
+}
