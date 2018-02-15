@@ -12,6 +12,7 @@ import java.math.BigInteger;
 public class FullNode implements Node {
     private HashingAlgorithm hashingAlgorithm = new SHA256();
     private BlockChain blockChain;
+    private boolean interrupted = false;
 
     public FullNode(BlockChain blockChain) {
         this.blockChain=blockChain;
@@ -29,6 +30,10 @@ public class FullNode implements Node {
         BigInteger nonce = new BigInteger("0");
         BigInteger hash;
         do{
+            if (this.interrupted) {
+                this.interrupted = false;
+                return null;
+            }
             hash = new BigInteger(String.valueOf(hashingAlgorithm.hash(
                     previousBlockHash.toString()
                             + transactions.hashTransactions().toString()
@@ -70,4 +75,10 @@ public class FullNode implements Node {
     public BigInteger hashBlock(Block block) {
         return hashingAlgorithm.hash(block.toString());
     }
+
+    @Override
+    public void interrupt() {
+        interrupted = true;
+    }
+
 }
