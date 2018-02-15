@@ -1,8 +1,6 @@
 package Impl;
 
-import Impl.Hashing.SHA256;
 import Interfaces.Address;
-import Interfaces.HashingAlgorithm;
 import Interfaces.Transaction;
 
 import java.math.BigInteger;
@@ -11,7 +9,6 @@ import java.math.BigInteger;
  * It uses the SHA-256 hashing function.
 * */
 public class StandardTransaction implements Transaction {
-    private final HashingAlgorithm hashingAlgorithm = new SHA256();
     private Address sender;
     private Address receiver;
     private int value;
@@ -35,7 +32,7 @@ public class StandardTransaction implements Transaction {
 
     @Override
     public BigInteger transActionHash() {
-        return hashingAlgorithm.hash(toString());
+        return Global.hash(toString());
     }
 
     @Override

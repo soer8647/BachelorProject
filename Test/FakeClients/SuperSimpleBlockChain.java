@@ -15,7 +15,7 @@ import java.math.BigInteger;
 
         public static void main(String[] args) {
             //variables
-            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new SHA256());
+            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
             BlockChain  myBlockChain = new StandardBlockChain(genesisBlock);
             Node node = new FullNode(myBlockChain);
             BigInteger hash = genesisBlock.hash();

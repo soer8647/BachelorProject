@@ -1,6 +1,5 @@
 package Impl;
 
-import Impl.Hashing.SHA256;
 import Interfaces.*;
 
 
@@ -10,7 +9,6 @@ import java.math.BigInteger;
 * It uses the SHA256 hashing algorithm
 * */
 public class FullNode implements Node {
-    private HashingAlgorithm hashingAlgorithm = new SHA256();
     private BlockChain blockChain;
     private boolean interrupted = false;
 
@@ -24,7 +22,7 @@ public class FullNode implements Node {
         //TODO make hardness parameter change
         int hardness = 10;
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
-        BigInteger hardValue = BigInteger.valueOf(2).pow(hashingAlgorithm.getBitSize()).shiftRight(hardness);
+        BigInteger hardValue = BigInteger.valueOf(2).pow(Global.getBitSize()).shiftRight(hardness);
 
         //set nonce
         BigInteger nonce = new BigInteger("0");
@@ -34,14 +32,14 @@ public class FullNode implements Node {
                 this.interrupted = false;
                 return null;
             }
-            hash = new BigInteger(String.valueOf(hashingAlgorithm.hash(
+            hash = new BigInteger(String.valueOf(Global.hash(
                     previousBlockHash.toString()
                             + transactions.hashTransactions().toString()
                             + nonce.toString())));
             nonce = nonce.add(new BigInteger("1"));
         } while(hash.compareTo(hardValue)>0);
 
-        Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1,hashingAlgorithm );
+        Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1);
         blockChain.addBlock(newBlock);
         return newBlock;
     }
@@ -73,7 +71,7 @@ public class FullNode implements Node {
 
     @Override
     public BigInteger hashBlock(Block block) {
-        return hashingAlgorithm.hash(block.toString());
+        return Global.hash(block.toString());
     }
 
     @Override

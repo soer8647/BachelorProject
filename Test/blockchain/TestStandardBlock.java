@@ -18,7 +18,7 @@ public class TestStandardBlock {
 
     @Before
     public void setup(){
-        block = new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new SHA256());
+        block = new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
     }
 
     @Test

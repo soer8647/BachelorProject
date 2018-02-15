@@ -18,18 +18,15 @@ public class SHA256 implements HashingAlgorithm {
         }
     }
 
-    @Override
     public BigInteger hash(String data) {
         byte[] hash = sha256.digest(data.getBytes());
         return new BigInteger(1,hash);
     }
 
-    @Override
     public MessageDigest getHashingAlgorithm() {
         return sha256;
     }
 
-    @Override
     public int getBitSize() {
         return 256;
     }

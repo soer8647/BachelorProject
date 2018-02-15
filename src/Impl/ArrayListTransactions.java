@@ -1,7 +1,5 @@
 package Impl;
 
-import Impl.Hashing.SHA256;
-import Interfaces.HashingAlgorithm;
 import Interfaces.Transaction;
 import Interfaces.Transactions;
 
@@ -13,7 +11,6 @@ import java.util.Collection;
 * It uses the SHA-256 hashing algorithm.
 * */
 public class ArrayListTransactions implements Transactions {
-    private final HashingAlgorithm hashingAlgorithm = new SHA256();
     private ArrayList<Transaction> transactions;
 
     public ArrayListTransactions() {
@@ -27,7 +24,7 @@ public class ArrayListTransactions implements Transactions {
 
     @Override
     public BigInteger hashTransactions() {
-        return hashingAlgorithm.hash(toString());
+        return Global.hash(toString());
     }
 
     @Override
