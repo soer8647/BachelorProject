@@ -8,10 +8,11 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class UDPListener {
-    public static void main(String[] args) {
+    private boolean interrupted;
+    public UDPListener(int port) {
         BlockingQueue q = new LinkedBlockingQueue();
-        UDPReceiver receiver = new UDPReceiver(q,9876);
-        while (true) {
+        UDPReceiver receiver = new UDPReceiver(q,port);
+        while (!interrupted) {
             try {
                 Event event = (Event) q.take();
                 if (event instanceof ReceivedBlockEvent) {
@@ -21,5 +22,12 @@ public class UDPListener {
                 e.printStackTrace();
             }
         }
+    }
+    public void interrupt() {
+        interrupted = true;
+    }
+
+    public static void main(String[] args) {
+        UDPListener listener = new UDPListener(9876);
     }
 }
