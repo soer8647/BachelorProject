@@ -2,6 +2,7 @@ package Interfaces;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
+import java.security.PublicKey;
 
 /*
 * This interface is for a single transaction.
@@ -21,12 +22,12 @@ public interface Transaction {
     /**
      * @return The "address" or identifier of the sender of this transaction.
      */
-    BigInteger getSenderAddress();
+    Address getSenderAddress();
 
     /**
      * @return The "address" of identifier of the receiver of this transaction.
      */
-    BigInteger getReceiverAddress();
+    Address getReceiverAddress();
 
     /**
      * @return The amount of money send in this transaction.

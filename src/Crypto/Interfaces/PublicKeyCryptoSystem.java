@@ -1,15 +1,15 @@
 package Crypto.Interfaces;
 
-import Crypto.Impl.PrivateKey;
-import Crypto.Impl.PublicKey;
+import Crypto.Impl.RSAPrivateKey;
+import Crypto.Impl.RSAPublicKey;
 
 import java.math.BigInteger;
 
 public interface PublicKeyCryptoSystem {
-    BigInteger encrypt(PublicKey key,BigInteger message);
-    BigInteger decrypt(PrivateKey key,BigInteger cipher);
-    BigInteger sign(PrivateKey key,BigInteger message);
-    boolean verify(PublicKey key, BigInteger signature, BigInteger message);
+    BigInteger encrypt(RSAPublicKey key, BigInteger message);
+    BigInteger decrypt(RSAPrivateKey key, BigInteger cipher);
+    BigInteger sign(RSAPrivateKey key, BigInteger message);
+    boolean verify(RSAPublicKey key, BigInteger signature, BigInteger message);
     KeyPair generateNewKeys();
 
     int getKeyBitLength();

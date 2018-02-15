@@ -1,6 +1,9 @@
 package blockchain;
 
+import Crypto.Impl.RSAPublicKey;
+import Impl.PublicKeyAddress;
 import Impl.StandardTransaction;
+import Interfaces.Address;
 import Interfaces.Transaction;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
@@ -22,7 +25,10 @@ public class TestStandardTransaction {
     public void setUp(){
         valueProof = new TransactionStub();
         signature = new BigInteger("42");
-        standardTransaction = new StandardTransaction(new BigInteger("1234"), new BigInteger("4321"), 1, valueProof, signature);
+
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature);
     }
 
     @Test
@@ -70,7 +76,12 @@ public class TestStandardTransaction {
     @Test
     public void shouldOverrideToString(){
         BigInteger hash = valueProof.transActionHash();
-        String should = "Sender: 1234, receiver: 4321, value: 1, hash of value proof transaction: " +hash+", signature: "+ signature;
+
+        String should = "Sender: "+standardTransaction.getSenderAddress().toString()+",\n"+
+                        "Receiver: "+standardTransaction.getReceiverAddress().toString()+
+                                ",\nValue: 1,\nHash of value proof transaction: " +hash+",\nSignature: "+ signature+"\n";
+
+
         assertEquals(should,standardTransaction.toString());
     }
 

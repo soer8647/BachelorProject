@@ -1,7 +1,7 @@
 package Impl;
 
-import Crypto.Impl.PrivateKey;
-import Crypto.Impl.PublicKey;
+import Crypto.Impl.RSAPrivateKey;
+import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Interfaces.Account;
@@ -11,8 +11,8 @@ import java.math.BigInteger;
 
 public class StandardAccount implements Account{
     private PublicKeyCryptoSystem cryptoSystem;
-    private PrivateKey privateKey;
-    private PublicKey publicKey;
+    private RSAPrivateKey privateKey;
+    private RSAPublicKey publicKey;
 
     public StandardAccount(PublicKeyCryptoSystem cryptoSystem) {
         this.cryptoSystem = cryptoSystem;
@@ -22,9 +22,14 @@ public class StandardAccount implements Account{
         publicKey = keyPair.getPublicKey();
     }
 
+    public StandardAccount(PublicKeyCryptoSystem cryptoSystem, RSAPrivateKey privateKey, RSAPublicKey publicKey) {
+        this.cryptoSystem = cryptoSystem;
+        this.privateKey = privateKey;
+        this.publicKey = publicKey;
+    }
 
     @Override
-    public PublicKey getAddress() {
+    public RSAPublicKey getAddress() {
         return publicKey;
     }
 
@@ -34,7 +39,7 @@ public class StandardAccount implements Account{
     }
 
     @Override
-    public PrivateKey getPrivateKey() {
+    public RSAPrivateKey getPrivateKey() {
         return privateKey;
     }
 
@@ -42,5 +47,15 @@ public class StandardAccount implements Account{
     @Override
     public PublicKeyCryptoSystem getCryptoSystem() {
         return cryptoSystem;
+    }
+
+    @Override
+    public RSAPublicKey getPublicKey() {
+        return publicKey;
+    }
+
+    @Override
+    public Transaction makeTransaction() {
+        return null;
     }
 }

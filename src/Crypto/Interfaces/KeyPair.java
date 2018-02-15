@@ -1,12 +1,10 @@
 package Crypto.Interfaces;
 
-import Crypto.Impl.PrivateKey;
-import Crypto.Impl.PublicKey;
-
-import java.math.BigInteger;
+import Crypto.Impl.RSAPrivateKey;
+import Crypto.Impl.RSAPublicKey;
 
 public interface KeyPair {
 
-    PublicKey getPublicKey();
-    PrivateKey getPrivateKey();
+    RSAPublicKey getPublicKey();
+    RSAPrivateKey getPrivateKey();
 }

@@ -1,6 +1,10 @@
 package blockchain;
 
+import Crypto.Impl.RSAPrivateKey;
+import Crypto.Impl.RSAPublicKey;
 import Crypto.Impl.RSA;
+import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.StandardAccount;
 import Interfaces.Account;
 import org.junit.Before;
@@ -33,4 +37,20 @@ public class TestStandardAccount {
     public void shouldUseRsa() {
         assertEquals(account.getCryptoSystem().getClass(), RSA.class);
     }
+
+    @Test
+    public void shouldHavePublicKey() {
+        assertNotEquals(account.getPublicKey(),null);
+    }
+
+    @Test
+    public void shouldBeAbleToMakeAccountFromKeyPair() {
+        PublicKeyCryptoSystem cryptoSystem = new RSA(1000,new BigInteger("3"));
+        KeyPair rsaKeyPair = cryptoSystem.generateNewKeys();
+        RSAPublicKey publicKey = rsaKeyPair.getPublicKey();
+        RSAPrivateKey privateKey = rsaKeyPair.getPrivateKey();
+        assertNotEquals(new StandardAccount(cryptoSystem,privateKey,publicKey),null);
+    }
+
+
 }

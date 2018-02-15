@@ -1,5 +1,6 @@
 package blockchain.Stubs;
 
+import Interfaces.Address;
 import Interfaces.Transaction;
 
 import java.math.BigInteger;
@@ -11,12 +12,12 @@ public class TransactionStub implements Transaction{
     }
 
     @Override
-    public BigInteger getSenderAddress() {
+    public Address getSenderAddress() {
         return null;
     }
 
     @Override
-    public BigInteger getReceiverAddress() {
+    public Address getReceiverAddress() {
         return null;
     }
 

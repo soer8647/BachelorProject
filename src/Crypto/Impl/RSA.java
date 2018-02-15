@@ -1,6 +1,5 @@
 package Crypto.Impl;
 
-import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 
 import java.math.BigInteger;
@@ -17,22 +16,22 @@ private BigInteger e;
     }
 
     @Override
-    public BigInteger encrypt(PublicKey key, BigInteger message) {
+    public BigInteger encrypt(RSAPublicKey key, BigInteger message) {
         return message.modPow(key.getE(), key.getN());
     }
 
     @Override
-    public BigInteger decrypt(PrivateKey key, BigInteger cipher) {
+    public BigInteger decrypt(RSAPrivateKey key, BigInteger cipher) {
         return cipher.modPow(key.getD(), key.getN());
     }
 
     @Override
-    public BigInteger sign(PrivateKey key, BigInteger message) {
+    public BigInteger sign(RSAPrivateKey key, BigInteger message) {
         return message.modPow(key.getD(), key.getN());
     }
 
     @Override
-    public boolean verify(PublicKey key, BigInteger signature, BigInteger message) {
+    public boolean verify(RSAPublicKey key, BigInteger signature, BigInteger message) {
         BigInteger candidate = signature.modPow(key.getE(), key.getN());
         return candidate.equals(message);
     }
@@ -54,7 +53,7 @@ private BigInteger e;
         BigInteger n = p.multiply(q);
         BigInteger d = e.modInverse(p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
 
-        return new RSAKeyPair(new PublicKey(e,n),new PrivateKey(n,d));
+        return new RSAKeyPair(new RSAPublicKey(e,n),new RSAPrivateKey(n,d));
 
     }
 

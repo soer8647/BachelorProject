@@ -1,6 +1,7 @@
 package Impl;
 
 import Impl.Hashing.SHA256;
+import Interfaces.Address;
 import Interfaces.HashingAlgorithm;
 import Interfaces.Transaction;
 
@@ -11,8 +12,8 @@ import java.math.BigInteger;
 * */
 public class StandardTransaction implements Transaction {
     private final HashingAlgorithm hashingAlgorithm = new SHA256();
-    private BigInteger sender;
-    private BigInteger receiver;
+    private Address sender;
+    private Address receiver;
     private int value;
     private Transaction valueProof;
     private BigInteger signature;
@@ -24,7 +25,7 @@ public class StandardTransaction implements Transaction {
      * @param valueProof    The transaction where the sender has proof of funds for this transaction.
      * @param signature     The signature of the sender on this transaction.
      */
-    public StandardTransaction(BigInteger sender, BigInteger receiver, int value, Transaction valueProof, BigInteger signature) {
+    public StandardTransaction(Address sender, Address receiver, int value, Transaction valueProof, BigInteger signature) {
         this.sender = sender;
         this.receiver = receiver;
         this.value = value;
@@ -38,12 +39,12 @@ public class StandardTransaction implements Transaction {
     }
 
     @Override
-    public BigInteger getSenderAddress() {
+    public Address getSenderAddress() {
         return sender;
     }
 
     @Override
-    public BigInteger getReceiverAddress() {
+    public Address getReceiverAddress() {
         return receiver;
     }
 
@@ -61,10 +62,10 @@ public class StandardTransaction implements Transaction {
 
     @Override
     public String toString() {
-        return "Sender: "+sender+
-                ", receiver: "+receiver+
-                ", value: "+value+
-                ", hash of value proof transaction: " + valueProof.transActionHash()+
-                ", signature: "+signature;
+        return "Sender: "+sender+",\n"+
+                "Receiver: "+receiver+",\n"+
+                "Value: "+value+",\n"+
+                "Hash of value proof transaction: " + valueProof.transActionHash()+",\n"+
+                "Signature: "+signature+"\n";
     }
 }

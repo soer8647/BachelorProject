@@ -2,24 +2,22 @@ package Crypto.Impl;
 
 import Crypto.Interfaces.KeyPair;
 
-import java.math.BigInteger;
-
 public class RSAKeyPair implements KeyPair {
-    private PublicKey publicKey;
-    private PrivateKey privateKey;
+    private RSAPublicKey publicKey;
+    private RSAPrivateKey privateKey;
 
-    public RSAKeyPair(PublicKey publicKey, PrivateKey privateKey) {
+    public RSAKeyPair(RSAPublicKey publicKey, RSAPrivateKey privateKey) {
         this.publicKey = publicKey;
         this.privateKey = privateKey;
     }
 
     @Override
-    public PublicKey getPublicKey() {
+    public RSAPublicKey getPublicKey() {
         return publicKey;
     }
 
     @Override
-    public PrivateKey getPrivateKey() {
+    public RSAPrivateKey getPrivateKey() {
         return privateKey;
     }
 }

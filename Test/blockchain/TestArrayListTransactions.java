@@ -1,7 +1,10 @@
 package blockchain;
 
+import Crypto.Impl.RSAPublicKey;
 import Impl.ArrayListTransactions;
+import Impl.PublicKeyAddress;
 import Impl.StandardTransaction;
+import Interfaces.Address;
 import Interfaces.Transaction;
 import Interfaces.Transactions;
 import blockchain.Stubs.TransactionStub;
@@ -25,9 +28,13 @@ public class TestArrayListTransactions {
     @Before
     public void setUp(){
         valueProof = new TransactionStub();
-        t1 = new StandardTransaction(new BigInteger("1234"), new BigInteger("4321"), 1, valueProof, new BigInteger("42"));
-        t2 = new StandardTransaction(new BigInteger("1234"),new BigInteger("4321"), 1, valueProof, new BigInteger("24"));
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+
+        t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"));
+        t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"));
         transactions = new ArrayListTransactions();
+
     }
 
     @Test
@@ -55,9 +62,6 @@ public class TestArrayListTransactions {
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
             byte[] hash = sha256.digest(transactions.toString().getBytes());
-
-
-
             BigInteger hashValue = new BigInteger(1,hash);
 
             assertEquals(hashValue,transactions.hashTransactions());
