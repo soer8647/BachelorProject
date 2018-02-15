@@ -27,11 +27,7 @@ public class ArrayListTransactions implements Transactions {
 
     @Override
     public BigInteger hashTransactions() {
-        StringBuilder builder = new StringBuilder();
-        for (Transaction t: transactions){
-            builder.append(t.transActionHash());
-        }
-        return hashingAlgorithm.hash(builder.toString());
+        return hashingAlgorithm.hash(toString());
     }
 
     @Override
@@ -47,8 +43,9 @@ public class ArrayListTransactions implements Transactions {
     @Override
     public String toString(){
         StringBuilder builder = new StringBuilder();
+        builder.append("Transactions:\n");
         for (Transaction t : transactions){
-            builder.append(t.toString());
+            builder.append("\t"+t.toString()+"\n");
         }
         return builder.toString();
     }
