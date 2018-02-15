@@ -21,7 +21,7 @@ public class UDPReceiver {
         new Thread(() -> createAndListenSocket()).start();
     }
 
-    private void createAndListenSocket() throws IOException {
+    private void createAndListenSocket() {
         try {
             socket = new DatagramSocket(this.port);
             byte[] incomingData = new byte[1024];
@@ -41,6 +41,8 @@ public class UDPReceiver {
                 }
             }
         } catch (SocketException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
