@@ -1,6 +1,7 @@
 package blockchain;
 
 import Impl.StandardTransaction;
+import Interfaces.Transaction;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,10 +17,12 @@ public class TestStandardTransaction {
 
     private StandardTransaction standardTransaction;
     private BigInteger signature;
+    private Transaction valueProof;
     @Before
     public void setUp(){
+        valueProof = new TransactionStub();
         signature = new BigInteger("42");
-        standardTransaction = new StandardTransaction(1234, 1234, 1, new TransactionStub(), signature);
+        standardTransaction = new StandardTransaction(1234, 4321, 1, valueProof, signature);
     }
 
     @Test
@@ -62,6 +65,13 @@ public class TestStandardTransaction {
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }
+    }
+
+    @Test
+    public void shouldOverrideToString(){
+        BigInteger hash = valueProof.transActionHash();
+        String should = "Sender: 1234, receiver: 4321, value: 1, hash of value proof transaction: " +hash+", signature: "+ signature;
+        assertEquals(should,standardTransaction.toString());
     }
 
 

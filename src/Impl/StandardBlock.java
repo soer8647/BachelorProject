@@ -64,7 +64,6 @@ public class StandardBlock implements Block {
 
     @Override
     public BigInteger hash() {
-        System.out.println("BLOCKTRANS\n"+transactions.hashTransactions().toString());
         return new BigInteger(String.valueOf(hashingAlgorithm.hash(
                 previousHash.toString()
                         + transactions.hashTransactions().toString()

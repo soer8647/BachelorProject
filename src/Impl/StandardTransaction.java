@@ -56,4 +56,13 @@ public class StandardTransaction implements Transaction {
     public BigInteger getSignature() {
         return signature;
     }
+
+    @Override
+    public String toString() {
+        return "Sender: "+sender+
+                ", receiver: "+receiver+
+                ", value: "+value+
+                ", hash of value proof transaction: " + valueProof.transActionHash()+
+                ", signature: "+signature;
+    }
 }

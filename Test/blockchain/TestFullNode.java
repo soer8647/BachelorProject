@@ -11,6 +11,9 @@ import blockchain.Stubs.GenesisBlockStub;
 import org.junit.Before;
 import org.junit.Test;
 
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import java.awt.*;
 import java.io.File;
 import java.math.BigInteger;
 
@@ -58,7 +61,9 @@ public class TestFullNode {
     @Test
     public void shouldBeAbleToMineFiveBlocks(){
         HashingAlgorithm hasher = new SHA256();
-        File falcon = new File("resources/falconGenesis.jpg");
+
+        File falcon = new File("../../src/resources/falconGenesis.jpg");
+
         //Make file to a int : hashCode
         int hashCode = falcon.hashCode();
         //Make int to a BigInteger

@@ -35,16 +35,9 @@ public class FullNode implements Node {
                             + nonce.toString())));
             nonce = nonce.add(new BigInteger("1"));
         } while(hash.compareTo(hardValue)>0);
-        System.out.println("TRANS\n"+transactions.hashTransactions().toString());
+
         Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1,hashingAlgorithm );
         blockChain.addBlock(newBlock);
-        //TODO MAKE THE TWO HASHES AGREE : seems like hash of transactions is not the same.
-        //TODO Empty ArrayListTransactions does not have same hash!!!!!!!
-        //System.out.println(hash);
-        //System.out.println(newBlock.hash());
-
-
-
 
     }
 
