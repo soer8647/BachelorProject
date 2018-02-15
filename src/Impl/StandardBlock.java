@@ -17,21 +17,19 @@ public class StandardBlock implements Block {
     private int transactionLimit;
     private Transactions transactions;
     private int blockNumber;
-    private HashingAlgorithm hashingAlgorithm;
 
     public StandardBlock(BigInteger nonce,
                          int hardnessParameter,
                          BigInteger previousHash,
                          int transactionLimit,
                          Transactions transactions,
-                         int blockNumber, HashingAlgorithm hashingAlgorithm) {
+                         int blockNumber) {
         this.nonce = nonce;
         this.hardnessParameter = hardnessParameter;
         this.previousHash = previousHash;
         this.transactionLimit = transactionLimit;
         this.transactions = transactions;
         this.blockNumber=blockNumber;
-        this.hashingAlgorithm = hashingAlgorithm;
     }
 
     @Override
@@ -66,7 +64,7 @@ public class StandardBlock implements Block {
 
     @Override
     public BigInteger hash() {
-        return new BigInteger(String.valueOf(hashingAlgorithm.hash(
+        return new BigInteger(String.valueOf(Global.hash(
                 previousHash.toString()
                         + transactions.hashTransactions().toString()
                         + nonce)));

@@ -1,4 +1,6 @@
 package Interfaces.Communication;
 
-public interface Event {
+import java.io.Serializable;
+
+public interface Event extends Serializable{
 }

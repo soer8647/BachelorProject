@@ -1,5 +1,6 @@
 package Interfaces;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collection;
 
@@ -11,7 +12,7 @@ import java.util.Collection;
 * 3. Blocknumber
 * 4. Hash of previous block
 * */
-public interface Block {
+public interface Block extends Serializable{
     /**
      * @return The transactions inside this block.
      */

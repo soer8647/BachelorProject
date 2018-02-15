@@ -1,12 +1,15 @@
 package Interfaces;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.util.Collection;
 
 /*
 * This interface is suppose to be a datastructure for holding transactions. The implemented class decides on how to hash the transactions.
 * */
-public interface Transactions<T extends Collection<Transaction>> {
+
+public interface Transactions<T extends Collection> extends Serializable {
+
 
     /**
      * @return      All the transactions stored in this datastructure.

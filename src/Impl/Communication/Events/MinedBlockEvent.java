@@ -13,4 +13,6 @@ public class MinedBlockEvent implements Event {
     public Block getBlock() {
         return block;
     }
+
+
 }

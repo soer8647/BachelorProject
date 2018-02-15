@@ -17,11 +17,11 @@ import java.math.BigInteger;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class CommunicatingBlockChain {
+public class FauxCommunicatingBlockChain {
     public static void main(String[] args) {
-        BlockingQueue<Event> queue_A = new LinkedBlockingQueue<Event>();
-        BlockingQueue<Event> queue_B = new LinkedBlockingQueue<Event>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new SHA256());
+        BlockingQueue<Event> queue_A = new LinkedBlockingQueue<>();
+        BlockingQueue<Event> queue_B = new LinkedBlockingQueue<>();
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
         NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A);
         NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);

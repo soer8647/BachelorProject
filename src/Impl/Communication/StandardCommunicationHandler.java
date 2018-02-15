@@ -59,6 +59,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleReceivedBlock(Block block) {
+        System.out.println("ReceivedBlock event");
         if (nodeRunner.validateBlock(block)) {
             nodeRunner.interruptReceivedBlock(block);
         }
@@ -71,6 +72,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleMinedBlock(Block block) {
+        System.out.println("MinedBlock event");
         publisher.publishBlock(block);
     }
 }
