@@ -63,11 +63,11 @@ public class StandardAccount implements Account{
      * @return              The transaction object.
      */
     @Override
-    public Transaction makeTransaction(Address sender, Address receiver, int value, Transaction valueProof) {
+    public Transaction makeTransaction(Address sender, Address receiver, int value, BigInteger valueProof,int blockValueProof) {
         String transaction = sender.toString()+receiver.toString()+value+valueProof.toString();
         BigInteger signature = sender.getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
 
-        return new StandardTransaction(sender,receiver,value,valueProof,signature);
+        return new StandardTransaction(sender,receiver,value,valueProof,signature, blockValueProof);
     }
 
     public HashingAlgorithm getHashingAlgorithm() {

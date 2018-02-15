@@ -2,9 +2,11 @@ package Impl;
 
 import Interfaces.Block;
 import Interfaces.HashingAlgorithm;
+import Interfaces.Transaction;
 import Interfaces.Transactions;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 public class StandardBlock implements Block {
 
@@ -33,7 +35,7 @@ public class StandardBlock implements Block {
     }
 
     @Override
-    public Transactions getTransactions() {
+    public Transactions<Collection<Transaction>> getTransactions() {
         return transactions;
     }
 

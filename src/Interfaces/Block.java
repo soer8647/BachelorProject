@@ -1,6 +1,7 @@
 package Interfaces;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 /*
 * This interface is intended to represent a single block of the blockchain.
@@ -14,7 +15,7 @@ public interface Block {
     /**
      * @return The transactions inside this block.
      */
-    Transactions getTransactions();
+    Transactions<Collection<Transaction>> getTransactions();
 
     /**
      * @return The number of the block

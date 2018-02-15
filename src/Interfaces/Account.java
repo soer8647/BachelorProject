@@ -20,7 +20,7 @@ public interface Account {
 
     RSAPublicKey getPublicKey();
 
-    Transaction makeTransaction(Address sender, Address receiver, int value,Transaction valueProof);
+    Transaction makeTransaction(Address sender, Address receiver, int value, BigInteger valueProof, int blockValueProof);
 
     HashingAlgorithm getHashingAlgorithm();
 }

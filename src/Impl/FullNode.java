@@ -5,6 +5,9 @@ import Interfaces.*;
 
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+
 /*
 * This class is meant to implement a node, that holds the whole blockchain.
 * It uses the SHA256 hashing algorithm
@@ -47,7 +50,32 @@ public class FullNode implements Node {
     }
 
     @Override
-    public boolean validateTransactions(Transactions transactions) {
+    public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
+        //TODO remove invalid transaction in stead of returning false for all
+        //For each transaction
+        for (Transaction t: transactions.getTransactions()) {
+            //TODO validate signature
+            //Get the block where there should be proof of funds.
+            Block block = blockChain.getBlock(t.getBlockNumberOfValueProof());
+            Transaction proofTransaction=null;
+            //Validate that the block holds the transaction with the given hash
+            for (Transaction tx:block.getTransactions().getTransactions()){ //TODO change retarded naming.
+                if (tx.transActionHash().equals(t.getValueProof())){
+                    proofTransaction = tx;
+                    break;
+                }
+            }
+            if (proofTransaction==null){
+                return false;
+            }
+            //validate that the receiver of the funds is the sender of the new transaction
+            Address receiverOfFunds = proofTransaction.getReceiverAddress();
+            if(!receiverOfFunds.equals(t.getSenderAddress()))return false;
+            //Validate that the received funds not are less than sending funds
+            if(t.getValue()>proofTransaction.getValue()) return false;
+
+            return true;
+        }
         return false;
     }
 

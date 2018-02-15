@@ -2,8 +2,6 @@ package Interfaces;
 
 import java.io.Serializable;
 import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.PublicKey;
 
 /*
 * This interface is for a single transaction.
@@ -36,9 +34,11 @@ public interface Transaction extends Serializable {
     int getValue();
 
     /**
-     * @return The transaction where the sender has a proof of funds to make this transaction.
+     * @return       The transaction hash where the sender has a proof of funds to make this transaction.
      */
-    Transaction getValueProof();
+    BigInteger getValueProof();
+
+    int getBlockNumberOfValueProof();
 
     BigInteger getSignature();
 

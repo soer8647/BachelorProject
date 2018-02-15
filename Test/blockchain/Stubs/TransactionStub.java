@@ -8,7 +8,7 @@ import java.math.BigInteger;
 public class TransactionStub implements Transaction{
     @Override
     public BigInteger transActionHash() {
-        return null;
+        return new BigInteger("404");
     }
 
     @Override
@@ -28,8 +28,13 @@ public class TransactionStub implements Transaction{
     }
 
     @Override
-    public Transaction getValueProof() {
-        return null;
+    public BigInteger getValueProof() {
+        return new BigInteger("8008");
+    }
+
+    @Override
+    public int getBlockNumberOfValueProof() {
+        return 0;
     }
 
     @Override

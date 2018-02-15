@@ -1,6 +1,5 @@
 package blockchain;
 
-import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPublicKey;
 import Impl.ArrayListTransactions;
 import Impl.PublicKeyAddress;
@@ -24,17 +23,17 @@ import static org.junit.Assert.assertThat;
 
 public class TestArrayListTransactions {
     private Transactions transactions;
-    private Transaction valueProof;
+    private BigInteger valueProof;
     private Transaction t1;
     private Transaction t2;
     @Before
     public void setUp(){
-        valueProof = new TransactionStub();
+        valueProof = new TransactionStub().transActionHash();
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")), new CryptoSystemStub());
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")),new CryptoSystemStub());
 
-        t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"));
-        t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"));
+        t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"), 0);
+        t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"), 0);
         transactions = new ArrayListTransactions();
 
     }

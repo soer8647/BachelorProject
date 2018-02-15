@@ -1,6 +1,7 @@
 package Interfaces;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 public interface Node {
 
@@ -20,7 +21,7 @@ public interface Node {
      * @param transactions          When mining a block or validating a block one should be able to validate that the transactions are valid.
      * @return                      true is all transactions are valid, false otherwise.
      */
-    boolean validateTransactions(Transactions transactions);
+    boolean validateTransactions(Transactions<Collection<Transaction>> transactions);
 
     /**
      * @return                      All the transactions that this node has not yes incorporated in a block.

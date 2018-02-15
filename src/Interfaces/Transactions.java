@@ -6,7 +6,7 @@ import java.util.Collection;
 /*
 * This interface is suppose to be a datastructure for holding transactions. The implemented class decides on how to hash the transactions.
 * */
-public interface Transactions<T extends Collection> {
+public interface Transactions<T extends Collection<Transaction>> {
 
     /**
      * @return      All the transactions stored in this datastructure.

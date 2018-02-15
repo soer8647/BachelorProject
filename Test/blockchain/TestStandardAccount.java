@@ -4,8 +4,6 @@ import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
-import Crypto.Interfaces.PrivateKey;
-import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
@@ -65,21 +63,21 @@ public class TestStandardAccount {
 
     @Test
     public void shouldBeAbleToMakeTransaction() {
-        Transaction valueProof = new TransactionStub();
+        BigInteger valueProof = new TransactionStub().transActionHash();
         Address sender = new PublicKeyAddress(account.getPublicKey(),cryptoSystem);
         Address receiver = new AddressStub();
 
-        assertNotEquals(account.makeTransaction(sender,receiver,1,valueProof),null);
+        assertNotEquals(account.makeTransaction(sender,receiver,1,valueProof, 0),null);
     }
 
     @Test
     public void shouldBeVerifiableSignatureOnTransaction() {
-        Transaction valueProof = new TransactionStub();
+        BigInteger valueProof = new TransactionStub().transActionHash();
         Address sender = new PublicKeyAddress(account.getPublicKey(),cryptoSystem);
         Address receiver = new AddressStub();
         RSAPublicKey publicKey = account.getPublicKey();
 
-        Transaction transaction = account.makeTransaction(sender,receiver,1,valueProof);
+        Transaction transaction = account.makeTransaction(sender,receiver,1,valueProof, 0);
 
         String tx = sender.toString()+receiver.toString()+1+valueProof.toString();
         BigInteger hash = account.getHashingAlgorithm().hash(tx);
