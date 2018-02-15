@@ -12,8 +12,9 @@ public interface Node {
      *
      * @param previousBlockHash     The hash of the previous block
      * @param transactions          The transactions to validate and mine in this block
+     * @return                      The new block, that has been mined
      */
-    void mine(BigInteger previousBlockHash, Transactions transactions);
+    Block mine(BigInteger previousBlockHash, Transactions transactions);
 
     /**
      * @param transactions          When mining a block or validating a block one should be able to validate that the transactions are valid.
@@ -29,10 +30,10 @@ public interface Node {
     /**
      * When a block is mined on another node it is propagated to the network. You have to validate this block before accepting it.
      *
-     * @param incommingBlock        The block that this node has received from the network
+     * @param incomingBlock        The block that this node has received from the network
      * @return                      true if the block is valid. false otherwise.
      */
-    boolean validateBlock(Block incommingBlock);
+    boolean validateBlock(Block incomingBlock);
 
 
     /**
