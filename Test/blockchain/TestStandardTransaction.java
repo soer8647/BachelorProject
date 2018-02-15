@@ -22,17 +22,17 @@ public class TestStandardTransaction {
     public void setUp(){
         valueProof = new TransactionStub();
         signature = new BigInteger("42");
-        standardTransaction = new StandardTransaction(1234, 4321, 1, valueProof, signature);
+        standardTransaction = new StandardTransaction(new BigInteger("1234"), new BigInteger("4321"), 1, valueProof, signature);
     }
 
     @Test
     public void hasSender(){
-        assertNotEquals(standardTransaction.getSender(),0);
+        assertNotEquals(standardTransaction.getSenderAddress(),0);
     }
 
     @Test
     public void hasReceiver(){
-        assertNotEquals(standardTransaction.getReceiver(),0);
+        assertNotEquals(standardTransaction.getReceiverAddress(),0);
     }
 
     @Test

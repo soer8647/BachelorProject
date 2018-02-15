@@ -11,8 +11,8 @@ import java.math.BigInteger;
 * */
 public class StandardTransaction implements Transaction {
     private final HashingAlgorithm hashingAlgorithm = new SHA256();
-    private long sender;
-    private long receiver;
+    private BigInteger sender;
+    private BigInteger receiver;
     private int value;
     private Transaction valueProof;
     private BigInteger signature;
@@ -24,7 +24,7 @@ public class StandardTransaction implements Transaction {
      * @param valueProof    The transaction where the sender has proof of funds for this transaction.
      * @param signature     The signature of the sender on this transaction.
      */
-    public StandardTransaction(long sender, long receiver, int value, Transaction valueProof, BigInteger signature) {
+    public StandardTransaction(BigInteger sender, BigInteger receiver, int value, Transaction valueProof, BigInteger signature) {
         this.sender = sender;
         this.receiver = receiver;
         this.value = value;
@@ -37,11 +37,13 @@ public class StandardTransaction implements Transaction {
         return hashingAlgorithm.hash(toString());
     }
 
-    public long getSender() {
+    @Override
+    public BigInteger getSenderAddress() {
         return sender;
     }
 
-    public long getReceiver() {
+    @Override
+    public BigInteger getReceiverAddress() {
         return receiver;
     }
 

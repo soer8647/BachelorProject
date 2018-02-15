@@ -8,8 +8,9 @@ import java.security.MessageDigest;
 *
 * A transaction should specify :
 * 1. Sender
-* 2. Reciever
+* 2. Receiver
 * 3. Amount
+* 4. Proof of funds
 * */
 public interface Transaction {
     /**
@@ -20,12 +21,12 @@ public interface Transaction {
     /**
      * @return The "address" or identifier of the sender of this transaction.
      */
-    long getSender();
+    BigInteger getSenderAddress();
 
     /**
      * @return The "address" of identifier of the receiver of this transaction.
      */
-    long getReceiver();
+    BigInteger getReceiverAddress();
 
     /**
      * @return The amount of money send in this transaction.

@@ -11,14 +11,15 @@ public class TransactionStub implements Transaction{
     }
 
     @Override
-    public long getSender() {
-        return 0;
+    public BigInteger getSenderAddress() {
+        return null;
     }
 
     @Override
-    public long getReceiver() {
-        return 0;
+    public BigInteger getReceiverAddress() {
+        return null;
     }
+
 
     @Override
     public int getValue() {

@@ -25,8 +25,8 @@ public class TestArrayListTransactions {
     @Before
     public void setUp(){
         valueProof = new TransactionStub();
-        t1 = new StandardTransaction(1234, 4321, 1, valueProof, new BigInteger("42"));
-        t2 = new StandardTransaction(1234, 4321, 1, valueProof, new BigInteger("24"));
+        t1 = new StandardTransaction(new BigInteger("1234"), new BigInteger("4321"), 1, valueProof, new BigInteger("42"));
+        t2 = new StandardTransaction(new BigInteger("1234"),new BigInteger("4321"), 1, valueProof, new BigInteger("24"));
         transactions = new ArrayListTransactions();
 
     }
