@@ -31,4 +31,9 @@ public class TransactionStub implements Transaction{
     public Transaction getValueProof() {
         return null;
     }
+
+    @Override
+    public BigInteger getSignature() {
+        return null;
+    }
 }

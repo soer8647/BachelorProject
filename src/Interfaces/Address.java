@@ -1,6 +1,9 @@
 package Interfaces;
 
-public interface Address {
+import Crypto.Interfaces.PublicKeyCryptoSystem;
 
-    //Tagginginterface for addresses in a blockchain system.
+import java.math.BigInteger;
+
+public interface Address {
+        PublicKeyCryptoSystem getCryptoSystem();
 }

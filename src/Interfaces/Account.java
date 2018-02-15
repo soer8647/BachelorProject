@@ -13,16 +13,14 @@ public interface Account {
      */
     RSAPublicKey getAddress();
 
-    /**
-     * @param transaction       The transaction that the account makes.
-     * @return                  The signature on the transaction.
-     */
-    BigInteger sign(Transaction transaction);
+
     RSAPrivateKey getPrivateKey();
 
     PublicKeyCryptoSystem getCryptoSystem();
 
     RSAPublicKey getPublicKey();
 
-    Transaction makeTransaction();
+    Transaction makeTransaction(Address sender, Address receiver, int value,Transaction valueProof);
+
+    HashingAlgorithm getHashingAlgorithm();
 }

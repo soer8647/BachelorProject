@@ -1,5 +1,6 @@
 package Interfaces;
 
+import java.io.Serializable;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.PublicKey;
@@ -13,7 +14,7 @@ import java.security.PublicKey;
 * 3. Amount
 * 4. Proof of funds
 * */
-public interface Transaction {
+public interface Transaction extends Serializable {
     /**
      * @return      The hash of this transaction.
      */
@@ -39,5 +40,6 @@ public interface Transaction {
      */
     Transaction getValueProof();
 
+    BigInteger getSignature();
 
 }

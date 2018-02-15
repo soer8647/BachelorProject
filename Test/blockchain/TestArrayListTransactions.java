@@ -1,5 +1,6 @@
 package blockchain;
 
+import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPublicKey;
 import Impl.ArrayListTransactions;
 import Impl.PublicKeyAddress;
@@ -7,6 +8,7 @@ import Impl.StandardTransaction;
 import Interfaces.Address;
 import Interfaces.Transaction;
 import Interfaces.Transactions;
+import blockchain.Stubs.CryptoSystemStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,8 +30,8 @@ public class TestArrayListTransactions {
     @Before
     public void setUp(){
         valueProof = new TransactionStub();
-        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
-        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")), new CryptoSystemStub());
+        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")),new CryptoSystemStub());
 
         t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"));
         t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"));
