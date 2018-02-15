@@ -24,13 +24,11 @@ public class SuperSimpleBlockChain {
         Node node = new FullNode(myBlockChain);
         BigInteger hash = genesisBlock.hash();
 
-        while(iteration<10) {
-
-            // Attempt to find a "correct" nonce
-
+        while(true) {
             Block newBlock = node.mine(hash, new ArrayListTransactions());
             hash = newBlock.hash();
-            System.out.println("new block found!");
+            System.out.println("\nnew block found!");
+            System.out.println(newBlock);
             iteration++;
         }
     }

@@ -69,4 +69,12 @@ public class StandardBlock implements Block {
                         + transactions.hashTransactions().toString()
                         + nonce)));
     }
+
+    @Override
+    public String toString() {
+        return "Block "+getBlockNumber()+"\n"
+                + "Previous Hash: " + previousHash + "\n"
+                + transactions + "\n"
+                + "My Hash: " + hash();
+    }
 }
