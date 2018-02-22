@@ -49,4 +49,6 @@ public interface Block extends Serializable{
      * @return      The hash of the nonce, transactions and previous block hash.
      */
     BigInteger hash();
+
+     CoinBaseTransaction getCoinBase();
 }

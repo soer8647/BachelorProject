@@ -2,12 +2,12 @@ package FakeClients;
 
 import Impl.ArrayListTransactions;
 import Impl.FullNode;
-import Impl.Hashing.SHA256;
 import Impl.StandardBlock;
 import Impl.StandardBlockChain;
 import Interfaces.Block;
 import Interfaces.BlockChain;
 import Interfaces.Node;
+import blockchain.Stubs.CoinBaseTransactionStub;
 
 import java.math.BigInteger;
 
@@ -15,7 +15,7 @@ import java.math.BigInteger;
 
         public static void main(String[] args) {
             //variables
-            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
+            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new CoinBaseTransactionStub());
             BlockChain  myBlockChain = new StandardBlockChain(genesisBlock);
             Node node = new FullNode(myBlockChain);
             BigInteger hash = genesisBlock.hash();

@@ -1,10 +1,9 @@
 package Impl;
 
+import Configuration.Configuration;
 import Interfaces.*;
 
-
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.Collection;
 
 /*
@@ -14,9 +13,11 @@ import java.util.Collection;
 public class FullNode implements Node {
     private BlockChain blockChain;
     private boolean interrupted = false;
+    private Address minerAddress;
 
     public FullNode(BlockChain blockChain) {
         this.blockChain=blockChain;
+        this.minerAddress = null; //TODO FIX
     }
 
     @Override
@@ -30,6 +31,7 @@ public class FullNode implements Node {
         //set nonce
         BigInteger nonce = new BigInteger("0");
         BigInteger hash;
+        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(minerAddress,Configuration.getBlockReward());
         do{
             if (this.interrupted) {
                 this.interrupted = false;
@@ -38,11 +40,19 @@ public class FullNode implements Node {
             hash = new BigInteger(String.valueOf(Global.hash(
                     previousBlockHash.toString()
                             + transactions.hashTransactions().toString()
-                            + nonce.toString())));
+                            + nonce.toString()
+                            +coinBase.toString())));
             nonce = nonce.add(new BigInteger("1"));
         } while(hash.compareTo(hardValue)>0);
 
-        Block newBlock = new StandardBlock(nonce,hardness,previousBlockHash,10,new ArrayListTransactions(),blockChain.getBlockNumber()+1);
+        Block newBlock = new StandardBlock(
+                nonce,
+                hardness,
+                previousBlockHash,
+                10,
+                new ArrayListTransactions(),
+                blockChain.getBlockNumber()+1,
+                coinBase);
         blockChain.addBlock(newBlock);
         return newBlock;
     }

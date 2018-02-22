@@ -1,9 +1,6 @@
 package Impl;
 
-import Interfaces.Block;
-import Interfaces.HashingAlgorithm;
-import Interfaces.Transaction;
-import Interfaces.Transactions;
+import Interfaces.*;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -17,19 +14,21 @@ public class StandardBlock implements Block {
     private int transactionLimit;
     private Transactions transactions;
     private int blockNumber;
+    private CoinBaseTransaction coinBaseTransaction;
 
     public StandardBlock(BigInteger nonce,
                          int hardnessParameter,
                          BigInteger previousHash,
                          int transactionLimit,
                          Transactions transactions,
-                         int blockNumber) {
+                         int blockNumber, CoinBaseTransaction coinbase) {
         this.nonce = nonce;
         this.hardnessParameter = hardnessParameter;
         this.previousHash = previousHash;
         this.transactionLimit = transactionLimit;
         this.transactions = transactions;
         this.blockNumber=blockNumber;
+        this.coinBaseTransaction = coinbase;
     }
 
     @Override
@@ -68,6 +67,11 @@ public class StandardBlock implements Block {
                 previousHash.toString()
                         + transactions.hashTransactions().toString()
                         + nonce)));
+    }
+
+    @Override
+    public CoinBaseTransaction getCoinBase() {
+        return coinBaseTransaction;
     }
 
     @Override

@@ -3,7 +3,6 @@ package Impl.Communication;
 import Impl.ArrayListTransactions;
 import Impl.Communication.Events.MinedBlockEvent;
 import Impl.FullNode;
-import Impl.StandardBlock;
 import Impl.StandardBlockChain;
 import Interfaces.Block;
 import Interfaces.Communication.Event;

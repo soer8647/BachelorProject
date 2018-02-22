@@ -1,6 +1,7 @@
 package blockchain.Stubs;
 
 import Interfaces.Block;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Transactions;
 
 import java.math.BigInteger;
@@ -38,6 +39,11 @@ public class BlockStub implements Block {
 
     @Override
     public BigInteger hash() {
+        return null;
+    }
+
+    @Override
+    public CoinBaseTransaction getCoinBase() {
         return null;
     }
 }

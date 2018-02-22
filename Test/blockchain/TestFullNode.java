@@ -14,6 +14,7 @@ import Interfaces.Block;
 import Interfaces.BlockChain;
 import Impl.Global;
 import Interfaces.Node;
+import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.GenesisBlockStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
@@ -104,7 +105,7 @@ public class TestFullNode {
 
 
         //make block with the transaction
-        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1);
+        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1, new CoinBaseTransactionStub());
         Block genesis = new GenesisBlockStub();
 
         BlockChain blockChain = new StandardBlockChain(genesis);

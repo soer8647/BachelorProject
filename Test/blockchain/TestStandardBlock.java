@@ -1,9 +1,9 @@
 package blockchain;
 
 import Impl.ArrayListTransactions;
-import Impl.Hashing.SHA256;
 import Impl.StandardBlock;
 import Interfaces.Block;
+import blockchain.Stubs.CoinBaseTransactionStub;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -18,7 +18,7 @@ public class TestStandardBlock {
 
     @Before
     public void setup(){
-        block = new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
+        block = new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new CoinBaseTransactionStub());
     }
 
     @Test

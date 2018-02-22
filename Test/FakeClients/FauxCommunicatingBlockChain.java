@@ -1,11 +1,11 @@
 package FakeClients;
 
 import Impl.ArrayListTransactions;
+import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.FauxPublisher;
 import blockchain.Stubs.FauxReceiver;
 import Impl.Communication.StandardCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
-import Impl.Hashing.SHA256;
 import Impl.StandardBlock;
 import Interfaces.Block;
 import Interfaces.Communication.CommunicationHandler;
@@ -21,7 +21,7 @@ public class FauxCommunicatingBlockChain {
     public static void main(String[] args) {
         BlockingQueue<Event> queue_A = new LinkedBlockingQueue<>();
         BlockingQueue<Event> queue_B = new LinkedBlockingQueue<>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new CoinBaseTransactionStub());
         NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A);
         NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);
