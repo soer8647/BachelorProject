@@ -14,6 +14,7 @@ import Interfaces.Communication.CommunicationHandler;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
+import Interfaces.TransactionManager;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -36,7 +37,8 @@ public class UDPClient{
     public static void startUDP(int myPort, int otherPort, InetAddress ip) {
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
-        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue);
+        TransactionManager transMan = new EmptyTransactionsManager();
+        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan);
         UDPReceiver receiver = new UDPReceiver(queue,myPort);
         Publisher publisher = new UDPPublisher(ip,otherPort);
         CommunicationHandler communicationHandler_B = new StandardCommunicationHandler(nodeRunner,publisher,queue);

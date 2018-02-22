@@ -1,14 +1,13 @@
 package Impl.Communication;
 
-import Impl.ArrayListTransactions;
+import Impl.*;
 import Impl.Communication.Events.MinedBlockEvent;
-import Impl.FullNode;
-import Impl.StandardBlock;
-import Impl.StandardBlockChain;
 import Interfaces.Block;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Node;
+import Interfaces.TransactionManager;
+import Interfaces.Transactions;
 
 import java.util.concurrent.BlockingQueue;
 
@@ -17,7 +16,7 @@ public class StandardNodeRunner implements NodeRunner {
     private boolean interrupted = false;
     private Block specialBlock;
 
-    public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue) {
+    public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager) {
         this.node = new FullNode(new StandardBlockChain(genesisBlock));
 
         Thread thread = new Thread(new Runnable() {
@@ -25,7 +24,9 @@ public class StandardNodeRunner implements NodeRunner {
             public void run() {
                 Block newBlock = genesisBlock;
                 while(!interrupted) {
-                    newBlock = node.mine(newBlock.hash(), new ArrayListTransactions());
+                    Transactions trans = transactionManager.getSomeTransactions();
+
+                    newBlock = node.mine(newBlock.hash(), trans);
                     if (newBlock==null && specialBlock!=null) {
                         node.getBlockChain().addBlock(specialBlock);
                         specialBlock = null;

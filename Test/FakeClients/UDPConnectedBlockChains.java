@@ -3,6 +3,7 @@ package FakeClients;
 import Impl.ArrayListTransactions;
 import Impl.Communication.UDPPublisher;
 import Impl.Communication.UDPReceiver;
+import Interfaces.TransactionManager;
 import blockchain.Stubs.FauxPublisher;
 import blockchain.Stubs.FauxReceiver;
 import Impl.Communication.StandardCommunicationHandler;
@@ -36,7 +37,9 @@ public class UDPConnectedBlockChains {
     public static void startUDP(int myPort, int otherPort, InetAddress ip) {
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
-        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue);
+        TransactionManager transMan = new EmptyTransactionsManager();
+
+        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan);
         UDPReceiver receiver = new UDPReceiver(queue,myPort);
         Publisher publisher = new UDPPublisher(ip,otherPort);
         CommunicationHandler communicationHandler_B = new StandardCommunicationHandler(nodeRunner,publisher,queue);

@@ -1,6 +1,9 @@
 package FakeClients;
 
 import Impl.ArrayListTransactions;
+import Interfaces.Transaction;
+import Interfaces.TransactionManager;
+import Interfaces.Transactions;
 import blockchain.Stubs.FauxPublisher;
 import blockchain.Stubs.FauxReceiver;
 import Impl.Communication.StandardCommunicationHandler;
@@ -22,8 +25,11 @@ public class FauxCommunicatingBlockChain {
         BlockingQueue<Event> queue_A = new LinkedBlockingQueue<>();
         BlockingQueue<Event> queue_B = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1);
-        NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A);
-        NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B);
+
+        TransactionManager transMan = new EmptyTransactionsManager();
+
+        NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A,transMan);
+        NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B,transMan);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);
         FauxReceiver receiver_B = new FauxReceiver(queue_B);
         Publisher publisher_A = new FauxPublisher(receiver_B);
