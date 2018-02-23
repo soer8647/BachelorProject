@@ -1,6 +1,7 @@
 package Impl;
 
 import Configuration.Configuration;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Interfaces.*;
 
 import java.math.BigInteger;
@@ -124,4 +125,12 @@ public class FullNode implements Node {
         return address;
     }
 
+    /**
+     * @param transaction       The transaction to verify the signature on
+     * @return                  True if there is a valid transaction signature.
+     */
+    public boolean verifyTransactionSignature(Transaction transaction) {
+        PublicKeyCryptoSystem cs = address.getCryptoSystem();
+        return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transActionHash());
+    }
 }

@@ -3,11 +3,13 @@ package blockchain.Stubs;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PrivateKey;
+import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 
 import java.math.BigInteger;
 
-public class CryptoSystemStub implements PublicKeyCryptoSystem {
+public class CryptoSystemStub implements PublicKeyCryptoSystem <RSAPublicKey,RSAPrivateKey>{
     @Override
     public BigInteger encrypt(RSAPublicKey key, BigInteger message) {
         return null;
@@ -27,6 +29,7 @@ public class CryptoSystemStub implements PublicKeyCryptoSystem {
     public boolean verify(RSAPublicKey key, BigInteger signature, BigInteger message) {
         return false;
     }
+
 
     @Override
     public KeyPair generateNewKeys() {

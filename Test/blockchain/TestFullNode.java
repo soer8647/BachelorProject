@@ -23,13 +23,14 @@ import org.junit.Test;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.security.Signature;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 
 public class TestFullNode {
-    private Node node;
+    private FullNode node;
     private BlockChain blockChain;
     private Block block;
     private Address nodeAddress;
@@ -87,7 +88,7 @@ public class TestFullNode {
 
 
     @Test
-    public void shouldBeAbleToVerifyTransactionsBySignature() {
+    public void shouldBeAbleToVerifyTransactionsByValue() {
         // Make addresses
         PublicKeyCryptoSystem cryptoSystem = new RSA(1000, new BigInteger("3"));
         KeyPair keyPair = cryptoSystem.generateNewKeys();
@@ -120,11 +121,24 @@ public class TestFullNode {
         blockChain.addBlock(genesis);
         blockChain.addBlock(block);
         node = new FullNode(blockChain, new AddressStub());
-        //Make new transaction to verify
-        Transaction newTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);
+
+        //Make new transaction to verify by value
+        Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);
         Transactions transactionsToVerify = new ArrayListTransactions();
-        transactionsToVerify.add(newTransaction);
+        transactionsToVerify.add(validTransaction);
         assertTrue(node.validateTransactions(transactionsToVerify));
 
+        //Make transaction to deny by value
+        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,6,transaction.transActionHash(), 1);
+        Transactions transactionsToDeny = new ArrayListTransactions();
+        transactionsToDeny.add(invalidTransaction);
+        assertFalse(node.validateTransactions(transactionsToDeny));
+
+        //Validate transaction by signature
+
+        assertTrue(node.verifyTransactionSignature(validTransaction));
+
     }
+
+
 }

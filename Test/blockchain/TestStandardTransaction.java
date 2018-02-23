@@ -65,7 +65,9 @@ public class TestStandardTransaction {
     public void shouldHashWithSHA256(){
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
-            byte[] hash = sha256.digest(standardTransaction.toString().getBytes());
+
+            String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+valueProof.toString();
+            byte[] hash = sha256.digest(s.getBytes());
             BigInteger hashValue = new BigInteger(1,hash);
             assertEquals(hashValue,standardTransaction.transActionHash());
         } catch (NoSuchAlgorithmException e) {

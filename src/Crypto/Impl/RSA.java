@@ -1,11 +1,12 @@
 package Crypto.Impl;
 
+import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 
 import java.math.BigInteger;
 import java.util.Random;
 
-public class RSA implements PublicKeyCryptoSystem {
+public class RSA implements PublicKeyCryptoSystem<RSAPublicKey,RSAPrivateKey> {
 
 private int keyBitLength;
 private BigInteger e;
@@ -14,6 +15,8 @@ private BigInteger e;
         this.keyBitLength = keyBitLength;
         this.e = e;
     }
+
+
 
     @Override
     public BigInteger encrypt(RSAPublicKey key, BigInteger message) {

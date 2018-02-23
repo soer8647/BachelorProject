@@ -5,11 +5,11 @@ import Crypto.Impl.RSAPublicKey;
 
 import java.math.BigInteger;
 
-public interface PublicKeyCryptoSystem {
-    BigInteger encrypt(RSAPublicKey key, BigInteger message);
-    BigInteger decrypt(RSAPrivateKey key, BigInteger cipher);
-    BigInteger sign(RSAPrivateKey key, BigInteger message);
-    boolean verify(RSAPublicKey key, BigInteger signature, BigInteger message);
+public interface PublicKeyCryptoSystem<T extends PublicKey, G extends PrivateKey> {
+    BigInteger encrypt(T key, BigInteger message);
+    BigInteger decrypt(G key, BigInteger cipher);
+    BigInteger sign(G key, BigInteger message);
+    boolean verify(T key, BigInteger signature, BigInteger message);
     KeyPair generateNewKeys();
 
     int getKeyBitLength();

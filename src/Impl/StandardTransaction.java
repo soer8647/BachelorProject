@@ -33,9 +33,12 @@ public class StandardTransaction implements Transaction {
         this.blockNumberValueProof = blockNumberValueProof;
     }
 
+    /**
+     * @return      The hash of the transaction without the signature.
+     */
     @Override
     public BigInteger transActionHash() {
-        return Global.hash(toString());
+        return Global.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
     }
 
     @Override
@@ -76,4 +79,6 @@ public class StandardTransaction implements Transaction {
                 "Hash of value proof transaction: " + valueProof+",\n"+
                 "Signature: "+signature+"\n";
     }
+
+
 }
