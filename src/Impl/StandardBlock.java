@@ -66,7 +66,8 @@ public class StandardBlock implements Block {
         return new BigInteger(String.valueOf(Global.hash(
                 previousHash.toString()
                         + transactions.hashTransactions().toString()
-                        + nonce)));
+                        + nonce.toString()
+                        +coinBaseTransaction.toString())));
     }
 
     @Override

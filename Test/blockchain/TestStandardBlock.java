@@ -1,6 +1,7 @@
 package blockchain;
 
 import Impl.ArrayListTransactions;
+import Impl.Global;
 import Impl.StandardBlock;
 import Interfaces.Block;
 import blockchain.Stubs.CoinBaseTransactionStub;
@@ -18,7 +19,14 @@ public class TestStandardBlock {
 
     @Before
     public void setup(){
-        block = new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new CoinBaseTransactionStub());
+        block = new StandardBlock(
+                new BigInteger("42"),
+                20,
+                new BigInteger("42"),
+                8,
+                new ArrayListTransactions(),
+                1,
+                new CoinBaseTransactionStub());
     }
 
     @Test
@@ -64,7 +72,14 @@ public class TestStandardBlock {
 
     @Test
     public void shouldBeAbleToHashBlock(){
+        BigInteger hash = new BigInteger(String.valueOf(Global.hash(
+                new BigInteger("42").toString()+
+                        new ArrayListTransactions().hashTransactions().toString()+
+                        new BigInteger("42").toString()+
+                        new CoinBaseTransactionStub().toString())));
+        assertEquals(hash,block.hash());
 
     }
+
 
 }

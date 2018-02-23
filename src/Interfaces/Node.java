@@ -55,4 +55,9 @@ public interface Node {
     BigInteger hashBlock(Block block);
 
     void interrupt();
+
+    /**
+     * @return      The address in the blockchain for this node. This is where the blockreward is transferred to.
+     */
+    Address getAddress();
 }

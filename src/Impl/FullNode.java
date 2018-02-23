@@ -13,11 +13,13 @@ import java.util.Collection;
 public class FullNode implements Node {
     private BlockChain blockChain;
     private boolean interrupted = false;
-    private Address minerAddress;
+    private Address address;
 
-    public FullNode(BlockChain blockChain) {
+
+    public FullNode(BlockChain blockChain, Address address) {
         this.blockChain=blockChain;
-        this.minerAddress = null; //TODO FIX
+        this.address = address;
+
     }
 
     @Override
@@ -31,7 +33,7 @@ public class FullNode implements Node {
         //set nonce
         BigInteger nonce = new BigInteger("0");
         BigInteger hash;
-        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(minerAddress,Configuration.getBlockReward());
+        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(address,Configuration.getBlockReward());
         do{
             if (this.interrupted) {
                 this.interrupted = false;
@@ -115,6 +117,11 @@ public class FullNode implements Node {
     @Override
     public void interrupt() {
         interrupted = true;
+    }
+
+    @Override
+    public Address getAddress() {
+        return address;
     }
 
 }

@@ -1,11 +1,16 @@
 package FakeClients;
 
+import Crypto.Impl.RSA;
+import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.ArrayListTransactions;
 import Impl.Communication.UDPPublisher;
 import Impl.Communication.UDPReceiver;
 import Impl.Communication.StandardCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
+import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
+import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.Communication.CommunicationHandler;
 import Interfaces.Communication.Event;
@@ -36,7 +41,11 @@ public class UDPClient{
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
         TransactionManager transMan = new EmptyTransactionsManager();
-        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan);
+
+        PublicKeyCryptoSystem cs = new RSA(500,new BigInteger("3"));
+        KeyPair node1KeyPair = cs.generateNewKeys();
+        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey(),cs);
+        NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address);
         UDPReceiver receiver = new UDPReceiver(queue,myPort);
         Publisher publisher = new UDPPublisher(ip,otherPort);
         CommunicationHandler communicationHandler_B = new StandardCommunicationHandler(nodeRunner,publisher,queue);

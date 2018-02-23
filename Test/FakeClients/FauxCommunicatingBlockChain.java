@@ -1,9 +1,16 @@
 package FakeClients;
 
+import Configuration.Configuration;
+import Crypto.Impl.RSA;
+import Crypto.Impl.RSAKeyPair;
+import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.ArrayListTransactions;
 import Impl.Communication.StandardCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
+import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
+import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.Communication.CommunicationHandler;
 import Interfaces.Communication.Event;
@@ -27,8 +34,15 @@ public class FauxCommunicatingBlockChain {
 
         TransactionManager transMan = new EmptyTransactionsManager();
 
-        NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A,transMan);
-        NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B,transMan);
+        PublicKeyCryptoSystem cs = new RSA(Configuration.keyBitLength,new BigInteger("3"));
+        KeyPair node1KeyPair = cs.generateNewKeys();
+        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey(),cs);
+
+        KeyPair node2KeyPair = cs.generateNewKeys();
+        Address node2Address = new PublicKeyAddress(node2KeyPair.getPublicKey(),cs);
+
+        NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A,transMan,node1Address);
+        NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B,transMan,node2Address);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);
         FauxReceiver receiver_B = new FauxReceiver(queue_B);
         Publisher publisher_A = new FauxPublisher(receiver_B);

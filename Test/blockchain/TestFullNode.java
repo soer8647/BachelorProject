@@ -14,6 +14,7 @@ import Interfaces.Block;
 import Interfaces.BlockChain;
 import Impl.Global;
 import Interfaces.Node;
+import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.GenesisBlockStub;
 import blockchain.Stubs.TransactionStub;
@@ -31,11 +32,18 @@ public class TestFullNode {
     private Node node;
     private BlockChain blockChain;
     private Block block;
+    private Address nodeAddress;
     @Before
     public void setUp(){
         block = new GenesisBlockStub();
         blockChain = new StandardBlockChain(block);
-        node = new FullNode(blockChain);
+        nodeAddress = new AddressStub();
+        node = new FullNode(blockChain, nodeAddress);
+    }
+
+    @Test
+    public void shouldHaveAddress() {
+         assertEquals(node.getAddress(),nodeAddress);
     }
 
     @Test
@@ -111,7 +119,7 @@ public class TestFullNode {
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(genesis);
         blockChain.addBlock(block);
-        node = new FullNode(blockChain);
+        node = new FullNode(blockChain, new AddressStub());
         //Make new transaction to verify
         Transaction newTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);
         Transactions transactionsToVerify = new ArrayListTransactions();

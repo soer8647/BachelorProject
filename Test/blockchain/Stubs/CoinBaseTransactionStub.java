@@ -13,4 +13,9 @@ public class CoinBaseTransactionStub implements CoinBaseTransaction{
     public Address getMinerAddress() {
         return null;
     }
+
+    @Override
+    public String toString() {
+        return "CoinBaseTransactionStub{}";
+    }
 }
