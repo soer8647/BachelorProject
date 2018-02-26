@@ -6,11 +6,11 @@ import Interfaces.CoinBaseTransaction;
 public class StandardCoinBaseTransaction implements CoinBaseTransaction {
 
 
-    private Address minerAddres;
+    private Address minerAddress;
     private int value;
 
-    public StandardCoinBaseTransaction(Address minerAddres, int value) {
-        this.minerAddres = minerAddres;
+    public StandardCoinBaseTransaction(Address minerAddress, int value) {
+        this.minerAddress = minerAddress;
         this.value = value;
     }
 
@@ -21,13 +21,13 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
 
     @Override
     public Address getMinerAddress() {
-        return minerAddres;
+        return minerAddress;
     }
 
     @Override
     public String toString() {
         return "StandardCoinBaseTransaction:" +
-                "minerAddres=" + minerAddres +
+                "minerAddres=" + minerAddress +
                 ", value=" + value;
     }
 }

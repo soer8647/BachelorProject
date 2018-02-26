@@ -79,6 +79,7 @@ public class StandardBlock implements Block {
     public String toString() {
         return "Block "+getBlockNumber()+"\n"
                 + "Previous Hash: " + previousHash + "\n"
+                + "CoinBase: " + coinBaseTransaction
                 + transactions + "\n"
                 + "My Hash: " + hash();
     }
