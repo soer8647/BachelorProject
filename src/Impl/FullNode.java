@@ -27,7 +27,7 @@ public class FullNode implements Node {
     public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
         //TODO make hardness parameter change
-        int hardness = 10;
+        int hardness = Configuration.hardnessParameter;
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
         BigInteger hardValue = BigInteger.valueOf(2).pow(Global.getBitSize()).shiftRight(hardness);
 
@@ -65,29 +65,37 @@ public class FullNode implements Node {
         //TODO remove invalid transaction in stead of returning false for all
         //For each transaction
         for (Transaction t: transactions.getTransactions()) {
-            //TODO validate signature
-            //Get the block where there should be proof of funds.
-            Block block = blockChain.getBlock(t.getBlockNumberOfValueProof());
-            Transaction proofTransaction=null;
-            //Validate that the block holds the transaction with the given hash
-            for (Transaction tx:block.getTransactions().getTransactions()){ //TODO change retarded naming.
-                if (tx.transActionHash().equals(t.getValueProof())){
-                    proofTransaction = tx;
-                    break;
-                }
-            }
-            if (proofTransaction==null){
+            if(!validateTransaction(t)) {
                 return false;
             }
-            //validate that the receiver of the funds is the sender of the new transaction
-            Address receiverOfFunds = proofTransaction.getReceiverAddress();
-            if(!receiverOfFunds.equals(t.getSenderAddress()))return false;
-            //Validate that the received funds not are less than sending funds
-            if(t.getValue()>proofTransaction.getValue()) return false;
-
-            return true;
         }
-        return false;
+        return true;
+    }
+
+    private boolean validateTransaction(Transaction t){
+        if(!verifyTransactionSignature(t)) {
+            return false;
+        }
+        //Get the block where there should be proof of funds.
+        Block block = blockChain.getBlock(t.getBlockNumberOfValueProof());
+        Transaction proofTransaction=null;
+        //Validate that the block holds the transaction with the given hash
+        for (Transaction tx:block.getTransactions().getTransactions()){ //TODO change retarded naming.
+            if (tx.transActionHash().equals(t.getValueProof())){
+                proofTransaction = tx;
+                break;
+            }
+        }
+        if (proofTransaction==null){
+            return false;
+        }
+        //validate that the receiver of the funds is the sender of the new transaction
+        Address receiverOfFunds = proofTransaction.getReceiverAddress();
+        if(!receiverOfFunds.equals(t.getSenderAddress())){
+            return false;}
+        //Validate that the received funds not are less than sending funds
+        System.out.println(t.getValue()<proofTransaction.getValue());
+        return t.getValue()<=proofTransaction.getValue();
     }
 
     @Override

@@ -88,7 +88,7 @@ public class TestFullNode {
 
 
     @Test
-    public void shouldBeAbleToVerifyTransactionsByValue() {
+    public void shouldBeAbleToVerifyTransactions() {
         // Make addresses
         PublicKeyCryptoSystem cryptoSystem = new RSA(1000, new BigInteger("3"));
         KeyPair keyPair = cryptoSystem.generateNewKeys();
@@ -132,13 +132,18 @@ public class TestFullNode {
         Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,6,transaction.transActionHash(), 1);
         Transactions transactionsToDeny = new ArrayListTransactions();
         transactionsToDeny.add(invalidTransaction);
+
+        //Remove invalid transactions
         assertFalse(node.validateTransactions(transactionsToDeny));
 
-        //Validate transaction by signature
 
+
+        //Validate transaction by signature
         assertTrue(node.verifyTransactionSignature(validTransaction));
 
     }
+
+
 
 
 }
