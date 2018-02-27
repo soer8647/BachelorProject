@@ -8,7 +8,7 @@ public class Configuration {
 
     //The blockreward for mining a block
     public static int blockReward = 10;
-    public static int hardnessParameter = 10;
+    public static int hardnessParameter = 15;
     public static int keyBitLength = 500;
     private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
 
