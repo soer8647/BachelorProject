@@ -34,12 +34,12 @@ public class FauxCommunicatingBlockChain {
 
         TransactionManager transMan = new EmptyTransactionsManager();
 
-        PublicKeyCryptoSystem cs = new RSA(Configuration.keyBitLength,new BigInteger("3"));
-        KeyPair node1KeyPair = cs.generateNewKeys();
-        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey(),cs);
+        PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
+        KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
+        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
-        KeyPair node2KeyPair = cs.generateNewKeys();
-        Address node2Address = new PublicKeyAddress(node2KeyPair.getPublicKey(),cs);
+        KeyPair node2KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
+        Address node2Address = new PublicKeyAddress(node2KeyPair.getPublicKey());
 
         NodeRunner nodeRunner_A = new StandardNodeRunner(genesisBlock,queue_A,transMan,node1Address);
         NodeRunner nodeRunner_B = new StandardNodeRunner(genesisBlock,queue_B,transMan,node2Address);

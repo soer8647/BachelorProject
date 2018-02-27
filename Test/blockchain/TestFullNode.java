@@ -90,17 +90,17 @@ public class TestFullNode {
     @Test
     public void shouldBeAbleToVerifyTransactionsByValue() {
         // Make addresses
-        PublicKeyCryptoSystem cryptoSystem = new RSA(1000, new BigInteger("3"));
-        KeyPair keyPair = cryptoSystem.generateNewKeys();
+        PublicKeyCryptoSystem cryptoSystem = new RSA(1000);
+        KeyPair keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
 
         RSAPublicKey publicKeySender = keyPair.getPublicKey();
         RSAPrivateKey privateKeySender = keyPair.getPrivateKey();
-        Address senderAddress = new PublicKeyAddress(publicKeySender,cryptoSystem);
+        Address senderAddress = new PublicKeyAddress(publicKeySender);
 
-        keyPair = cryptoSystem.generateNewKeys();
+        keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
         RSAPublicKey publicKeyReceiver = keyPair.getPublicKey();
         RSAPrivateKey privateKeyReceiver = keyPair.getPrivateKey();
-        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver,cryptoSystem);
+        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
 
         // Make a transaction
         BigInteger valueProofFake = new TransactionStub().transActionHash();

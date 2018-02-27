@@ -26,8 +26,8 @@ public class TestStandardTransaction {
         valueProof = new TransactionStub().transActionHash();
         signature = new BigInteger("42");
 
-        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")),new CryptoSystemStub());
-        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")),new CryptoSystemStub());
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
+        Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0);
     }
 

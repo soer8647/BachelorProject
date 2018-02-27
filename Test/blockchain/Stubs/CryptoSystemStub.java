@@ -32,7 +32,7 @@ public class CryptoSystemStub implements PublicKeyCryptoSystem <RSAPublicKey,RSA
 
 
     @Override
-    public KeyPair generateNewKeys() {
+    public KeyPair generateNewKeys(BigInteger e) {
         return null;
     }
 

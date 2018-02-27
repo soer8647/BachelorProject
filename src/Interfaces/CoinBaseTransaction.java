@@ -1,6 +1,8 @@
 package Interfaces;
 
-public interface CoinBaseTransaction {
+import java.io.Serializable;
+
+public interface CoinBaseTransaction extends Serializable{
 
     /**
      * @return      The block mining reward

@@ -1,6 +1,8 @@
 package Crypto.Interfaces;
 
-public interface PublicKey {
+import java.io.Serializable;
+
+public interface PublicKey extends Serializable{
 
     String getCryptoSystemName();
 }

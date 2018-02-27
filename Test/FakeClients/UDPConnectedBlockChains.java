@@ -1,5 +1,6 @@
 package FakeClients;
 
+import Configuration.Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
@@ -42,9 +43,10 @@ public class UDPConnectedBlockChains {
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
         TransactionManager transMan = new EmptyTransactionsManager();
-        PublicKeyCryptoSystem cs = new RSA(500,new BigInteger("3"));
-        KeyPair node1KeyPair = cs.generateNewKeys();
-        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey(),cs);
+        PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
+        KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
+        System.out.println(node1KeyPair.getPublicKey());
+        Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
         NodeRunner nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address);
         UDPReceiver receiver = new UDPReceiver(queue,myPort);
         Publisher publisher = new UDPPublisher(ip,otherPort);

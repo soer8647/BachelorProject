@@ -9,11 +9,9 @@ import java.util.Random;
 public class RSA implements PublicKeyCryptoSystem<RSAPublicKey,RSAPrivateKey> {
 
 private int keyBitLength;
-private BigInteger e;
 
-    public RSA(int keyBitLength, BigInteger e) {
+    public RSA(int keyBitLength) {
         this.keyBitLength = keyBitLength;
-        this.e = e;
     }
 
 
@@ -40,7 +38,7 @@ private BigInteger e;
     }
 
     @Override
-    public RSAKeyPair generateNewKeys() {
+    public RSAKeyPair generateNewKeys(BigInteger e) {
         Random r = new Random();
 
         BigInteger p = new BigInteger(keyBitLength / 2, 1, r);

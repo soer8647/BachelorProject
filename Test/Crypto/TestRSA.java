@@ -18,7 +18,7 @@ public class TestRSA {
 
     @Before
     public void setUp(){
-        rsa = new RSA(1000,new BigInteger("3"));
+        rsa = new RSA(1000);
     }
 
     @Test
@@ -33,17 +33,17 @@ public class TestRSA {
 
     @Test
     public void shouldGenerateKeys(){
-        assertNotEquals(rsa.generateNewKeys(),null);
+        assertNotEquals(rsa.generateNewKeys(BigInteger.valueOf(3)),null);
     }
 
     @Test
     public void shouldGenerateRandomKeys(){
-        assertNotEquals(rsa.generateNewKeys(),rsa.generateNewKeys());
+        assertNotEquals(rsa.generateNewKeys(BigInteger.valueOf(3)),rsa.generateNewKeys(BigInteger.valueOf(3)));
     }
 
     @Test
     public void shouldEncryptAndDecrypt() {
-        RSAKeyPair keyPair = rsa.generateNewKeys();
+        RSAKeyPair keyPair = rsa.generateNewKeys(BigInteger.valueOf(3));
 
         BigInteger message = new BigInteger("42");
         BigInteger cipher = rsa.encrypt(keyPair.getPublicKey(),message);
@@ -54,7 +54,7 @@ public class TestRSA {
 
     @Test
     public void shouldBeAbleToSignMessageAndVerify() {
-        RSAKeyPair keyPair = rsa.generateNewKeys();
+        RSAKeyPair keyPair = rsa.generateNewKeys(BigInteger.valueOf(3));
 
         BigInteger message = new BigInteger("42");
 

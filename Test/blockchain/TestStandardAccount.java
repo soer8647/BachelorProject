@@ -28,7 +28,7 @@ public class TestStandardAccount {
     private Account account;
     @Before
     public void setUp(){
-        cryptoSystem = new RSA(1000,new BigInteger("3"));
+        cryptoSystem = new RSA(1000);
         account = new StandardAccount(cryptoSystem, new SHA256());
     }
 
@@ -54,8 +54,8 @@ public class TestStandardAccount {
 
     @Test
     public void shouldBeAbleToMakeAccountFromKeyPair() {
-        PublicKeyCryptoSystem cryptoSystem = new RSA(1000,new BigInteger("3"));
-        KeyPair rsaKeyPair = cryptoSystem.generateNewKeys();
+        PublicKeyCryptoSystem cryptoSystem = new RSA(1000);
+        KeyPair rsaKeyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
         RSAPublicKey publicKey = rsaKeyPair.getPublicKey();
         RSAPrivateKey privateKey = rsaKeyPair.getPrivateKey();
         assertNotEquals(new StandardAccount(cryptoSystem,privateKey,publicKey, new SHA256()),null);
@@ -64,7 +64,7 @@ public class TestStandardAccount {
     @Test
     public void shouldBeAbleToMakeTransaction() {
         BigInteger valueProof = new TransactionStub().transActionHash();
-        Address sender = new PublicKeyAddress(account.getPublicKey(),cryptoSystem);
+        Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
 
         assertNotEquals(account.makeTransaction(sender,receiver,1,valueProof, 0),null);
@@ -73,7 +73,7 @@ public class TestStandardAccount {
     @Test
     public void shouldBeVerifiableSignatureOnTransaction() {
         BigInteger valueProof = new TransactionStub().transActionHash();
-        Address sender = new PublicKeyAddress(account.getPublicKey(),cryptoSystem);
+        Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
         RSAPublicKey publicKey = account.getPublicKey();
 
