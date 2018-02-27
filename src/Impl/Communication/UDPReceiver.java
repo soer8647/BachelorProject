@@ -3,6 +3,7 @@ package Impl.Communication;
 import Interfaces.Communication.Event;
 
 import java.io.ByteArrayInputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
@@ -24,7 +25,7 @@ public class UDPReceiver {
     private void createAndListenSocket() {
         try {
             socket = new DatagramSocket(this.port);
-            byte[] incomingData = new byte[1024];
+            byte[] incomingData = new byte[2048];
 
             while (true) {
                 System.out.println("listening");

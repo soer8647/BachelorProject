@@ -1,5 +1,6 @@
 package Crypto.Interfaces;
 
+import Crypto.Impl.RSAKeyPair;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 
@@ -10,7 +11,8 @@ public interface PublicKeyCryptoSystem<T extends PublicKey, G extends PrivateKey
     BigInteger decrypt(G key, BigInteger cipher);
     BigInteger sign(G key, BigInteger message);
     boolean verify(T key, BigInteger signature, BigInteger message);
-    KeyPair generateNewKeys();
+
+    KeyPair generateNewKeys(BigInteger e);
 
     int getKeyBitLength();
 }

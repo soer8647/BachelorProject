@@ -1,5 +1,6 @@
 package Impl;
 
+import Configuration.Configuration;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
@@ -20,7 +21,7 @@ public class StandardAccount implements Account{
     public StandardAccount(PublicKeyCryptoSystem cryptoSystem, HashingAlgorithm hashingAlgorithm) {
         this.cryptoSystem = cryptoSystem;
         this.hashingAlgorithm = hashingAlgorithm;
-        KeyPair keyPair = cryptoSystem.generateNewKeys();
+        KeyPair keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
 
         privateKey = keyPair.getPrivateKey();
         publicKey = keyPair.getPublicKey();
@@ -66,7 +67,7 @@ public class StandardAccount implements Account{
     public Transaction makeTransaction(Address sender, Address receiver, int value, BigInteger valueProof,int blockValueProof) {
 
         String transaction = sender.toString()+receiver.toString()+value+valueProof.toString();
-        BigInteger signature = sender.getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
+        BigInteger signature = getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
 
         return new StandardTransaction(sender,receiver,value,valueProof,signature, blockValueProof);
     }

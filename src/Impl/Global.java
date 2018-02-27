@@ -17,13 +17,6 @@ public class Global {
     }
 
     /**
-     * @return The MessageDigest object corresponding to a hashing algorithm.
-     */
-    public static MessageDigest getHashingAlgorithm() {
-        return hasher.getHashingAlgorithm();
-    }
-
-    /**
      * @return  The size of the value that the hash function outputs
      */
     public static int getBitSize() {

@@ -12,7 +12,7 @@ import java.net.*;
 
 public class UDPPublisher implements Publisher{
     private final InetAddress ip;
-    DatagramSocket Socket;
+    private DatagramSocket Socket;
     private int port;
 
     public UDPPublisher(InetAddress ip, int port) {
@@ -25,7 +25,6 @@ public class UDPPublisher implements Publisher{
         Event event = new ReceivedBlockEvent(block);
         try {
             Socket = new DatagramSocket();
-            byte[] incomingData = new byte[1024];
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(event);
