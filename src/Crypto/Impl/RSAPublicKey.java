@@ -16,7 +16,6 @@ public class RSAPublicKey implements PublicKey {
     }
 
     public RSAPublicKey(String data){
-        System.out.println(data);
         String e_="";
         String n_="";
         char[] chars = data.toCharArray();
@@ -36,9 +35,6 @@ public class RSAPublicKey implements PublicKey {
                 }
             }
         }
-        System.out.println("n: "+n_);
-
-        System.out.println("e: "+e_);
         n = new BigInteger(n_);
         e = new BigInteger(e_);
     }

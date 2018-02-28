@@ -21,7 +21,8 @@ public class StandardBlock implements Block {
                          BigInteger previousHash,
                          int transactionLimit,
                          Transactions transactions,
-                         int blockNumber, CoinBaseTransaction coinbase) {
+                         int blockNumber,
+                         CoinBaseTransaction coinbase) {
         this.nonce = nonce;
         this.hardnessParameter = hardnessParameter;
         this.previousHash = previousHash;

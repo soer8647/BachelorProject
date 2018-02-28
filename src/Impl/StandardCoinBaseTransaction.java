@@ -16,6 +16,9 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
         this.value = value;
     }
 
+    /**
+     * @param data      Given a string that would be made from the objects toString method, turn it into an object again.
+     */
     public StandardCoinBaseTransaction(String data) {
         String publickey = data.substring(data.indexOf("["),data.indexOf("]"));
         PublicKey key = new RSAPublicKey(publickey);

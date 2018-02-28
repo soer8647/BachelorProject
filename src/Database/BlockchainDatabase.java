@@ -7,7 +7,7 @@ import Crypto.Impl.RSAPublicKey;
 import java.math.BigInteger;
 import java.sql.*;
 
-public class BlockchainDatabase {
+public class BlockchainDatabase implements BlockChain{
 
     private static String connectionURL;
     private static Connection conn;
@@ -48,7 +48,6 @@ public class BlockchainDatabase {
         //   ## BOOT DATABASE SECTION ##
         try {
             conn = DriverManager.getConnection(connectionURL);
-            conn.setAutoCommit(true);
 
             // Connect to database
             System.out.println("Connected to database " + databaseName);
@@ -125,10 +124,8 @@ public class BlockchainDatabase {
 
     /**
      * @param block     The block that your want to append to the blockchain.
-     * @return          True is the query went well. False otherwise.
      */
-    public boolean addBlock(Block block) {
-        System.out.println(block.toString());
+    public void addBlock(Block block) {
         String query = "INSERT INTO BLOCKCHAIN " +
                 "VALUES ("+block.getBlockNumber()+","
                 +block.getNonce()+","
@@ -136,8 +133,16 @@ public class BlockchainDatabase {
                 +block.getPreviousHash().toString()+"','"
                 +block.hash().toString()+"','"
                 +block.getCoinBase().toString()+"')";
-        return query(query);
+        try {
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
+    @Override
+    public Block getGenesisBlock() {
+        return getBlock(0);
     }
 
     /**
@@ -167,9 +172,8 @@ public class BlockchainDatabase {
     /**
      * @param transaction       The transaction to put on the blockchain.
      * @param blocknumber       The blocknumber of the mined block where this transaction was in.
-     * @return                  True if the query was successful. False otherwise.
      */
-    public boolean addTransaction(Transaction transaction,int blocknumber) {
+    public void addTransaction(Transaction transaction,int blocknumber) {
         String query = "INSERT INTO TRANSACTIONS "
                 + "VALUES ("
                 + "'"+transaction.getSenderAddress()+"',"
@@ -181,24 +185,21 @@ public class BlockchainDatabase {
                 + transaction.transActionHash().toString()+"',"
                 +"'"+transaction.getSignature().toString()+"')";
 
-        return query(query);
+        try {
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     /**
      * @param sql       The string equivalence of a SQL statement.
      * @return          True if the query was successful. False otherwise.
      */
-    private boolean query(String sql){
-        try {
-            Statement s = conn.createStatement();
-            s.execute(sql);
-            s.close();
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        }
-        return true;
+    private void query(String sql) throws SQLException {
+        Statement s = conn.createStatement();
+        s.execute(sql);
+        s.close();
     }
 
     /**
@@ -257,7 +258,6 @@ public class BlockchainDatabase {
             ResultSet setT = s.executeQuery(queryT);
             while(setT.next()){
                 Address sender = new PublicKeyAddress(new RSAPublicKey(setT.getString("SENDER")));
-                System.out.println(sender);
                 Address receiver = new PublicKeyAddress(new RSAPublicKey(setT.getString("RECEIVER")));
                 int value = setT.getInt("VALUE");
                 int blocknr_value_proof = setT.getInt("BLOCKNR_VALUE_PROOF");
@@ -273,5 +273,30 @@ public class BlockchainDatabase {
             e.printStackTrace();
         }
         return null;
+    }
+
+    @Override
+    public int getBlockNumber() {
+        return countDataEntries("BLOCKCHAIN");
+    }
+
+    public int getTotalNumberOfTransactions(){
+        return countDataEntries("TRANSACTIONS");
+    }
+
+    private int countDataEntries(String tablename){
+        try {
+            String query = "SELECT COUNT(*) FROM "+tablename;
+            Statement s = conn.createStatement();
+            ResultSet rs = s.executeQuery(query);
+            rs.next();
+            int rt =rs.getInt(1);
+            rs.close();
+            s.close();
+            return  rt;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
     }
 }
