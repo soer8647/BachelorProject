@@ -19,9 +19,8 @@ public class BlockchainDatabase {
         // define the driver to use
         driver = "org.apache.derby.jdbc.EmbeddedDriver";
         // the database name
-        String dbName=databaseName;
         // define the Derby connection URL to use
-        connectionURL = "jdbc:derby:" + dbName + ";create=true";
+        connectionURL = "jdbc:derby:" + databaseName + ";create=true";
 
         //Store the blockchain in one table and store all transactions in another table
         String blockchain = "CREATE TABLE BLOCKCHAIN"
@@ -52,7 +51,7 @@ public class BlockchainDatabase {
             conn.setAutoCommit(true);
 
             // Connect to database
-            System.out.println("Connected to database " + dbName);
+            System.out.println("Connected to database " + databaseName);
 
             //   ## INITIAL SQL SECTION ##
             if (!tableExists("BLOCKCHAIN")){
@@ -67,7 +66,6 @@ public class BlockchainDatabase {
             if (!tableExists("TRANSACTIONS")){
 
                 Statement s = conn.createStatement();
-
                 s.execute(transactions);
                 System.out.println ("Creating table: "+ "TRANSACTIONS");
                 s.close();
@@ -80,9 +78,11 @@ public class BlockchainDatabase {
             System.out.println(" . . . exception thrown:");
             e.printStackTrace(System.out);
         }
-
     }
 
+    /**
+     *  Closes the connection and shuts down the database.
+     */
     public void shutDown() {
 
         try {
@@ -90,8 +90,7 @@ public class BlockchainDatabase {
             System.out.println("Closed connection");
 
             //DATABASE SHUTDOWN SECTION
-            /*** In embedded mode, an application should shut down Derby.
-             Shutdown throws the XJ015 exception to confirm success. ***/
+            //Shutdown throws the XJ015 exception to confirm success.
             if (driver.equals("org.apache.derby.jdbc.EmbeddedDriver")) {
                 boolean gotSQLExc = false;
                 try {
@@ -124,6 +123,10 @@ public class BlockchainDatabase {
         return  exist;
     }
 
+    /**
+     * @param block     The block that your want to append to the blockchain.
+     * @return          True is the query went well. False otherwise.
+     */
     public boolean addBlock(Block block) {
         System.out.println(block.toString());
         String query = "INSERT INTO BLOCKCHAIN " +
@@ -137,6 +140,11 @@ public class BlockchainDatabase {
 
     }
 
+    /**
+     * Calls: DELETE TABLE @name on the database. To remove all entries.
+     *
+     * @param name  The name of the table.
+     */
     public void clearTable(String name){
         try {
             if (conn.isClosed()) conn = DriverManager.getConnection(connectionURL);
@@ -156,6 +164,11 @@ public class BlockchainDatabase {
         }
     }
 
+    /**
+     * @param transaction       The transaction to put on the blockchain.
+     * @param blocknumber       The blocknumber of the mined block where this transaction was in.
+     * @return                  True if the query was successful. False otherwise.
+     */
     public boolean addTransaction(Transaction transaction,int blocknumber) {
         String query = "INSERT INTO TRANSACTIONS "
                 + "VALUES ("
@@ -171,6 +184,10 @@ public class BlockchainDatabase {
         return query(query);
     }
 
+    /**
+     * @param sql       The string equivalence of a SQL statement.
+     * @return          True if the query was successful. False otherwise.
+     */
     private boolean query(String sql){
         try {
             Statement s = conn.createStatement();
@@ -184,49 +201,55 @@ public class BlockchainDatabase {
         return true;
     }
 
+    /**
+     * @param transActionHash       The hash of the transaction that you want to retrieve.
+     * @param blockNumber           The blocknumber of the block where the transaction was put on the blockchain.
+     * @return                      The transaction object.
+     */
     public Transaction getTransaction(BigInteger transActionHash, int blockNumber) {
         try {
             Statement s = conn.createStatement();
-
-            String query = "SELECT * FROM TRANSACTIONS WHERE BLOCKNR="+blockNumber +"AND TRANS_HASH="+"'"+transActionHash.toString()+"'";
-
-
+            // Query to database
+            String query = "SELECT * FROM TRANSACTIONS WHERE BLOCKNR="+blockNumber +" AND TRANS_HASH="+"'"+transActionHash.toString()+"'";
             ResultSet set = s.executeQuery(query);
-            while(set.next()){
-                Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
-                Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
-                int value = set.getInt("VALUE");
-                int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
-                BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
-                BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
-                return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
-            }
-            set.close();
+
+            set.next();
+            // Get the data from the resultset.
+            Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
+            Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
+            int value = set.getInt("VALUE");
+            int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
+            BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
+            BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
+            // Clean up resources
             s.close();
+            set.close();
+            return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
         } catch (SQLException e) {
             e.printStackTrace();
         }
         return null;
     }
 
+    /**
+     * @param blockNumber       The blocknumber of the block you want to retrieve.
+     * @return                  The block with the given blocknumber.
+     */
     public Block getBlock(int blockNumber) {
         try {
             Statement s = conn.createStatement();
-
+            // Get data from database
             String query = "SELECT * FROM BLOCKCHAIN WHERE BLOCKNR="+blockNumber;
-
             ResultSet set = s.executeQuery(query);
-            BigInteger prev_hash=null;
-            int nonce=0;
-            int hardness_param = 0;
-            CoinBaseTransaction coinBase=null;
-            while(set.next()){
-                prev_hash = new BigInteger(set.getString("PREV_BLOCK_HASH"));
-                nonce = set.getInt("NONCE");
-                hardness_param= set.getInt("HARDNESS_PARAM");
-                coinBase = new StandardCoinBaseTransaction(set.getString("COINBASE_TRANS"));
-            }
+            set.next(); //There should be only one block since blocknr is primary key
+
+            BigInteger prev_hash=new BigInteger(set.getString("PREV_BLOCK_HASH"));
+            int nonce = set.getInt("NONCE");
+            int hardness_param= set.getInt("HARDNESS_PARAM");
+            CoinBaseTransaction coinBase = new StandardCoinBaseTransaction(set.getString("COINBASE_TRANS"));
+
             set.close();
+
 
             String queryT = "SELECT * FROM TRANSACTIONS WHERE BLOCKNR="+blockNumber;
 
@@ -241,20 +264,14 @@ public class BlockchainDatabase {
                 BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
                 transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof));
-
             }
             setT.close();
             s.close();
-            Block b =  new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.transactionLimit,transactions,blockNumber,coinBase);
-            System.out.println(b.toString());
-            return b;
-
+            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.transactionLimit,transactions,blockNumber,coinBase);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-
         return null;
     }
 }
