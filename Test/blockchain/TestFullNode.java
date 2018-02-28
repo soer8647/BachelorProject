@@ -121,7 +121,6 @@ public class TestFullNode {
         Block genesis = new GenesisBlockStub();
 
         BlockChain blockChain = new StandardBlockChain(genesis);
-        blockChain.addBlock(genesis);
         blockChain.addBlock(block);
         node = new FullNode(blockChain, new AddressStub());
 
