@@ -37,14 +37,20 @@ public class TestBlockchainDatabase {
         block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),1,ct);
     }
 
+
+
     @Test
     public void shouldBeAbleToQueryANewBlock() {
-        assertTrue(db.addBlock(block));
+        int blocks = db.getBlockNumber();
+        db.addBlock(block);
+        assertEquals(blocks+1,db.getBlockNumber());
     }
 
     @Test
     public void shouldBeAbleToQueryTransaction() {
-        assertTrue(db.addTransaction(tx,0));
+        assertEquals(0,db.getTotalNumberOfTransactions());
+        db.addTransaction(tx,0);
+        assertEquals(1,db.getTotalNumberOfTransactions());
     }
 
     @Test
@@ -55,7 +61,7 @@ public class TestBlockchainDatabase {
 
     @Test
     public void shouldBeAbleToGetBlock() {
-        assertTrue(db.addBlock(block2));
+        db.addBlock(block2);
         String b = block2.toString();
         assertEquals(b,db.getBlock(1).toString());
     }
@@ -65,9 +71,9 @@ public class TestBlockchainDatabase {
         System.out.println("Running teardown");
 
         db.clearTable("BLOCKCHAIN");
-        System.out.println("BLOCKCHAIN table dropped");
+        System.out.println("BLOCKCHAIN table cleared");
         db.clearTable("TRANSACTIONS");
-        System.out.println("TRANSACTION table dropped");
+        System.out.println("TRANSACTION table cleared");
 
         db.shutDown();
     }
