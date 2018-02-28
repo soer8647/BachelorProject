@@ -27,7 +27,7 @@ public class FullNode implements Node {
     public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
         //TODO make hardness parameter change
-        int hardness = Configuration.hardnessParameter;
+        int hardness = Configuration.getHardnessParameter();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
         BigInteger hardValue = BigInteger.valueOf(2).pow(Global.getBitSize()).shiftRight(hardness);
 
@@ -94,7 +94,6 @@ public class FullNode implements Node {
         if(!receiverOfFunds.equals(t.getSenderAddress())){
             return false;}
         //Validate that the received funds not are less than sending funds
-        System.out.println(t.getValue()<proofTransaction.getValue());
         return t.getValue()<=proofTransaction.getValue();
     }
 
@@ -106,7 +105,8 @@ public class FullNode implements Node {
 
     @Override
     public boolean validateBlock(Block incomingBlock) {
-        return false;
+        //TODO: DO
+        return true;
     }
 
     @Override

@@ -4,6 +4,7 @@ import Configuration.Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import GUI.GuiApp;
 import Impl.ArrayListTransactions;
 import Impl.Communication.UDPPublisher;
 import Impl.Communication.UDPReceiver;
@@ -33,6 +34,7 @@ public class UDPClient{
     private final CommunicationHandler communicationHandler;
 
     public UDPClient(int myPort, int otherPort, InetAddress ip) {
+
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
         TransactionManager transMan = new EmptyTransactionsManager();
@@ -40,7 +42,9 @@ public class UDPClient{
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
-        nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address);
+
+        GuiApp display = new GuiApp(node1Address.getPublicKey());
+        nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address,display);
         receiver = new UDPReceiver(queue,myPort);
         publisher = new UDPPublisher(ip,otherPort);
         communicationHandler = new StandardCommunicationHandler(nodeRunner,publisher,queue);

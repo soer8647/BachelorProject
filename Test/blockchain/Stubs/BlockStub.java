@@ -19,7 +19,7 @@ public class BlockStub implements Block {
 
     @Override
     public BigInteger getNonce() {
-        return null;
+        return new BigInteger("1");
     }
 
     @Override
@@ -29,7 +29,7 @@ public class BlockStub implements Block {
 
     @Override
     public BigInteger getPreviousHash() {
-        return null;
+        return new BigInteger("42");
     }
 
     @Override
@@ -39,7 +39,7 @@ public class BlockStub implements Block {
 
     @Override
     public BigInteger hash() {
-        return null;
+        return new BigInteger("1337");
     }
 
     @Override

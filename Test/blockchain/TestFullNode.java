@@ -1,4 +1,5 @@
 package blockchain;
+import Configuration.Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
@@ -40,6 +41,7 @@ public class TestFullNode {
         blockChain = new StandardBlockChain(block);
         nodeAddress = new AddressStub();
         node = new FullNode(blockChain, nodeAddress);
+        Configuration.hardnessParameter=10;
     }
 
     @Test

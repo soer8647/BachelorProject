@@ -1,11 +1,27 @@
 package blockchain.Stubs;
 
+import Crypto.Impl.RSA;
+import Crypto.Interfaces.KeyPair;
+import Crypto.Interfaces.PublicKey;
+import Crypto.Interfaces.PublicKeyCryptoSystem;
+import Impl.PublicKeyAddress;
 import Interfaces.Address;
 import Interfaces.Transaction;
 
 import java.math.BigInteger;
 
 public class TransactionStub implements Transaction{
+
+    private final KeyPair keypair;
+    private PublicKeyAddress pk;
+
+
+    public TransactionStub() {
+        PublicKeyCryptoSystem rsa = new RSA(500);
+        keypair = rsa.generateNewKeys(new BigInteger("3"));
+        pk = new PublicKeyAddress(keypair.getPublicKey());
+    }
+
     @Override
     public BigInteger transActionHash() {
         return new BigInteger("404");
@@ -13,12 +29,12 @@ public class TransactionStub implements Transaction{
 
     @Override
     public Address getSenderAddress() {
-        return null;
+        return pk;
     }
 
     @Override
     public Address getReceiverAddress() {
-        return null;
+        return pk;
     }
 
 
@@ -39,6 +55,6 @@ public class TransactionStub implements Transaction{
 
     @Override
     public BigInteger getSignature() {
-        return null;
+        return new BigInteger("8080");
     }
 }

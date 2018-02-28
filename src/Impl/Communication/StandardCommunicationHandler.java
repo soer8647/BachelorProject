@@ -62,6 +62,8 @@ public class StandardCommunicationHandler implements CommunicationHandler{
         System.out.println("ReceivedBlock event");
         if (nodeRunner.validateBlock(block)) {
             nodeRunner.interruptReceivedBlock(block);
+        } else {
+            System.out.println("Not valid");
         }
     }
 
