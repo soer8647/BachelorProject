@@ -15,6 +15,7 @@ public class StandardBlockChain implements BlockChain {
     {
         this.blocks = new ArrayList<>();
         this.genesisBlock = genesisBlock;
+        blocks.add(genesisBlock);
     }
 
     @Override

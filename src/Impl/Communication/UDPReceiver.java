@@ -28,7 +28,6 @@ public class UDPReceiver {
             byte[] incomingData = new byte[2048];
 
             while (true) {
-                System.out.println("listening");
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
                 socket.receive(incomingPacket);
                 byte[] data = incomingPacket.getData();

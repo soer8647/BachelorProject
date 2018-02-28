@@ -11,13 +11,16 @@ import java.io.ObjectOutputStream;
 import java.net.*;
 
 public class UDPPublisher implements Publisher{
-    private final InetAddress ip;
+    private InetAddress[] ips;
     private DatagramSocket Socket;
-    private int port;
+    private int[] ports;
 
-    public UDPPublisher(InetAddress ip, int port) {
-        this.ip = ip;
-        this.port = port;
+    public UDPPublisher(InetAddress[] ip, int[] port) {
+        if (ip.length != port.length) {
+            throw new IllegalArgumentException();
+        }
+        this.ips = ip;
+        this.ports = port;
     }
 
     @Override
@@ -29,9 +32,12 @@ public class UDPPublisher implements Publisher{
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(event);
             byte[] data = outputStream.toByteArray();
-            DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, this.port);
-            Socket.send(sendPacket);
-            System.out.println("send");
+            for (int i = 0; i < ips.length; i++) {
+                InetAddress ip = this.ips[i];
+                int port = this.ports[i];
+                DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
+                Socket.send(sendPacket);
+            }
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {

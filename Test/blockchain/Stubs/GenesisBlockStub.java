@@ -40,7 +40,7 @@ public class GenesisBlockStub implements Block {
 
     @Override
     public BigInteger hash() {
-        return null;
+        return BigInteger.ZERO;
     }
 
     @Override

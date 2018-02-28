@@ -34,11 +34,17 @@ public class StandardNodeRunner implements NodeRunner {
                     Transactions trans = transactionManager.getSomeTransactions();
 
                     //TODO: Ensure that the block hasnt been added to the chain before method returns
+                 //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     newBlock = node.mine(newBlock.hash(), trans);
-                    if (newBlock==null && specialBlock!=null) {
+                    if (newBlock==null) {
+                        if (specialBlock==null) {
+                            System.out.println("Chaos");
+                            newBlock = node.getBlockChain().getBlock(node.getBlockChain().getBlockNumber());
+                            continue;
+                        }
                         node.getBlockChain().addBlock(specialBlock);
-                        display.addToDisplay(specialBlock);
                         newBlock = specialBlock;
+                        display.addToDisplay(specialBlock);
                         specialBlock = null;
                     } else {
                         display.addToDisplay(newBlock);
@@ -64,5 +70,10 @@ public class StandardNodeRunner implements NodeRunner {
     public void interruptReceivedBlock(Block block) {
         this.specialBlock = block;
         node.interrupt();
+    }
+
+    @Override
+    public int getBlockNumber() {
+        return node.getBlockChain().getBlockNumber();
     }
 }

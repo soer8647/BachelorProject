@@ -105,9 +105,9 @@ public class FullNode implements Node {
 
     @Override
     public boolean validateBlock(Block incomingBlock) {
-        //TODO: DO
-        return true;
-    }
+            return blockChain.getBlock(incomingBlock.getBlockNumber()-1).hash().equals(incomingBlock.getPreviousHash())
+                    && validateTransactions(incomingBlock.getTransactions());
+        }
 
     @Override
     public void removeTransaction(Transaction transaction) {

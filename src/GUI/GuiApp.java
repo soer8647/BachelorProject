@@ -3,6 +3,7 @@ package GUI;
 //could just import javax.swing.* and java.awt.* etc..
 import Crypto.Interfaces.PublicKey;
 import Impl.Communication.Display;
+import Interfaces.Block;
 
 import javax.swing.*;
 import java.awt.BorderLayout;
@@ -45,6 +46,12 @@ public class GuiApp implements Display{
 
     @Override
     public void addToDisplay(Object o) {
-        model.addElement(o);
+        if (o instanceof Block) {
+            Block b = (Block) o;
+            String s = "nr: " +b.getBlockNumber() + " hash: " + b.hash() + " prev: " + b.getPreviousHash() + "Pwner: " + b.getCoinBase().getMinerAddress().getPublicKey();
+            model.add(0,s);
+        } else {
+            model.add(0,o);
+        }
     }
 }

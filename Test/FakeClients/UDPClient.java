@@ -33,7 +33,7 @@ public class UDPClient{
     private final UDPPublisher publisher;
     private final CommunicationHandler communicationHandler;
 
-    public UDPClient(int myPort, int otherPort, InetAddress ip) {
+    public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
 
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
@@ -46,7 +46,7 @@ public class UDPClient{
         GuiApp display = new GuiApp(node1Address.getPublicKey());
         nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address,display);
         receiver = new UDPReceiver(queue,myPort);
-        publisher = new UDPPublisher(ip,otherPort);
+        publisher = new UDPPublisher(ips,otherPorts);
         communicationHandler = new StandardCommunicationHandler(nodeRunner,publisher,queue);
     }
 
@@ -62,6 +62,6 @@ public class UDPClient{
             e.printStackTrace();
         }
 //        startUDP(9876,6789,IPAddress);
-        UDPClient client = new UDPClient(6789,9876,IPAddress);
+        UDPClient client = new UDPClient(6789, new int[]{9876}, new InetAddress[]{IPAddress});
     }
 }
