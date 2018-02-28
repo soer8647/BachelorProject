@@ -11,6 +11,7 @@ public class Configuration {
     public static int hardnessParameter = 15;
     public static int keyBitLength = 500;
     private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
+    public static int transactionLimit=10;
 
     public static Configuration getConfiguration() {
         return configuration;
