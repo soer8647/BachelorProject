@@ -36,10 +36,11 @@ public class TestStandardBlockchain {
 
     @Test
     public void shouldBeAbleToAddBlockToBlockChain() {
-        blockChain.addBlock(new GenesisBlockStub());
         assertEquals(blockChain.getBlockNumber(), 0);
         blockChain.addBlock(new BlockStub());
         assertEquals(blockChain.getBlockNumber(), 1);
+        blockChain.addBlock(new BlockStub());
+        assertEquals(blockChain.getBlockNumber(), 2);
     }
 
 

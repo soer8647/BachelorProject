@@ -59,11 +59,20 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleReceivedBlock(Block block) {
-        System.out.println("ReceivedBlock event");
-        if (nodeRunner.validateBlock(block)) {
-            nodeRunner.interruptReceivedBlock(block);
+//        System.out.println("ReceivedBlock event");
+        if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {
+            //we dont care about old
+        } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
+            //TODO: Change (maybe) if last block was received
+        } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
+            //TODO: Handle other nodes being more than 1 ahead
+//            System.out.println("Other blocks far ahead");
         } else {
-            System.out.println("Not valid");
+            if (nodeRunner.validateBlock(block)) {
+                nodeRunner.interruptReceivedBlock(block);
+            } else {
+//                System.out.println("Not valid");
+            }
         }
     }
 
@@ -74,7 +83,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleMinedBlock(Block block) {
-        System.out.println("MinedBlock event");
+ //       System.out.println("MinedBlock event");
         publisher.publishBlock(block);
     }
 }
