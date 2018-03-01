@@ -1,5 +1,6 @@
 package Impl;
 
+import Configuration.Configuration;
 import Interfaces.Address;
 import Interfaces.Transaction;
 
@@ -38,7 +39,7 @@ public class StandardTransaction implements Transaction {
      */
     @Override
     public BigInteger transActionHash() {
-        return Global.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
+            return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
     }
 
     @Override

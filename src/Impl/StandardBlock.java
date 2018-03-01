@@ -1,5 +1,6 @@
 package Impl;
 
+import Configuration.Configuration;
 import Interfaces.*;
 
 import java.math.BigInteger;
@@ -64,7 +65,7 @@ public class StandardBlock implements Block {
 
     @Override
     public BigInteger hash() {
-        return new BigInteger(String.valueOf(Global.hash(
+        return new BigInteger(String.valueOf(Configuration.hash(
                 previousHash.toString()
                         + transactions.hashTransactions().toString()
                         + nonce.toString()

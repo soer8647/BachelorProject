@@ -1,7 +1,7 @@
 package blockchain;
 
+import Configuration.Configuration;
 import Impl.ArrayListTransactions;
-import Impl.Global;
 import Impl.StandardBlock;
 import Interfaces.Block;
 import blockchain.Stubs.CoinBaseTransactionStub;
@@ -72,7 +72,7 @@ public class TestStandardBlock {
 
     @Test
     public void shouldBeAbleToHashBlock(){
-        BigInteger hash = new BigInteger(String.valueOf(Global.hash(
+        BigInteger hash = new BigInteger(String.valueOf(Configuration.hash(
                 new BigInteger("42").toString()+
                         new ArrayListTransactions().hashTransactions().toString()+
                         new BigInteger("42").toString()+

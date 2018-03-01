@@ -21,7 +21,7 @@ public class StandardTransactionManager implements TransactionManager {
     public Transactions getSomeTransactions() {
         Transactions result = new ArrayListTransactions();
         Iterator<Transaction> iter = transactions.iterator();
-        for (int i = 0; i < Configuration.transactionLimit; i++) {
+        for (int i = 0; i < Configuration.getTransactionLimit(); i++) {
             if (!iter.hasNext()) {
                 break;
             }
