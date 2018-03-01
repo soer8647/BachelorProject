@@ -14,8 +14,6 @@ import Impl.FullNode;
 import Impl.StandardBlockChain;
 import Interfaces.Block;
 import Interfaces.BlockChain;
-import Impl.Global;
-import Interfaces.Node;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.GenesisBlockStub;
@@ -26,7 +24,6 @@ import org.junit.Test;
 
 import java.io.File;
 import java.math.BigInteger;
-import java.security.Signature;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
@@ -55,7 +52,7 @@ public class TestFullNode {
         blockChain = new BlockchainDatabase("FULLNODETEST",block);
         nodeAddress = stx.getSenderAddress();
         node = new FullNode(blockChain, nodeAddress);
-        Configuration.hardnessParameter=10;
+        Configuration.setHardnessParameter(10);
     }
 
     @Test
@@ -81,7 +78,7 @@ public class TestFullNode {
         int hashCode = falcon.hashCode();
         //Make int to a BigInteger
         BigInteger integer = new BigInteger(Integer.toString(hashCode));
-        node.mine(Global.hash(integer.toString()),new ArrayListTransactions());
+        node.mine(Configuration.hash(integer.toString()),new ArrayListTransactions());
         //The genesisblock should have blocknumber 0.
         assertEquals(blocks+1,node.getBlockChain().getBlockNumber());
     }
@@ -95,11 +92,10 @@ public class TestFullNode {
         int hashCode = falcon.hashCode();
         //Make int to a BigInteger
         BigInteger integer = new BigInteger(Integer.toString(hashCode));
-        //node.mine(Global.hash(integer.toString()),new ArrayListTransactions());
         int blocks = blockChain.getBlockNumber();
         for (int i=1;i<6;i++){
             BigInteger previousHash = node.getBlockChain().getBlock(i-1).hash();
-            node.mine(Global.hash(previousHash.toString()),new ArrayListTransactions());
+            node.mine(Configuration.hash(previousHash.toString()),new ArrayListTransactions());
             assertEquals(blocks+i,node.getBlockChain().getBlockNumber());
         }
     }

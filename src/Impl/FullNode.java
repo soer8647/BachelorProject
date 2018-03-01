@@ -29,7 +29,7 @@ public class FullNode implements Node {
         //TODO make hardness parameter change
         int hardness = Configuration.getHardnessParameter();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
-        BigInteger hardValue = BigInteger.valueOf(2).pow(Global.getBitSize()).shiftRight(hardness);
+        BigInteger hardValue = BigInteger.valueOf(2).pow(Configuration.getBitSize()).shiftRight(hardness);
 
         //set nonce
         BigInteger nonce = new BigInteger("0");
@@ -40,7 +40,7 @@ public class FullNode implements Node {
                 this.interrupted = false;
                 return null;
             }
-            hash = new BigInteger(String.valueOf(Global.hash(
+            hash = new BigInteger(String.valueOf(Configuration.hash(
                     previousBlockHash.toString()
                             + transactions.hashTransactions().toString()
                             + nonce.toString()
@@ -120,7 +120,7 @@ public class FullNode implements Node {
 
     @Override
     public BigInteger hashBlock(Block block) {
-        return Global.hash(block.toString());
+        return Configuration.hash(block.toString());
     }
 
     @Override
