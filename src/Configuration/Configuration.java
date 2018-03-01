@@ -2,19 +2,37 @@ package Configuration;
 
 import Crypto.Impl.RSA;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import Impl.Hashing.SHA256;
+import Interfaces.HashingAlgorithm;
+
+import java.math.BigInteger;
 
 public class Configuration {
+
     private static Configuration configuration = new Configuration();
 
     //The blockreward for mining a block
-    public static int blockReward = 10;
-    public static int hardnessParameter = 15;
-    public static int keyBitLength = 500;
+    private static int blockReward = 10;
+    private static int hardnessParameter = 15;
+    private static int keyBitLength = 500;
     private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
-    public static int transactionLimit=10;
+    private static int transactionLimit=10;
+    private static HashingAlgorithm hasher = new SHA256();
 
-    public static Configuration getConfiguration() {
-        return configuration;
+
+    /**
+     * @return The corresponding Biginteger of a hash
+     */
+    public static BigInteger hash(String data) {
+        return hasher.hash(data);
+    }
+
+
+    /**
+     * @return  The size of the value that the hash function outputs
+     */
+    public static int getBitSize() {
+        return hasher.getBitSize();
     }
 
     public static int getBlockReward() {
@@ -31,5 +49,13 @@ public class Configuration {
 
     public static PublicKeyCryptoSystem getCryptoSystem() {
         return cryptoSystem;
+    }
+
+    public static void setHardnessParameter(int hardnessParameter) {
+        Configuration.hardnessParameter = hardnessParameter;
+    }
+
+    public static int getTransactionLimit() {
+        return transactionLimit;
     }
 }

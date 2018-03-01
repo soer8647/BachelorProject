@@ -268,7 +268,7 @@ public class BlockchainDatabase implements BlockChain{
             }
             setT.close();
             s.close();
-            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.transactionLimit,transactions,blockNumber,coinBase);
+            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.getTransactionLimit(),transactions,blockNumber,coinBase);
 
         } catch (SQLException e) {
             e.printStackTrace();

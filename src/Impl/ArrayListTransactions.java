@@ -1,5 +1,6 @@
 package Impl;
 
+import Configuration.Configuration;
 import Interfaces.Transaction;
 import Interfaces.Transactions;
 
@@ -24,7 +25,7 @@ public class ArrayListTransactions implements Transactions {
 
     @Override
     public BigInteger hashTransactions() {
-        return Global.hash(toString());
+        return Configuration.hash(toString());
     }
 
     @Override
