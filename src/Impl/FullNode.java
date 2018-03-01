@@ -17,16 +17,15 @@ public class FullNode implements Node {
     private Address address;
 
 
+
     public FullNode(BlockChain blockChain, Address address) {
         this.blockChain=blockChain;
         this.address = address;
-
     }
 
     @Override
     public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
-        //TODO make hardness parameter change
         int hardness = Configuration.getHardnessParameter();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
         BigInteger hardValue = BigInteger.valueOf(2).pow(Global.getBitSize()).shiftRight(hardness);
@@ -59,6 +58,7 @@ public class FullNode implements Node {
         blockChain.addBlock(newBlock);
         return newBlock;
     }
+
 
     @Override
     public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
