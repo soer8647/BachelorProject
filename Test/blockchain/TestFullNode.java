@@ -118,7 +118,7 @@ public class TestFullNode {
         keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
         RSAPublicKey publicKeyReceiver = keyPair.getPublicKey();
         RSAPrivateKey privateKeyReceiver = keyPair.getPrivateKey();
-        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
+        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);  
 
         // Make a transaction
         BigInteger valueProofFake = new TransactionStub().transActionHash();

@@ -37,7 +37,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
                         e.printStackTrace();
                     }
                     HandleEvent(event);
-                }
+                    }
             }
         });
         thread.start();
@@ -79,6 +79,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
     @Override
     public void HandleNewTransaction(Transaction transaction) {
         // put into Node's queue of potential transactions
+        nodeRunner.getTransactionManager().addTransaction(transaction);
     }
 
     @Override

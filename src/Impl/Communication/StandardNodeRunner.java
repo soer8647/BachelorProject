@@ -11,6 +11,7 @@ import java.math.BigInteger;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardNodeRunner implements NodeRunner {
+    private final TransactionManager transactionManager;
     private Node node;
     private boolean interrupted = false;
     private Block specialBlock;
@@ -25,7 +26,7 @@ public class StandardNodeRunner implements NodeRunner {
 
     public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, Address address,Display display) {
         this.node = new FullNode(new StandardBlockChain(genesisBlock), address);
-
+        this.transactionManager = transactionManager;
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -44,10 +45,8 @@ public class StandardNodeRunner implements NodeRunner {
                         }
                         node.getBlockChain().addBlock(specialBlock);
                         newBlock = specialBlock;
-                        display.addToDisplay(specialBlock);
                         specialBlock = null;
                     } else {
-                        display.addToDisplay(newBlock);
                         try {
                             eventQueue.put(new MinedBlockEvent(newBlock));
                         } catch (InterruptedException e) {
@@ -55,6 +54,8 @@ public class StandardNodeRunner implements NodeRunner {
                             System.out.println("interrupted while posting new mined block :O");
                         }
                     }
+                    display.addToDisplay(newBlock);
+                    transactionManager.removeTransactions(newBlock.getTransactions());
                 }
             }
         });
@@ -75,5 +76,15 @@ public class StandardNodeRunner implements NodeRunner {
     @Override
     public int getBlockNumber() {
         return node.getBlockChain().getBlockNumber();
+    }
+
+    @Override
+    public TransactionManager getTransactionManager() {
+        return this.transactionManager;
+    }
+
+    @Override
+    public boolean validateTransaction(Transaction transaction) {
+        return node.validateTransaction(transaction);
     }
 }

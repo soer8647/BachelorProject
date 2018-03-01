@@ -1,0 +1,43 @@
+package Impl;
+
+import Configuration.Configuration;
+import Interfaces.Communication.NodeRunner;
+import Interfaces.Transaction;
+import Interfaces.TransactionManager;
+import Interfaces.Transactions;
+
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
+
+public class StandardTransactionManager implements TransactionManager {
+    private Queue<Transaction> transactions;
+
+    public StandardTransactionManager() {
+        transactions = new LinkedList<>();
+    }
+
+    @Override
+    public Transactions getSomeTransactions() {
+        Transactions result = new ArrayListTransactions();
+        Iterator<Transaction> iter = transactions.iterator();
+        for (int i = 0; i < Configuration.transactionLimit; i++) {
+            if (!iter.hasNext()) {
+                break;
+            }
+            Transaction tran = iter.next();
+            result.add(tran);
+        }
+        return result;
+    }
+
+    @Override
+    public void addTransaction(Transaction transaction) {
+        this.transactions.add(transaction);
+    }
+
+    @Override
+    public void removeTransactions(Transactions toBeRemovedTransactions) {
+        this.transactions.removeAll(toBeRemovedTransactions.getTransactions());
+    }
+}
