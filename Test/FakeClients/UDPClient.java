@@ -12,6 +12,7 @@ import Impl.Communication.StandardCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
+import Impl.StandardTransactionManager;
 import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.Communication.CommunicationHandler;
@@ -37,7 +38,7 @@ public class UDPClient{
 
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
-        TransactionManager transMan = new EmptyTransactionsManager();
+        TransactionManager transMan = new StandardTransactionManager();
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));

@@ -72,7 +72,7 @@ public class FullNode implements Node {
         return true;
     }
 
-    private boolean validateTransaction(Transaction t){
+    public boolean validateTransaction(Transaction t){
         if(!verifyTransactionSignature(t)) {
             return false;
         }

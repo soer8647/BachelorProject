@@ -1,6 +1,8 @@
 package Interfaces.Communication;
 
 import Interfaces.Block;
+import Interfaces.Transaction;
+import Interfaces.TransactionManager;
 
 public interface NodeRunner {
     boolean validateBlock(Block block);
@@ -17,4 +19,8 @@ public interface NodeRunner {
      * @return the blocknumber of the inner node
      */
     int getBlockNumber();
+
+    TransactionManager getTransactionManager();
+
+    boolean validateTransaction(Transaction transaction);
 }
