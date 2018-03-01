@@ -1,6 +1,7 @@
 package blockchain.Stubs;
 
 import Crypto.Impl.RSA;
+import Crypto.Impl.RSAKeyPair;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;

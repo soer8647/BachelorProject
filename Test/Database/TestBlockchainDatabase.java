@@ -29,12 +29,12 @@ public class TestBlockchainDatabase {
     @Before
     public void setUp(){
         System.out.println("Running setup");
-        db = new BlockchainDatabase("TEST");
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10);
-        block = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
-        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),1,ct);
+        block = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),1,ct);
+        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),2,ct);
+        db = new BlockchainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct));
     }
 
 
@@ -42,6 +42,7 @@ public class TestBlockchainDatabase {
     @Test
     public void shouldBeAbleToQueryANewBlock() {
         int blocks = db.getBlockNumber();
+        System.out.println("Adding block "+block.getBlockNumber()+" to blockchain");
         db.addBlock(block);
         assertEquals(blocks+1,db.getBlockNumber());
     }
@@ -63,7 +64,7 @@ public class TestBlockchainDatabase {
     public void shouldBeAbleToGetBlock() {
         db.addBlock(block2);
         String b = block2.toString();
-        assertEquals(b,db.getBlock(1).toString());
+        assertEquals(b,db.getBlock(block2.getBlockNumber()).toString());
     }
 
     @AfterClass

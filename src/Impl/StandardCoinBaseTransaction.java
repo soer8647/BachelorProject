@@ -20,11 +20,15 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
      * @param data      Given a string that would be made from the objects toString method, turn it into an object again.
      */
     public StandardCoinBaseTransaction(String data) {
-        String publickey = data.substring(data.indexOf("["),data.indexOf("]"));
-        PublicKey key = new RSAPublicKey(publickey);
-        String valueString = data.substring(data.indexOf("value=")+6,data.length());
-        value = Integer.valueOf(valueString);
-        minerAddress = new PublicKeyAddress(key);
+        try {
+            String publickey = data.substring(data.indexOf("["), data.indexOf("]"));
+            PublicKey key = new RSAPublicKey(publickey);
+            String valueString = data.substring(data.indexOf("value=") + 6, data.length());
+            value = Integer.valueOf(valueString);
+            minerAddress = new PublicKeyAddress(key);
+        }catch (StringIndexOutOfBoundsException e){
+            System.out.println("ERROR: StandardCoinBaseTransaction can not be made from String: \n"+data);
+        }
     }
 
     @Override

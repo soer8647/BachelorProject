@@ -3,6 +3,7 @@ import Configuration.Configuration;
 import Impl.*;
 import Interfaces.*;
 import Crypto.Impl.RSAPublicKey;
+import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
 import java.sql.*;
@@ -13,7 +14,7 @@ public class BlockchainDatabase implements BlockChain{
     private static Connection conn;
     private final String driver;
 
-    public BlockchainDatabase(String databaseName) {
+    public BlockchainDatabase(String databaseName, Block genesisblock) {
 
         //   ## DEFINE VARIABLES SECTION ##
         // define the driver to use
@@ -47,8 +48,8 @@ public class BlockchainDatabase implements BlockChain{
         //  Beginning of Primary DB access section
         //   ## BOOT DATABASE SECTION ##
         try {
+            DriverManager.registerDriver(new EmbeddedDriver());
             conn = DriverManager.getConnection(connectionURL);
-
             // Connect to database
             System.out.println("Connected to database " + databaseName);
 
@@ -60,6 +61,10 @@ public class BlockchainDatabase implements BlockChain{
                 System.out.println ("Creating table: "+ "BLOCKCHAIN");
                 s.close();
             }
+            // If the table is empty add genesisblock
+            if(getBlockNumber()==-1){
+                System.out.println("No block found,Adding block "+genesisblock.getBlockNumber()+" to blockchain");
+                addBlock(genesisblock);}
             //Check if table TRANSACTIONS exist
             //   ## INITIAL SQL SECTION ##
             if (!tableExists("TRANSACTIONS")){
@@ -243,7 +248,6 @@ public class BlockchainDatabase implements BlockChain{
             String query = "SELECT * FROM BLOCKCHAIN WHERE BLOCKNR="+blockNumber;
             ResultSet set = s.executeQuery(query);
             set.next(); //There should be only one block since blocknr is primary key
-
             BigInteger prev_hash=new BigInteger(set.getString("PREV_BLOCK_HASH"));
             int nonce = set.getInt("NONCE");
             int hardness_param= set.getInt("HARDNESS_PARAM");
@@ -277,7 +281,7 @@ public class BlockchainDatabase implements BlockChain{
 
     @Override
     public int getBlockNumber() {
-        return countDataEntries("BLOCKCHAIN");
+        return countDataEntries("BLOCKCHAIN")-1;
     }
 
     public int getTotalNumberOfTransactions(){
@@ -297,6 +301,6 @@ public class BlockchainDatabase implements BlockChain{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return -1;
+        return -2;
     }
 }

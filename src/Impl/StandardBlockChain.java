@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-public class StandardBlockChain implements BlockChain {
+public class StandardBlockChain implements BlockChain{
     private Collection<Block> blocks;
     private Block genesisBlock;
     public StandardBlockChain(Block genesisBlock)

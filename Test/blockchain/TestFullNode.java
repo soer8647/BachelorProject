@@ -5,6 +5,7 @@ import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import Database.BlockchainDatabase;
 import Impl.*;
 import Impl.Hashing.SHA256;
 import Interfaces.*;
@@ -19,6 +20,7 @@ import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.GenesisBlockStub;
 import blockchain.Stubs.TransactionStub;
+import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -32,14 +34,26 @@ import static org.junit.Assert.*;
 
 public class TestFullNode {
     private FullNode node;
-    private BlockChain blockChain;
+    private static BlockchainDatabase blockChain;
     private Block block;
     private Address nodeAddress;
+    private Transaction tx;
+    private Transaction stx;
+    private CoinBaseTransaction ct;
+    private Block block2;
+
     @Before
     public void setUp(){
-        block = new GenesisBlockStub();
-        blockChain = new StandardBlockChain(block);
-        nodeAddress = new AddressStub();
+        //SETUP FROM DB
+        tx = new TransactionStub();
+        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());
+        ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10);
+        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
+        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
+
+
+        blockChain = new BlockchainDatabase("FULLNODETEST",block);
+        nodeAddress = stx.getSenderAddress();
         node = new FullNode(blockChain, nodeAddress);
         Configuration.hardnessParameter=10;
     }
@@ -60,8 +74,8 @@ public class TestFullNode {
     }
 
     @Test
-    public void shouldMineGenesisBlock(){
-        //TODO: remake this to actually reflect the blockchain
+    public void shouldMineABlock(){
+        int blocks = blockChain.getBlockNumber();
         File falcon = new File("resources/falconGenesis.jpg");
         //Make file to a int : hashCode
         int hashCode = falcon.hashCode();
@@ -69,7 +83,7 @@ public class TestFullNode {
         BigInteger integer = new BigInteger(Integer.toString(hashCode));
         node.mine(Global.hash(integer.toString()),new ArrayListTransactions());
         //The genesisblock should have blocknumber 0.
-        assertEquals(1,node.getBlockChain().getBlockNumber());
+        assertEquals(blocks+1,node.getBlockChain().getBlockNumber());
     }
 
     @Test
@@ -82,10 +96,11 @@ public class TestFullNode {
         //Make int to a BigInteger
         BigInteger integer = new BigInteger(Integer.toString(hashCode));
         //node.mine(Global.hash(integer.toString()),new ArrayListTransactions());
+        int blocks = blockChain.getBlockNumber();
         for (int i=1;i<6;i++){
             BigInteger previousHash = node.getBlockChain().getBlock(i-1).hash();
             node.mine(Global.hash(previousHash.toString()),new ArrayListTransactions());
-            assertEquals(i,node.getBlockChain().getBlockNumber());
+            assertEquals(blocks+i,node.getBlockChain().getBlockNumber());
         }
     }
 
@@ -144,6 +159,21 @@ public class TestFullNode {
         assertTrue(node.verifyTransactionSignature(validTransaction));
 
     }
+
+
+
+    @AfterClass
+    public static void tearDown(){
+        System.out.println("Running teardown");
+
+        blockChain.clearTable("BLOCKCHAIN");
+        System.out.println("BLOCKCHAIN table cleared");
+        blockChain.clearTable("TRANSACTIONS");
+        System.out.println("TRANSACTION table cleared");
+
+        blockChain.shutDown();
+    }
+
 
 
 
