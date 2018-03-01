@@ -34,7 +34,7 @@ public class BlockchainDatabase implements BlockChain{
                 +  " COINBASE_TRANS VARCHAR(255) NOT NULL"
                 +  " ) ";
 
-        String transactions =  "CREATE TABLE TRANSACTIONS"
+        String transactions =  "CREATE TABLE %s"
                 +  "(SENDER VARCHAR(255) NOT NULL,"
                 +  " RECEIVER VARCHAR(255) NOT NULL,"
                 +  " VALUE INT NOT NULL,"
@@ -44,6 +44,7 @@ public class BlockchainDatabase implements BlockChain{
                 +  " TRANS_HASH VARCHAR(255) NOT NULL,"
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
                 +  " ) " ;
+
         //  JDBC code sections
         //  Beginning of Primary DB access section
         //   ## BOOT DATABASE SECTION ##
@@ -54,27 +55,16 @@ public class BlockchainDatabase implements BlockChain{
             System.out.println("Connected to database " + databaseName);
 
             //   ## INITIAL SQL SECTION ##
-            if (!tableExists("BLOCKCHAIN")){
-
-                Statement s = conn.createStatement();
-                s.execute(blockchain);
-                System.out.println ("Creating table: "+ "BLOCKCHAIN");
-                s.close();
-            }
+            createTableIfNotExists("BLOCKCHAIN",blockchain);
             // If the table is empty add genesisblock
             if(getBlockNumber()==-1){
                 System.out.println("No block found,Adding block "+genesisblock.getBlockNumber()+" to blockchain");
                 addBlock(genesisblock);}
             //Check if table TRANSACTIONS exist
             //   ## INITIAL SQL SECTION ##
-            if (!tableExists("TRANSACTIONS")){
+            createTableIfNotExists("TRANSACTIONS", String.format(transactions, "TRANSACTIONS"));
 
-                Statement s = conn.createStatement();
-                s.execute(transactions);
-                System.out.println ("Creating table: "+ "TRANSACTIONS");
-                s.close();
-            }
-
+            createTableIfNotExists("PENDING_TRANSACTIONS", String.format(transactions, "PENDING_TRANSACTIONS"));
             //  Beginning of the primary catch block: prints stack trace
         }  catch (Throwable e)  {
             /*       Catch all exceptions and pass them to
@@ -302,5 +292,22 @@ public class BlockchainDatabase implements BlockChain{
             e.printStackTrace();
         }
         return -2;
+    }
+
+    /**
+     * Creates the table @tableName if it does not exist.
+     *
+     * @param tableName     Name of the table
+     * @param query         The SQL query that will create the table
+     */
+    private void createTableIfNotExists(String tableName,String query) throws SQLException {
+        if (!tableExists(tableName)){
+
+            Statement s = conn.createStatement();
+            s.execute(query);
+            System.out.println ("Creating table: "+ tableName);
+            s.close();
+        }
+
     }
 }
