@@ -21,7 +21,7 @@ public class BlockchainDatabase implements BlockChain{
         driver = "org.apache.derby.jdbc.EmbeddedDriver";
         // the database name
         // define the Derby connection URL to use
-        connectionURL = "jdbc:derby:" + databaseName + ";create=true";
+        connectionURL = "jdbc:derby:" +"databases/"+databaseName + ";create=true";
 
         //Store the blockchain in one table and store all transactions in another table
         String blockchain = "CREATE TABLE %s"
@@ -34,6 +34,8 @@ public class BlockchainDatabase implements BlockChain{
                 +  " COINBASE_TRANS VARCHAR(255) NOT NULL"
                 +  " ) ";
 
+
+
         String transactions =  "CREATE TABLE %s"
                 +  "(SENDER VARCHAR(255) NOT NULL,"
                 +  " RECEIVER VARCHAR(255) NOT NULL,"
@@ -41,12 +43,28 @@ public class BlockchainDatabase implements BlockChain{
                 +  " BLOCKNR INT NOT NULL, "
                 +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
                 +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
-                +  " TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT TRANS_HASH PRIMARY KEY,"
+                +  " TRANS_HASH VARCHAR(255) NOT NULL "
+                +  " CONSTRAINT TRANS_HASH PRIMARY KEY,"
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
                 +  " ) " ;
 
+        String pending_transactions =  "CREATE TABLE %s"
+                +  "(SENDER VARCHAR(255) NOT NULL,"
+                +  " RECEIVER VARCHAR(255) NOT NULL,"
+                +  " VALUE INT NOT NULL,"
+                +  " BLOCKNR INT NOT NULL, "
+                +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
+                +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
+                +  " PENDING_TRANS_HASH VARCHAR(255) NOT NULL "
+                +  " CONSTRAINT PENDING_TRANS_HASH PRIMARY KEY,"
+                +  " SIGNATURE VARCHAR(255) NOT NULL"
+                +  " ) " ;
+
+
+
+        //TODO MAKE FOREIGN KEY CONSTRAINT ON UNSPEND_TRANSACTIONS
         String unspent = "CREATE TABLE %s"
-                        +"(TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT TRANS_HASH PRIMARY KEY,"
+                        +"(UNSPENT_TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT UNSPENT_TRANS_HASH PRIMARY KEY,"
                         +"VALUE_LEFT INT NOT NULL)";
 
         //  JDBC code sections
@@ -69,7 +87,7 @@ public class BlockchainDatabase implements BlockChain{
             //   ## INITIAL SQL SECTION ##
             createTableIfNotExists("TRANSACTIONS", transactions);
 
-            createTableIfNotExists("PENDING_TRANSACTIONS", transactions);
+            createTableIfNotExists("PENDING_TRANSACTIONS", pending_transactions);
 
             createTableIfNotExists("UNSPENT_TRANSACTIONS", unspent);
             //  Beginning of the primary catch block: prints stack trace

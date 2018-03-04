@@ -1,5 +1,7 @@
 package Interfaces;
 
+import java.util.Collection;
+
 public interface TransactionManager {
 
     Transactions getSomeTransactions();
@@ -10,5 +12,5 @@ public interface TransactionManager {
      * Call this function, when a block (and its transactions has been added to the chain, and should no longer be in the pool of new transactions
      * @param transactions the list of transactions to be removed
      */
-    void removeTransactions(Transactions transactions);
+    void removeTransactions(Transactions<Collection<Transaction>> transactions);
 }

@@ -94,6 +94,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
     @Override
     public void HandleNewTransaction(Transaction transaction) {
+
         // put into Node's queue of potential transactions
         nodeRunner.getTransactionManager().addTransaction(transaction);
     }

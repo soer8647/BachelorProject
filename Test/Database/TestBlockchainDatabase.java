@@ -75,7 +75,6 @@ public class TestBlockchainDatabase {
         System.out.println("BLOCKCHAIN table cleared");
         db.clearTable("TRANSACTIONS");
         System.out.println("TRANSACTION table cleared");
-
         db.shutDown();
     }
 }

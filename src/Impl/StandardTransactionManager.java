@@ -6,6 +6,7 @@ import Interfaces.Transaction;
 import Interfaces.TransactionManager;
 import Interfaces.Transactions;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.Queue;
@@ -37,7 +38,7 @@ public class StandardTransactionManager implements TransactionManager {
     }
 
     @Override
-    public void removeTransactions(Transactions toBeRemovedTransactions) {
+    public void removeTransactions(Transactions<Collection<Transaction>> toBeRemovedTransactions) {
         this.transactions.removeAll(toBeRemovedTransactions.getTransactions());
     }
 }

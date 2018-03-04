@@ -1,6 +1,5 @@
 package Impl;
 
-import Configuration.Configuration;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
@@ -11,7 +10,10 @@ import Interfaces.HashingAlgorithm;
 import Interfaces.Transaction;
 
 import java.math.BigInteger;
-
+/*
+* A standard account is a way to access the block chain. An Account should be able to make transactions and view the  transaction history of this account.
+*
+* */
 public class StandardAccount implements Account{
     private PublicKeyCryptoSystem cryptoSystem;
     private RSAPrivateKey privateKey;
@@ -25,7 +27,6 @@ public class StandardAccount implements Account{
 
         privateKey = keyPair.getPrivateKey();
         publicKey = keyPair.getPublicKey();
-
     }
 
     public StandardAccount(PublicKeyCryptoSystem cryptoSystem, RSAPrivateKey privateKey, RSAPublicKey publicKey, HashingAlgorithm hashingAlgorithm) {
