@@ -1,7 +1,9 @@
 package Impl;
 
+import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.BlockChain;
+import Interfaces.Transaction;
 
 import java.awt.image.ByteLookupTable;
 import java.util.ArrayList;
@@ -47,6 +49,17 @@ public class StandardBlockChain implements BlockChain{
     @Override
     public Block getGenesisBlock() {
         return genesisBlock;
+    }
+
+    @Override
+    public Collection<Transaction> getTransactionHistory(Address address) {
+        ArrayList<Transaction> transactions = new ArrayList();
+        for (Block b : blocks){
+            for (Transaction t: b.getTransactions().getTransactions()){
+                if (t.getSenderAddress().toString().equals(address.toString()) || t.getReceiverAddress().toString().equals(address.toString())) transactions.add(t);
+            }
+        }
+        return transactions;
     }
 
 }

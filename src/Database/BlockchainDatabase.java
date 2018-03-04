@@ -7,6 +7,7 @@ import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
 import java.sql.*;
+import java.util.Collection;
 
 public class BlockchainDatabase implements BlockChain{
 
@@ -21,6 +22,7 @@ public class BlockchainDatabase implements BlockChain{
         driver = "org.apache.derby.jdbc.EmbeddedDriver";
         // the database name
         // define the Derby connection URL to use
+        //TODO set derby.system.home to another path. This is where the databases are.
         connectionURL = "jdbc:derby:" +"databases/"+databaseName + ";create=true";
 
         //Store the blockchain in one table and store all transactions in another table
@@ -163,6 +165,11 @@ public class BlockchainDatabase implements BlockChain{
     @Override
     public Block getGenesisBlock() {
         return getBlock(0);
+    }
+
+    @Override
+    public Collection<Transaction> getTransactionHistory(Address address) {
+        return null;
     }
 
     /**

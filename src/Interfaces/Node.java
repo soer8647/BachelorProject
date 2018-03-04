@@ -61,5 +61,17 @@ public interface Node {
      */
     Address getAddress();
 
+    /**
+     * Checks the signature and the proof of funds of a given transaction to see if it it valid.
+     *
+     * @param transaction       The transaction to be validated.
+     * @return                  True if the transaction os valid and false otherwise.
+     */
     boolean validateTransaction(Transaction transaction);
+
+    /**
+     * @param address       The address involved in transactions.
+     * @return              A collection of all transactions where this address is involved.
+     */
+    Collection<Transaction> getTransactionHistory(Address address);
 }

@@ -141,4 +141,9 @@ public class FullNode implements Node {
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transActionHash());
     }
+
+    @Override
+    public Collection<Transaction> getTransactionHistory(Address address) {
+        return blockChain.getTransactionHistory(address);
+    }
 }
