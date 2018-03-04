@@ -18,6 +18,7 @@ public class StandardAccount implements Account{
     private PublicKeyCryptoSystem cryptoSystem;
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
+    private PublicKeyAddress address;
     private HashingAlgorithm hashingAlgorithm;
 
     public StandardAccount(PublicKeyCryptoSystem cryptoSystem, HashingAlgorithm hashingAlgorithm) {
@@ -27,6 +28,7 @@ public class StandardAccount implements Account{
 
         privateKey = keyPair.getPrivateKey();
         publicKey = keyPair.getPublicKey();
+        address = new PublicKeyAddress(publicKey);
     }
 
     public StandardAccount(PublicKeyCryptoSystem cryptoSystem, RSAPrivateKey privateKey, RSAPublicKey publicKey, HashingAlgorithm hashingAlgorithm) {
@@ -34,11 +36,12 @@ public class StandardAccount implements Account{
         this.privateKey = privateKey;
         this.publicKey = publicKey;
         this.hashingAlgorithm = hashingAlgorithm;
+        address = new PublicKeyAddress(publicKey);
     }
 
     @Override
-    public RSAPublicKey getAddress() {
-        return publicKey;
+    public PublicKeyAddress getAddress() {
+        return address;
     }
 
     @Override

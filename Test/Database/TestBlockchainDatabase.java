@@ -42,7 +42,6 @@ public class TestBlockchainDatabase {
     @Test
     public void shouldBeAbleToQueryANewBlock() {
         int blocks = db.getBlockNumber();
-        System.out.println("Adding block "+block.getBlockNumber()+" to blockchain");
         db.addBlock(block);
         assertEquals(blocks+1,db.getBlockNumber());
     }

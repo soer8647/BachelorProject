@@ -159,7 +159,6 @@ public class BlockchainDatabase implements BlockChain{
         try {
             query(query);
             for (Transaction t:block.getTransactions().getTransactions()){
-                System.out.println("ACTUALLY ADDING");
                 addTransaction(t,block.getBlockNumber());
             }
         } catch (SQLException e) {
@@ -172,6 +171,10 @@ public class BlockchainDatabase implements BlockChain{
         return getBlock(0);
     }
 
+    /**
+     * @param address The address involved in transactions.
+     * @return      A collection of all the transactions where this address is involved.
+     */
     @Override
     public Collection<Transaction> getTransactionHistory(Address address) {
         Collection<Transaction> transactions = new ArrayList<>();
