@@ -13,7 +13,7 @@ public class Configuration {
 
     //The blockreward for mining a block
     private static int blockReward = 10;
-    private static int hardnessParameter = 15;
+    private static int hardnessParameter = 14;
     private static int keyBitLength = 500;
     private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
     private static int transactionLimit=10;

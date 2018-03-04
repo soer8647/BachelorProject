@@ -14,6 +14,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     private NodeRunner nodeRunner;
     private Publisher publisher;
     private boolean interrupted;
+    private OrphanChainHolder orphanage;
 
     /**
      *
@@ -24,6 +25,8 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     public StandardNodeCommunicationHandler(NodeRunner nodeRunner, Publisher publisher, BlockingQueue<Event> eventQueue) {
         this.nodeRunner = nodeRunner;
         this.publisher = publisher;
+
+        this.orphanage = new OrphanChainHolder();
 
         Thread thread = new Thread(new Runnable() {
             @Override
@@ -55,19 +58,41 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             HandleMinedBlock(((MinedBlockEvent) event).getBlock());
         } else if (event instanceof RequestEvent) {
             HandleRequest((RequestEvent) event);
-        }
-    }
+        } else if (event instanceof RequestedEvent) {
+            HandleRequested((RequestedEvent) event);
+        }    }
 
     private void HandleRequest(RequestEvent event) {
         int number = event.getNumber();
         if (number == -1) {
             number = nodeRunner.getBlockNumber();
         }
-        publisher.answerRequest(nodeRunner.getBlock(number), event.getIp(), event.getPort());
+       publisher.answerRequest(nodeRunner.getBlock(number), event.getIp(), event.getPort());
     }
 
     private void HandleRequested(RequestedEvent event) {
-        //TODO: MAKE
+        Block block = event.getBlock();
+        int key = event.getPort();
+        Block child = orphanage.getBlock(key);
+
+        //TODO : remove
+        if (child.getBlockNumber() - block.getBlockNumber() != 1) {
+            System.out.println(child.getBlockNumber() + " > " + block.getBlockNumber());
+        }
+
+        if (child.getPreviousHash().equals(block.hash())) {
+            if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
+                Object chain = orphanage.getChain(key);
+                //TODO: perform rollback (if it's the best chain)
+             //   System.out.println("Alternative chain built");
+            } else {
+                orphanage.addBlock(block,key);
+                publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
+             //   System.out.println("Building Alt Chain");
+            }
+        } else {
+            System.out.println("Bad Requested");
+        }
     }
 
     @Override
@@ -79,8 +104,10 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
-            //TODO: Handle other nodes being more than 1 ahead
-            publisher.requestMaxBlock(event.getIp(),event.getPort());
+            //TODO: Handle other nodes being more than 1 ahead (not done)
+            if (orphanage.addChain(block,event.getPort())) {
+                publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
+            }
 //            System.out.println("Other blocks far ahead");
         } else {
             if (nodeRunner.validateBlock(block)) {
@@ -93,7 +120,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
 
     @Override
     public void HandleNewTransaction(Transaction transaction) {
-
         // put into Node's queue of potential transactions
         nodeRunner.getTransactionManager().addTransaction(transaction);
     }

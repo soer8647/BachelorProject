@@ -12,4 +12,8 @@ public class RequestedEvent extends ProtoEvent {
         super(port, ip);
         this.block = block;
     }
+
+    public Block getBlock() {
+        return block;
+    }
 }
