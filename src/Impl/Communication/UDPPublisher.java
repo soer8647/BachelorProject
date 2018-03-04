@@ -73,7 +73,6 @@ public class UDPPublisher implements Publisher{
     @Override
     public void requestBlock(int number, InetAddress ip, int port) {
         Event event = new RequestEvent(number, localPort, localAdress);
-        System.out.println(localAdress);
         sendEvent(event,ip,port);
     }
 
