@@ -35,7 +35,12 @@ public class UDPClient{
     private final CommunicationHandler communicationHandler;
 
     public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
-
+        InetAddress myIp = null;
+        try {
+            myIp = InetAddress.getLocalHost();
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
         TransactionManager transMan = new StandardTransactionManager();
@@ -47,7 +52,7 @@ public class UDPClient{
         GuiApp display = new GuiApp(node1Address.getPublicKey());
         nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address,display);
         receiver = new UDPReceiver(queue,myPort);
-        publisher = new UDPPublisher(ips,otherPorts);
+        publisher = new UDPPublisher(myIp,myPort,ips,otherPorts);
         communicationHandler = new StandardCommunicationHandler(nodeRunner,publisher,queue);
     }
 

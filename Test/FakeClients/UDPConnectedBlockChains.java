@@ -31,7 +31,7 @@ public class UDPConnectedBlockChains {
     public static void main(String[] args) {
         InetAddress IPAddress = null;
         try {
-            IPAddress = InetAddress.getByName("localhost");
+            IPAddress = InetAddress.getLocalHost();
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

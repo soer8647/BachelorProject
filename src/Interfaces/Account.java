@@ -1,10 +1,10 @@
 package Interfaces;
 
 import Crypto.Impl.RSAPrivateKey;
-import Crypto.Impl.RSAPublicKey;
-import Crypto.Interfaces.PublicKeyCryptoSystem;
+        import Crypto.Impl.RSAPublicKey;
+        import Crypto.Interfaces.PublicKeyCryptoSystem;
 
-import java.math.BigInteger;
+        import java.math.BigInteger;
 
 public interface Account {
 

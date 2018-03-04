@@ -49,16 +49,31 @@ public class StandardCommunicationHandler implements CommunicationHandler{
      */
     private void HandleEvent(Event event) {
         if (event instanceof ReceivedBlockEvent) {
-            HandleReceivedBlock(((ReceivedBlockEvent) event).getBlock());
+            HandleReceivedBlock(((ReceivedBlockEvent) event));
         } else if (event instanceof TransactionEvent) {
             HandleNewTransaction(((TransactionEvent) event).getTransaction());
         } else if (event instanceof MinedBlockEvent) {
             HandleMinedBlock(((MinedBlockEvent) event).getBlock());
+        } else if (event instanceof RequestEvent) {
+            HandleRequest((RequestEvent) event);
         }
     }
 
+    private void HandleRequest(RequestEvent event) {
+        int number = event.getNumber();
+        if (number == -1) {
+            number = nodeRunner.getBlockNumber();
+        }
+        publisher.answerRequest(nodeRunner.getBlock(number), event.getIp(), event.getPort());
+    }
+
+    private void HandleRequested(RequestedEvent event) {
+        //TODO: MAKE
+    }
+
     @Override
-    public void HandleReceivedBlock(Block block) {
+    public void HandleReceivedBlock(ReceivedBlockEvent event) {
+        Block block = event.getBlock();
 //        System.out.println("ReceivedBlock event");
         if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {
             //we dont care about old
@@ -66,6 +81,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
             //TODO: Handle other nodes being more than 1 ahead
+            publisher.requestMaxBlock(event.getIp(),event.getPort());
 //            System.out.println("Other blocks far ahead");
         } else {
             if (nodeRunner.validateBlock(block)) {

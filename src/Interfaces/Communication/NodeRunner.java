@@ -23,4 +23,6 @@ public interface NodeRunner {
     TransactionManager getTransactionManager();
 
     boolean validateTransaction(Transaction transaction);
+
+    Block getBlock(int number);
 }

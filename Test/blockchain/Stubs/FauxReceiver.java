@@ -16,7 +16,7 @@ public class FauxReceiver {
     public void receiveBlock(Block block) {
         System.out.println("Received a block");
         try {
-            queue.put( new ReceivedBlockEvent(block));
+            queue.put( new ReceivedBlockEvent(block,0,null));
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
