@@ -52,7 +52,7 @@ public class FullNode implements Node {
                 hardness,
                 previousBlockHash,
                 10,
-                new ArrayListTransactions(),
+                transactions,
                 blockChain.getBlockNumber()+1,
                 coinBase);
         blockChain.addBlock(newBlock);

@@ -7,6 +7,7 @@ import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Collection;
 
 public class BlockchainDatabase implements BlockChain{
@@ -157,6 +158,10 @@ public class BlockchainDatabase implements BlockChain{
                 +block.getCoinBase().toString()+"')";
         try {
             query(query);
+            for (Transaction t:block.getTransactions().getTransactions()){
+                System.out.println("ACTUALLY ADDING");
+                addTransaction(t,block.getBlockNumber());
+            }
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -169,7 +174,39 @@ public class BlockchainDatabase implements BlockChain{
 
     @Override
     public Collection<Transaction> getTransactionHistory(Address address) {
-        return null;
+        Collection<Transaction> transactions = new ArrayList<>();
+        Statement s;
+        try {
+            s = conn.createStatement();
+            String query = "SELECT * FROM TRANSACTIONS " +
+                    "WHERE SENDER='"+address+"' OR RECEIVER='"+address+"'";
+            ResultSet r = s.executeQuery(query);
+            while (r.next()) {
+               transactions.add( getTransactionFromResultSet(r,s,false));
+            }
+            s.close();
+            r.close();
+
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return transactions;
+    }
+
+    private Transaction getTransactionFromResultSet(ResultSet set,Statement s,boolean close) throws SQLException {
+        // Get the data from the resultset.
+        Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
+        int value = set.getInt("VALUE");
+        int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
+        BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
+        BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
+        if (close){
+            s.close();
+            set.close();
+        }
+        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
     }
 
     /**
@@ -243,16 +280,8 @@ public class BlockchainDatabase implements BlockChain{
 
             set.next();
             // Get the data from the resultset.
-            Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
-            Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
-            int value = set.getInt("VALUE");
-            int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
-            BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
-            BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
-            // Clean up resources
-            s.close();
-            set.close();
-            return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
+
+            return getTransactionFromResultSet(set,s,true);
         } catch (SQLException e) {
             e.printStackTrace();
         }

@@ -38,6 +38,14 @@ public class TestFullNode {
     private Transaction stx;
     private CoinBaseTransaction ct;
     private Block block2;
+    private PublicKeyCryptoSystem cryptoSystem;
+    private KeyPair keyPair1;
+    private RSAPublicKey publicKeySender;
+    private RSAPrivateKey privateKeySender;
+
+    private KeyPair keyPair2;
+    private RSAPublicKey publicKeyReceiver;
+    private RSAPrivateKey privateKeyReceiver;
 
     @Before
     public void setUp(){
@@ -47,12 +55,27 @@ public class TestFullNode {
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
+        //SETUP ACCOUNTS AND TRANSACTIONS
+        cryptoSystem = new RSA(Configuration.getKeyBitLength());
+
+        keyPair1 = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
+        publicKeySender = keyPair1.getPublicKey();
+        privateKeySender = keyPair1.getPrivateKey();
+
+        keyPair2 = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
+        privateKeyReceiver = keyPair2.getPrivateKey();
+        publicKeyReceiver = keyPair2.getPublicKey();
 
 
         blockChain = new BlockchainDatabase("FULLNODETEST",block);
         nodeAddress = stx.getSenderAddress();
         node = new FullNode(blockChain, nodeAddress);
         Configuration.setHardnessParameter(10);
+
+
+
+
+
     }
 
     @Test
@@ -104,18 +127,9 @@ public class TestFullNode {
     @Test
     public void shouldBeAbleToVerifyTransactions() {
         // Make addresses
-        PublicKeyCryptoSystem cryptoSystem = new RSA(1000);
-        KeyPair keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
-
-        RSAPublicKey publicKeySender = keyPair.getPublicKey();
-        RSAPrivateKey privateKeySender = keyPair.getPrivateKey();
         Address senderAddress = new PublicKeyAddress(publicKeySender);
 
-        keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
-        RSAPublicKey publicKeyReceiver = keyPair.getPublicKey();
-        RSAPrivateKey privateKeyReceiver = keyPair.getPrivateKey();
-        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);  
-
+        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
         // Make a transaction
         BigInteger valueProofFake = new TransactionStub().transActionHash();
 
@@ -156,7 +170,32 @@ public class TestFullNode {
 
     }
 
+    @Test
+    public void shouldBeAbleToGetTransactionHistory() {
+        // Make addresses
+        Address senderAddress = new PublicKeyAddress(publicKeySender);
 
+        Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
+        // Make a transaction
+        BigInteger valueProofFake = new TransactionStub().transActionHash();
+
+        Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
+        Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
+
+
+        //Make transaction from sender
+        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProofFake, 0);
+        Transactions transactions = new ArrayListTransactions();
+        transactions.add(transaction);
+
+        //Make transaction from receiver to sender
+        Transaction transaction2 = sender.makeTransaction(receiverAddress,senderAddress,5,valueProofFake, 0);
+        Transactions transactions2 = new ArrayListTransactions();
+        transactions.add(transaction2);
+
+        node.mine(valueProofFake,transactions);
+        assertEquals(2,node.getTransactionHistory(senderAddress).size());
+    }
 
     @AfterClass
     public static void tearDown(){
