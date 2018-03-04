@@ -5,15 +5,11 @@ import Interfaces.Communication.Event;
 
 import java.net.InetAddress;
 
-public class ReceivedBlockEvent extends ProtoEvent {
+public class RequestedEvent extends ProtoEvent {
     private Block block;
 
-    public ReceivedBlockEvent(Block block, int port, InetAddress ip) {
+    public RequestedEvent(Block block, int port, InetAddress ip) {
         super(port, ip);
         this.block = block;
-    }
-
-    public Block getBlock() {
-        return block;
     }
 }

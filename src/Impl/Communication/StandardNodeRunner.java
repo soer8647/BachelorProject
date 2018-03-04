@@ -34,7 +34,6 @@ public class StandardNodeRunner implements NodeRunner {
                 while(!interrupted) {
                     Transactions trans = transactionManager.getSomeTransactions();
 
-                    //TODO: Ensure that the block hasnt been added to the chain before method returns
                  //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     newBlock = node.mine(newBlock.hash(), trans);
                     if (newBlock==null) {
@@ -48,7 +47,7 @@ public class StandardNodeRunner implements NodeRunner {
                         specialBlock = null;
                     } else {
                         try {
-                            eventQueue.put(new MinedBlockEvent(newBlock));
+                            eventQueue.put(new MinedBlockEvent(newBlock,0,null)); //TODO: is this proper way?
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             System.out.println("interrupted while posting new mined block :O");
@@ -86,5 +85,10 @@ public class StandardNodeRunner implements NodeRunner {
     @Override
     public boolean validateTransaction(Transaction transaction) {
         return node.validateTransaction(transaction);
+    }
+
+    @Override
+    public Block getBlock(int number) {
+        return node.getBlockChain().getBlock(number);
     }
 }
