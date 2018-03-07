@@ -8,6 +8,7 @@ import javafx.util.Pair;
 
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.concurrent.LinkedBlockingQueue;
 
 public interface AccountRunner {
 
@@ -35,4 +36,6 @@ public interface AccountRunner {
     EventHandler getEventHandler();
 
     Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException;
+
+    LinkedBlockingQueue<Event> getOutGoingEventQueue();
 }

@@ -3,17 +3,16 @@ package Impl.Communication;
 import Interfaces.Communication.Event;
 
 import java.io.ByteArrayInputStream;
-import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
-import java.net.SocketException;
 import java.net.DatagramSocket;
+import java.net.SocketException;
 import java.util.concurrent.BlockingQueue;
 
 public class UDPReceiver {
     private DatagramSocket socket = null;
-    private BlockingQueue queue;
+    private BlockingQueue<Event> queue;
     private int port;
 
     public UDPReceiver(BlockingQueue<Event> queue, int port) {
@@ -44,6 +43,8 @@ public class UDPReceiver {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }finally {
+            socket.close();
         }
     }
 }
