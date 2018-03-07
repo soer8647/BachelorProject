@@ -24,11 +24,11 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TestStandardAccountRunner {
 
@@ -69,12 +69,13 @@ public class TestStandardAccountRunner {
         account = new StandardAccount(cryptoSystem,privateKeySender,publicKeySender,new SHA256());
         transactionQueue = new LinkedBlockingQueue<>();
         nodeIpAndPortCollection = new ArrayList<>();
-        nodeIpAndPortCollection.add(new Pair(InetAddress.getLocalHost(),1));
-        accountRunner = new StandardAccountRunner(account, transactionQueue,nodeIpAndPortCollection);
+        nodeIpAndPortCollection.add(new Pair<InetAddress, Integer>(InetAddress.getLocalHost(),1));
+
     }
 
     @Test
     public void shouldHaveAccount() {
+        accountRunner = new StandardAccountRunner(account, transactionQueue,nodeIpAndPortCollection,8000);
         assertNotEquals(null,accountRunner.getAccount());
     }
 
@@ -88,29 +89,29 @@ public class TestStandardAccountRunner {
         //Transaction transaction = account.makeTransaction(account.getAddress(), receiverAddress,1,new BigInteger("42"),1);
         Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1);
         // Account sends 3 money
-        Collection<Transaction> transactions = new ArrayList(){{add(t1);}};
-        accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection);
+        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<Transaction>(){{add(t1);}};
+        accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection,8003);
         accountRunner.makeTransaction(receiverAddress,1);
-        assertEquals(1,accountRunner.getEventHandler().getEventCount());
+        assertEquals(1,accountRunner.getOutGoingEventQueue().size());
     }
 
     @Test
     public void shouldGetBalanceFromHistory() {
         //Setup fake history for account
-        Collection<Transaction> transactions = new ArrayList<>();
+        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
         // Account receives 42 money
         Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("42"),new BigInteger("42"),1);
         // Account sends 10 money
         Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("42"),new BigInteger("42"),1);
         transactions.add(t1);
         transactions.add(t2);
-        accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>());
+        accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>(),8001);
         assertEquals(32,accountRunner.getBalance());
     }
 
     @Test
     public void shouldGetValueProof() {
-        Collection<Transaction> transactions = new ArrayList<>();
+        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
         //Account gets 4 money
         Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1);
         // Account sends 3 money
@@ -132,11 +133,12 @@ public class TestStandardAccountRunner {
         transactions.add(t5);
         transactions.add(t6);
         try {
-            accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>());
+            accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>(),8002);
             assertEquals(3, accountRunner.getBalance());
-            assertEquals(new Pair<BigInteger, Integer>(new BigInteger("100"), 1).toString(), accountRunner.getValueProof(1).toString());
+            assertEquals(new Pair<>(new BigInteger("100"), 1).toString(), accountRunner.getValueProof(1).toString());
         }catch (NotEnoughMoneyException e){
             e.printStackTrace();
         }
             }
+
 }

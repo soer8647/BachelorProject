@@ -11,35 +11,34 @@ import javafx.util.Pair;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
-import java.util.Iterator;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class StandardAccountRunner implements AccountRunner {
 
     private Account account;
-    private LinkedBlockingQueue<Event> transactionQueue;
-    private Collection<Transaction> transactionHistory;
+    private LinkedBlockingQueue<Event> outGoingEventQueue;
+    private CopyOnWriteArrayList<Transaction> transactionHistory;
     private int balance;
     private EventHandler eventHandler;
     private Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
 
 
-    public StandardAccountRunner(Account account, LinkedBlockingQueue transactionQueue, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection) {
+    public StandardAccountRunner(Account account, LinkedBlockingQueue<Event> outGoingEventQueue, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
         this.account = account;
-        this.transactionQueue = transactionQueue;
+        this.outGoingEventQueue = outGoingEventQueue;
         this.nodeIpAndPortCollection = nodeIpAndPortCollection;
-        eventHandler = new AccountEventHandler();
-        transactionHistory = new ArrayList<>();
+        transactionHistory = new CopyOnWriteArrayList<>();
+        eventHandler = new AccountEventHandler(transactionHistory,outGoingEventQueue,listeningPort,nodeIpAndPortCollection);
         balance = getBalance();
     }
 
-    public StandardAccountRunner(Account account, Collection<Transaction> transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection) {
+    public StandardAccountRunner(Account account, CopyOnWriteArrayList<Transaction> transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
         this.account = account;
         this.transactionHistory = transactionHistory;
-        this.eventHandler = new AccountEventHandler();
+        this.outGoingEventQueue = new LinkedBlockingQueue<>();
+        this.eventHandler = new AccountEventHandler(transactionHistory,outGoingEventQueue,listeningPort,nodeIpAndPortCollection);
         this.nodeIpAndPortCollection = nodeIpAndPortCollection;
         balance = getBalance();
     }
@@ -76,9 +75,12 @@ public class StandardAccountRunner implements AccountRunner {
         try {
         Pair<BigInteger,Integer> proof = getValueProof(value);
             for (Pair<InetAddress,Integer> p:nodeIpAndPortCollection) {
-                eventHandler.handleOutGoingEvent(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), p.getValue(),p.getKey()));
+                outGoingEventQueue.put(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), p.getValue(),p.getKey()));
             }
         } catch (NotEnoughMoneyException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            //TODO Make transaction again?
             e.printStackTrace();
         }
     }
@@ -92,7 +94,7 @@ public class StandardAccountRunner implements AccountRunner {
             if (t.getReceiverAddress().toString().equals(account.getAddress().toString())){
                 //gets money
                 counter+=t.getValue();
-                System.out.println(counter>=bal);
+                //spends money
                 if (counter>=bal) return new Pair<>(t.getValueProof(),t.getBlockNumberOfValueProof());
             }
             else if(t.getSenderAddress().toString().equals(account.getAddress().toString())){
@@ -105,5 +107,13 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public EventHandler getEventHandler() {
         return eventHandler;
+    }
+
+    public LinkedBlockingQueue<Event> getOutGoingEventQueue() {
+        return outGoingEventQueue;
+    }
+
+    public Collection<Pair<InetAddress, Integer>> getNodeIpAndPortCollection() {
+        return nodeIpAndPortCollection;
     }
 }
