@@ -18,12 +18,9 @@ public class OrphanChainHolder {
         stack.addFirst(block);
     }
 
-    public Object getChain(int key) {
+    public Deque<Block> getChain(int key) {
         //TODO: convert to outside format
-        Object o =  chains.remove(key);
-        if (chains.containsKey(key)) {
-            System.out.println("Should not trigger");
-        }
+        Deque<Block> o =  chains.remove(key);
         return o;
     }
 

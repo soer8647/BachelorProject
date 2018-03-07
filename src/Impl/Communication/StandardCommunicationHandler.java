@@ -9,6 +9,7 @@ import Interfaces.Communication.Publisher;
 import Interfaces.Node;
 import Interfaces.Transaction;
 
+import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardCommunicationHandler implements CommunicationHandler{
@@ -83,13 +84,15 @@ public class StandardCommunicationHandler implements CommunicationHandler{
 
         if (child.getPreviousHash().equals(block.hash())) {
             if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
-                Object chain = orphanage.getChain(key);
+                Deque<Block> chain = orphanage.getChain(key);
                 //TODO: perform rollback (if it's the best chain)
+                if (chain.peekLast().getBlockNumber() > nodeRunner.getBlockNumber()) {
+                    nodeRunner.rollback(chain,chain.peekFirst().getBlockNumber());
+                }
              //   System.out.println("Alternative chain built");
             } else {
                 orphanage.addBlock(block,key);
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
-             //   System.out.println("Building Alt Chain");
             }
         } else {
             System.out.println("Bad Requested");

@@ -4,6 +4,8 @@ import Interfaces.Block;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
 
+import java.util.Deque;
+
 public interface NodeRunner {
     boolean validateBlock(Block block);
 
@@ -25,4 +27,6 @@ public interface NodeRunner {
     boolean validateTransaction(Transaction transaction);
 
     Block getBlock(int number);
+
+    void rollback(Deque<Block> chain, int blockNumber);
 }

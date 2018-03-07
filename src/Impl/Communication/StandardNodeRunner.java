@@ -8,6 +8,7 @@ import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 
 import java.math.BigInteger;
+import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardNodeRunner implements NodeRunner {
@@ -90,5 +91,15 @@ public class StandardNodeRunner implements NodeRunner {
     @Override
     public Block getBlock(int number) {
         return node.getBlockChain().getBlock(number);
+    }
+
+    @Override
+    public void rollback(Deque<Block> chain, int blockNumber) {
+        //reset Chain
+
+        //reset unspent   transactions
+
+        //reset potential transactions
+
     }
 }
