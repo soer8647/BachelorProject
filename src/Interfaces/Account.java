@@ -3,16 +3,16 @@ package Interfaces;
 import Crypto.Impl.RSAPrivateKey;
         import Crypto.Impl.RSAPublicKey;
         import Crypto.Interfaces.PublicKeyCryptoSystem;
+import Impl.PublicKeyAddress;
 
-        import java.math.BigInteger;
+import java.math.BigInteger;
 
 public interface Account {
 
     /**
      * @return  The address of this account
      */
-    RSAPublicKey getAddress();
-
+    PublicKeyAddress getAddress();
 
     RSAPrivateKey getPrivateKey();
 

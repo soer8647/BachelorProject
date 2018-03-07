@@ -1,7 +1,6 @@
 package Impl;
 
 import Configuration.Configuration;
-import Interfaces.Communication.NodeRunner;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
 import Interfaces.Transactions;

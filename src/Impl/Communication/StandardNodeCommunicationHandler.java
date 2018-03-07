@@ -2,17 +2,16 @@ package Impl.Communication;
 
 import Impl.Communication.Events.*;
 import Interfaces.Block;
-import Interfaces.Communication.CommunicationHandler;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
-import Interfaces.Node;
 import Interfaces.Transaction;
 
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 
-public class StandardCommunicationHandler implements CommunicationHandler{
+public class StandardNodeCommunicationHandler implements NodeCommunicationHandler {
     private NodeRunner nodeRunner;
     private Publisher publisher;
     private boolean interrupted;
@@ -24,7 +23,7 @@ public class StandardCommunicationHandler implements CommunicationHandler{
      * @param publisher, The publisher of the network module
      * @param eventQueue, The queue which the SCH takes events from.
      */
-    public StandardCommunicationHandler(NodeRunner nodeRunner, Publisher publisher, BlockingQueue<Event> eventQueue) {
+    public StandardNodeCommunicationHandler(NodeRunner nodeRunner, Publisher publisher, BlockingQueue<Event> eventQueue) {
         this.nodeRunner = nodeRunner;
         this.publisher = publisher;
 

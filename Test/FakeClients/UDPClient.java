@@ -1,24 +1,22 @@
 package FakeClients;
 
 import Configuration.Configuration;
-import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import GUI.GuiApp;
 import Impl.ArrayListTransactions;
+import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.UDPPublisher;
 import Impl.Communication.UDPReceiver;
-import Impl.Communication.StandardCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
 import Impl.StandardTransactionManager;
 import Interfaces.Address;
 import Interfaces.Block;
-import Interfaces.Communication.CommunicationHandler;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
-import Interfaces.Communication.Publisher;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import Interfaces.TransactionManager;
 
@@ -32,7 +30,7 @@ public class UDPClient{
     private final NodeRunner nodeRunner;
     private final UDPReceiver receiver;
     private final UDPPublisher publisher;
-    private final CommunicationHandler communicationHandler;
+    private final NodeCommunicationHandler nodeCommunicationHandler;
 
     public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
         InetAddress myIp = null;
@@ -53,7 +51,7 @@ public class UDPClient{
         nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address,display);
         receiver = new UDPReceiver(queue,myPort);
         publisher = new UDPPublisher(myIp,myPort,ips,otherPorts);
-        communicationHandler = new StandardCommunicationHandler(nodeRunner,publisher,queue);
+        nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
 
     public void stop() {

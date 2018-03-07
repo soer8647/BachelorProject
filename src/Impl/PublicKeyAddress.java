@@ -20,4 +20,6 @@ public class PublicKeyAddress implements Address {
         return "PublicKeyAddress:{\n\t[" +
                 "publicKey:" + publicKey+"]";
     }
+
+
 }

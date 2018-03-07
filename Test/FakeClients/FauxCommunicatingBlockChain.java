@@ -1,18 +1,16 @@
 package FakeClients;
 
 import Configuration.Configuration;
-import Crypto.Impl.RSA;
-import Crypto.Impl.RSAKeyPair;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.ArrayListTransactions;
-import Impl.Communication.StandardCommunicationHandler;
+import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
 import Interfaces.Address;
 import Interfaces.Block;
-import Interfaces.Communication.CommunicationHandler;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
@@ -47,8 +45,8 @@ public class FauxCommunicatingBlockChain {
         FauxReceiver receiver_B = new FauxReceiver(queue_B);
         Publisher publisher_A = new FauxPublisher(receiver_B);
         Publisher publisher_B = new FauxPublisher(receiver_A);
-        CommunicationHandler communicationHandler_A = new StandardCommunicationHandler(nodeRunner_A,publisher_A,queue_A);
-        CommunicationHandler communicationHandler_B = new StandardCommunicationHandler(nodeRunner_B,publisher_B,queue_B);
+        NodeCommunicationHandler nodeCommunicationHandler_A = new StandardNodeCommunicationHandler(nodeRunner_A,publisher_A,queue_A);
+        NodeCommunicationHandler nodeCommunicationHandler_B = new StandardNodeCommunicationHandler(nodeRunner_B,publisher_B,queue_B);
         System.out.println("begin");
     }
 }
