@@ -1,9 +1,12 @@
 package Interfaces.Communication;
 
+import Impl.Communication.NotEnoughMoneyException;
 import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.Transaction;
+import javafx.util.Pair;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
 public interface AccountRunner {
@@ -30,4 +33,6 @@ public interface AccountRunner {
     void makeTransaction(Address address,int value);
 
     EventHandler getEventHandler();
+
+    Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException;
 }
