@@ -6,6 +6,7 @@ import Impl.FullNode;
 import Impl.StandardBlockChain;
 import Interfaces.*;
 import Interfaces.Communication.Event;
+import Interfaces.Communication.HardnessManager;
 import Interfaces.Communication.NodeRunner;
 
 import java.util.ArrayDeque;
@@ -31,23 +32,7 @@ public class StandardNodeRunner implements NodeRunner {
             }
         });
     }
-    public StandardNodeRunner(Block genesis, BlockingQueue queue,TransactionManager transactionManager,Address address){
-
-        this(new FullNode(new StandardBlockChain(genesis),address),queue,transactionManager,new Display() {
-            @Override
-            public void addToDisplay(Object o) {
-            }
-
-            @Override
-            public void removeLatestFromDisplay() {
-            }
-        });
-    }
-    public StandardNodeRunner(Block genesis, BlockingQueue queue,TransactionManager transactionManager,Address address, Display display){
-        this(new FullNode(new StandardBlockChain(genesis),address),queue,transactionManager,display);
-    }
-
-    public StandardNodeRunner(Node node, BlockingQueue<Event> outGoingEventQueue, TransactionManager transactionManager,Display display) {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager,Display display) {
         this.node = node;
         this.transactionManager = transactionManager;
         this.display = display;
@@ -60,7 +45,7 @@ public class StandardNodeRunner implements NodeRunner {
                 while(!interrupted) {
                     Transactions trans = transactionManager.getSomeTransactions();
 
-                    //System.out.println(getBlockNumber() + ",,, " + newBlock);
+                 //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     lock.release();
                     newBlock = node.mine(newBlock.hash(), trans);
                     try {
@@ -74,12 +59,12 @@ public class StandardNodeRunner implements NodeRunner {
                             newBlock = node.getBlockChain().getBlock(node.getBlockChain().getBlockNumber());
                             continue;
                         }
-                        node.getBlockChain().addBlock(specialBlock);
+                        node.addBlock(specialBlock);
                         newBlock = specialBlock;
                         specialBlock = null;
                     } else {
                         try {
-                            outGoingEventQueue.put(new MinedBlockEvent(newBlock,0,null)); //TODO: is this proper way?
+                            eventQueue.put(new MinedBlockEvent(newBlock,0,null)); //TODO: is this proper way?
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             System.out.println("interrupted while posting new mined block :O");
@@ -151,14 +136,14 @@ public class StandardNodeRunner implements NodeRunner {
         //TODO: reset unspent transactions
 
         //reset the potentiel transactionspool ( in the TransactionManager)
-        do {
-            Block block = removedBlocks.removeFirst();
+        while (removedBlocks.peekFirst() != null) {
+        Block block = removedBlocks.removeFirst();
             for (Transaction t: block.getTransactions().getTransactions()) {
                 if (node.validateTransaction(t)) {
                     transactionManager.addTransaction(t);
                 }
             }
-        } while (removedBlocks.peekFirst() != null);
+        }
         lock.release();
     }
 }

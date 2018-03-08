@@ -17,10 +17,7 @@ import Impl.Hashing.SHA256;
 import Interfaces.Account;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
-import Interfaces.Communication.AccountRunner;
-import Interfaces.Communication.Event;
-import Interfaces.Communication.NodeCommunicationHandler;
-import Interfaces.Communication.NodeRunner;
+import Interfaces.Communication.*;
 import Interfaces.Transaction;
 import blockchain.Stubs.ConsolePublisher;
 import blockchain.Stubs.TransactionStub;
@@ -82,7 +79,7 @@ public class AccountAndNodeCommunication {
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
 
         transactionQueue = new LinkedBlockingQueue<>();
-        node = new FullNode(new BlockchainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress);
+        node = new FullNode(new BlockchainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress,new ConstantHardnessManager());
         Configuration.setHardnessParameter(17);
 
     }

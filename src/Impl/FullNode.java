@@ -4,6 +4,7 @@ import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import External.Pair;
 import Interfaces.*;
+import Interfaces.Communication.HardnessManager;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -16,18 +17,19 @@ public class FullNode implements Node {
     private BlockChain blockChain;
     private boolean interrupted = false;
     private Address address;
+    private HardnessManager hardnessManager;
 
 
-
-    public FullNode(BlockChain blockChain, Address address) {
+    public FullNode(BlockChain blockChain, Address address, HardnessManager hardnessManager) {
         this.blockChain=blockChain;
         this.address = address;
+        this.hardnessManager = hardnessManager;
     }
 
     @Override
     public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
-        int hardness = Configuration.getHardnessParameter();
+        int hardness = hardnessManager.getHardness();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
         BigInteger hardValue = BigInteger.valueOf(2).pow(Configuration.getBitSize()).shiftRight(hardness);
 
@@ -57,6 +59,7 @@ public class FullNode implements Node {
                 blockChain.getBlockNumber()+1,
                 coinBase);
         blockChain.addBlock(newBlock);
+        hardnessManager.notifyOfMining();
         return newBlock;
     }
 
@@ -159,11 +162,13 @@ public class FullNode implements Node {
 
     @Override
     public Block removeBlock() {
+        hardnessManager.notifyOfRemoved();
         return blockChain.removeBlock();
     }
 
     @Override
     public void addBlock(Block block) {
         blockChain.addBlock(block);
+        hardnessManager.notifyOfMining();
     }
 }

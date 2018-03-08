@@ -14,4 +14,5 @@ public interface TransactionManager {
      * @param transactions the list of transactions to be removed
      */
     void removeTransactions(Transactions<Collection<Transaction>> transactions);
+
 }

@@ -10,6 +10,12 @@ import Database.BlockchainDatabase;
 import Impl.*;
 import Impl.Hashing.SHA256;
 import Interfaces.*;
+import Impl.ArrayListTransactions;
+import Impl.FullNode;
+import Impl.StandardBlockChain;
+import Interfaces.Block;
+import Interfaces.BlockChain;
+import Interfaces.Communication.ConstantHardnessManager;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.AfterClass;
@@ -62,7 +68,7 @@ public class TestFullNode {
 
         blockChain = new BlockchainDatabase("FULLNODETEST",block);
         nodeAddress = stx.getSenderAddress();
-        node = new FullNode(blockChain, nodeAddress);
+        node = new FullNode(blockChain, nodeAddress,new ConstantHardnessManager());
         Configuration.setHardnessParameter(10);
     }
 
@@ -135,7 +141,7 @@ public class TestFullNode {
 
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(block);
-        node = new FullNode(blockChain, new AddressStub());
+        node = new FullNode(blockChain, new AddressStub(),new ConstantHardnessManager());
 
         //Make new transaction to verify by value
         Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);

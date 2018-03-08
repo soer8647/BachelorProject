@@ -6,6 +6,7 @@ import Impl.StandardBlock;
 import Impl.StandardBlockChain;
 import Interfaces.Block;
 import Interfaces.BlockChain;
+import Interfaces.Communication.ConstantHardnessManager;
 import Interfaces.Node;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;
@@ -18,7 +19,7 @@ import java.math.BigInteger;
             //variables
             Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1, new CoinBaseTransactionStub());
             BlockChain  myBlockChain = new StandardBlockChain(genesisBlock);
-            Node node = new FullNode(myBlockChain, new AddressStub());
+            Node node = new FullNode(myBlockChain, new AddressStub(),new ConstantHardnessManager());
             BigInteger hash = genesisBlock.hash();
 
             while(true) {
