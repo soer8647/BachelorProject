@@ -1,5 +1,6 @@
 package Impl.Communication;
 
+import GUI.Display;
 import Impl.Communication.Events.MinedBlockEvent;
 import Impl.FullNode;
 import Impl.StandardBlockChain;
@@ -148,8 +149,16 @@ public class StandardNodeRunner implements NodeRunner {
             display.addToDisplay(new_block);
         } while (newBlocks.peekFirst() != null);
         //TODO: reset unspent transactions
-        //TODO: transactionManager.rollback();
-        //TODO  reset Display
+
+        //reset the potentiel transactionspool ( in the TransactionManager)
+        do {
+            Block block = removedBlocks.removeFirst();
+            for (Transaction t: block.getTransactions().getTransactions()) {
+                if (node.validateTransaction(t)) {
+                    transactionManager.addTransaction(t);
+                }
+            }
+        } while (removedBlocks.peekFirst() != null);
         lock.release();
     }
 }

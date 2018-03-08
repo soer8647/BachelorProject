@@ -1,4 +1,4 @@
-package Impl.Communication;
+package GUI;
 
 public interface Display {
 

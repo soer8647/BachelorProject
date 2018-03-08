@@ -4,7 +4,7 @@ import Impl.Communication.NotEnoughMoneyException;
 import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.Transaction;
-import javafx.util.Pair;
+import External.Pair;
 
 import java.math.BigInteger;
 import java.util.Collection;

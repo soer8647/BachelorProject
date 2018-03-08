@@ -1,7 +1,7 @@
 package Impl.Communication;
 
+import External.Pair;
 import Interfaces.Communication.Event;
-import javafx.util.Pair;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;

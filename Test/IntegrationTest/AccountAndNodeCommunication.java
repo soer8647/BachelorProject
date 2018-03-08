@@ -19,7 +19,7 @@ import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Transaction;
 import blockchain.Stubs.TransactionStub;
-import javafx.util.Pair;
+import External.Pair;
 
 import java.math.BigInteger;
 import java.net.InetAddress;

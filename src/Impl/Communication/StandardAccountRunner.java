@@ -7,7 +7,7 @@ import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 import Interfaces.Transaction;
-import javafx.util.Pair;
+import External.Pair;
 
 import java.math.BigInteger;
 import java.net.InetAddress;

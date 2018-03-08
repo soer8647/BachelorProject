@@ -4,7 +4,7 @@ import Impl.Communication.Events.TransactionHistoryResponseEvent;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 import Interfaces.Transaction;
-import javafx.util.Pair;
+import External.Pair;
 
 import java.net.InetAddress;
 import java.util.Collection;

@@ -16,7 +16,7 @@ import Interfaces.Account;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Transaction;
-import javafx.util.Pair;
+import External.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
