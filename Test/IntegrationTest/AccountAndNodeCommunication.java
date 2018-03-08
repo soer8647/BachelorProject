@@ -7,24 +7,31 @@ import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Database.BlockchainDatabase;
+import External.Pair;
 import Impl.*;
 import Impl.Communication.StandardAccountRunner;
+import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
+import Impl.Communication.UDPReceiver;
 import Impl.Hashing.SHA256;
 import Interfaces.Account;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Transaction;
+import blockchain.Stubs.ConsolePublisher;
 import blockchain.Stubs.TransactionStub;
-import External.Pair;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public class AccountAndNodeCommunication {
@@ -33,24 +40,24 @@ public class AccountAndNodeCommunication {
 
     private KeyPair keyPair1;
     private RSAPublicKey publicKeyAccount;
-    private PublicKeyAddress accountAddress;
+    private static PublicKeyAddress accountAddress;
     private RSAPrivateKey privateKeyAccount;
 
-    private Account account;
-    private AccountRunner accountRunner;
+    private static Account account;
+    private static AccountRunner accountRunner;
 
     private KeyPair keyPair2;
     private RSAPrivateKey privateKeyNode;
     private RSAPublicKey publicKeyNode;
-    private PublicKeyAddress nodeAddress;
+    private static PublicKeyAddress nodeAddress;
 
     Pair<InetAddress,Integer> nodeConnInfo;
-    private FullNode node;
-    private NodeRunner nodeRunner;
+    private static FullNode node;
+    private static NodeRunner nodeRunner;
 
-    Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
+    static Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
 
-    private LinkedBlockingQueue<Event> transactionQueue;
+    private static LinkedBlockingQueue<Event> transactionQueue;
 
 
     public AccountAndNodeCommunication() {
@@ -76,10 +83,30 @@ public class AccountAndNodeCommunication {
 
         transactionQueue = new LinkedBlockingQueue<>();
         node = new FullNode(new BlockchainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress);
-        nodeRunner = new StandardNodeRunner(node,new LinkedBlockingQueue<>(),new StandardTransactionManager());
+        Configuration.setHardnessParameter(17);
+
+    }
+
+    public static void main(String[] args) {
+        new AccountAndNodeCommunication();
+
+        BlockingQueue<Event> incoming = new LinkedBlockingQueue<>();
+        nodeRunner = new StandardNodeRunner(node,incoming,new StandardTransactionManager());
+        UDPReceiver receiver = new UDPReceiver(incoming,8008);
+        NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new ConsolePublisher(),incoming);
+
+
 
         nodeIpAndPortCollection = new ArrayList<>();
-        accountRunner = new StandardAccountRunner(account,transactionQueue,nodeIpAndPortCollection,8000);
+        try {
+            nodeIpAndPortCollection.add(new Pair<>(InetAddress.getLocalHost(),8008));
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
+        CopyOnWriteArrayList transactionHistory = new CopyOnWriteArrayList<>();
+        transactionHistory.add(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1));
+        accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
+        accountRunner.makeTransaction(nodeAddress,10);
 
     }
 }

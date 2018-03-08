@@ -47,7 +47,7 @@ public class StandardNodeRunner implements NodeRunner {
         this(new FullNode(new StandardBlockChain(genesis),address),queue,transactionManager,display);
     }
 
-    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager,Display display) {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> outGoingEventQueue, TransactionManager transactionManager,Display display) {
         this.node = node;
         this.transactionManager = transactionManager;
         this.display = display;
@@ -60,7 +60,7 @@ public class StandardNodeRunner implements NodeRunner {
                 while(!interrupted) {
                     Transactions trans = transactionManager.getSomeTransactions();
 
-                 //   System.out.println(getBlockNumber() + ",,, " + newBlock);
+                    //System.out.println(getBlockNumber() + ",,, " + newBlock);
                     lock.release();
                     newBlock = node.mine(newBlock.hash(), trans);
                     try {
@@ -79,7 +79,7 @@ public class StandardNodeRunner implements NodeRunner {
                         specialBlock = null;
                     } else {
                         try {
-                            eventQueue.put(new MinedBlockEvent(newBlock,0,null)); //TODO: is this proper way?
+                            outGoingEventQueue.put(new MinedBlockEvent(newBlock,0,null)); //TODO: is this proper way?
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                             System.out.println("interrupted while posting new mined block :O");

@@ -1,4 +1,5 @@
 package blockchain;
+
 import Configuration.Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPrivateKey;
@@ -9,11 +10,6 @@ import Database.BlockchainDatabase;
 import Impl.*;
 import Impl.Hashing.SHA256;
 import Interfaces.*;
-import Impl.ArrayListTransactions;
-import Impl.FullNode;
-import Impl.StandardBlockChain;
-import Interfaces.Block;
-import Interfaces.BlockChain;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.GenesisBlockStub;
@@ -25,7 +21,6 @@ import org.junit.Test;
 import java.io.File;
 import java.math.BigInteger;
 
-import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.*;
 
 
@@ -71,11 +66,6 @@ public class TestFullNode {
         nodeAddress = stx.getSenderAddress();
         node = new FullNode(blockChain, nodeAddress);
         Configuration.setHardnessParameter(10);
-
-
-
-
-
     }
 
     @Test

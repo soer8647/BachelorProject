@@ -6,19 +6,19 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import GUI.GuiApp;
 import Impl.ArrayListTransactions;
 import Impl.Communication.StandardNodeCommunicationHandler;
+import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDPPublisher;
 import Impl.Communication.UDPReceiver;
-import Impl.Communication.StandardNodeRunner;
 import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
 import Impl.StandardTransactionManager;
 import Interfaces.Address;
 import Interfaces.Block;
-import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.Event;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
-import blockchain.Stubs.CoinBaseTransactionStub;
 import Interfaces.TransactionManager;
+import blockchain.Stubs.CoinBaseTransactionStub;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -48,6 +48,8 @@ public class UDPClient{
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
         GuiApp display = new GuiApp(node1Address.getPublicKey());
+
+
         nodeRunner = new StandardNodeRunner(genesisBlock,queue,transMan,node1Address,display);
         receiver = new UDPReceiver(queue,myPort);
         publisher = new UDPPublisher(myIp,myPort,ips,otherPorts);

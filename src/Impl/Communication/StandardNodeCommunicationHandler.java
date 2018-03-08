@@ -2,8 +2,8 @@ package Impl.Communication;
 
 import Impl.Communication.Events.*;
 import Interfaces.Block;
-import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.Event;
+import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
 import Interfaces.Transaction;
@@ -39,7 +39,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
-                    HandleEvent(event);
+                    handleEvent(event);
                     }
             }
         });
@@ -50,20 +50,20 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
      * This function determines the type of event and delegates to the appropriate function.
      * @param event, The event to be handled
      */
-    private void HandleEvent(Event event) {
+    private void handleEvent(Event event) {
         if (event instanceof ReceivedBlockEvent) {
-            HandleReceivedBlock(((ReceivedBlockEvent) event));
+            handleReceivedBlock(((ReceivedBlockEvent) event));
         } else if (event instanceof TransactionEvent) {
-            HandleNewTransaction(((TransactionEvent) event).getTransaction());
+            handleNewTransaction(((TransactionEvent) event).getTransaction());
         } else if (event instanceof MinedBlockEvent) {
-            HandleMinedBlock(((MinedBlockEvent) event).getBlock());
+            handleMinedBlock(((MinedBlockEvent) event).getBlock());
         } else if (event instanceof RequestEvent) {
-            HandleRequest((RequestEvent) event);
+            handleRequest((RequestEvent) event);
         } else if (event instanceof RequestedEvent) {
-            HandleRequested((RequestedEvent) event);
+            handleRequested((RequestedEvent) event);
         }    }
 
-    private void HandleRequest(RequestEvent event) {
+    private void handleRequest(RequestEvent event) {
         int number = event.getNumber();
         if (number == -1) {
             number = nodeRunner.getBlockNumber();
@@ -71,7 +71,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
        publisher.answerRequest(nodeRunner.getBlock(number), event.getIp(), event.getPort());
     }
 
-    private void HandleRequested(RequestedEvent event) {
+    private void handleRequested(RequestedEvent event) {
         Block block = event.getBlock();
         int key = event.getPort();
         Block child = orphanage.getBlock(key);
@@ -100,7 +100,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     @Override
-    public void HandleReceivedBlock(ReceivedBlockEvent event) {
+    public void handleReceivedBlock(ReceivedBlockEvent event) {
         Block block = event.getBlock();
 //        System.out.println("ReceivedBlock event");
         if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {
@@ -123,13 +123,13 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     @Override
-    public void HandleNewTransaction(Transaction transaction) {
+    public void handleNewTransaction(Transaction transaction) {
         // put into Node's queue of potential transactions
         nodeRunner.getTransactionManager().addTransaction(transaction);
     }
 
     @Override
-    public void HandleMinedBlock(Block block) {
+    public void handleMinedBlock(Block block) {
  //       System.out.println("MinedBlock event");
         publisher.publishBlock(block);
     }
