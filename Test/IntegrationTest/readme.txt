@@ -1,0 +1,1 @@
+We use jUnit for integration tests because we do not know any integration test framework.

@@ -7,7 +7,6 @@ import Interfaces.*;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 
-import java.math.BigInteger;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
@@ -21,8 +20,19 @@ public class StandardNodeRunner implements NodeRunner {
     private Block specialBlock;
     private Semaphore lock = new Semaphore(0);
 
-    public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, Address address) {
-        this(genesisBlock, eventQueue, transactionManager, address, new Display() {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager) {
+        this(node, eventQueue, transactionManager, new Display() {
+            @Override
+            public void addToDisplay(Object o) {
+            }
+            @Override
+            public void removeLatestFromDisplay() {
+            }
+        });
+    }
+    public StandardNodeRunner(Block genesis, BlockingQueue queue,TransactionManager transactionManager,Address address){
+
+        this(new FullNode(new StandardBlockChain(genesis),address),queue,transactionManager,new Display() {
             @Override
             public void addToDisplay(Object o) {
             }
@@ -32,15 +42,20 @@ public class StandardNodeRunner implements NodeRunner {
             }
         });
     }
+    public StandardNodeRunner(Block genesis, BlockingQueue queue,TransactionManager transactionManager,Address address, Display display){
+        this(new FullNode(new StandardBlockChain(genesis),address),queue,transactionManager,display);
+    }
 
-    public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, Address address,Display display) {
-        this.node = new FullNode(new StandardBlockChain(genesisBlock), address);
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager,Display display) {
+        this.node = node;
         this.transactionManager = transactionManager;
         this.display = display;
         Thread thread = new Thread(new Runnable() {
+            int prevBlocknr = node.getBlockChain().getBlockNumber();
+            Block newBlock = node.getBlockChain().getBlock(prevBlocknr);
+
             @Override
             public void run() {
-                Block newBlock = genesisBlock;
                 while(!interrupted) {
                     Transactions trans = transactionManager.getSomeTransactions();
 
