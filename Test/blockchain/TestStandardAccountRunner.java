@@ -9,14 +9,15 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Communication.StandardAccountRunner;
+import Impl.ConfirmedTransaction;
 import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
 import Impl.StandardTransaction;
 import Interfaces.Account;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
-import Interfaces.Transaction;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -87,55 +88,48 @@ public class TestStandardAccountRunner {
     @Test
     public void shouldDelegateTransaction() {
         //Transaction transaction = account.makeTransaction(account.getAddress(), receiverAddress,1,new BigInteger("42"),1);
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1, 0);
+        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1),2);
         // Account sends 3 money
-        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<Transaction>(){{add(t1);}};
+        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);}},new CopyOnWriteArrayList<>());
         accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection,8003);
         accountRunner.makeTransaction(receiverAddress,1);
-        assertEquals(1,accountRunner.getOutGoingEventQueue().size());
+        assertEquals(1,accountRunner.getEventQueue().size());
     }
 
     @Test
     public void shouldGetBalanceFromHistory() {
         //Setup fake history for account
-        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
+
         // Account receives 42 money
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("42"),new BigInteger("42"),1, 0);
+        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("100"),new BigInteger("42"),1),2);
         // Account sends 10 money
-        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("42"),new BigInteger("42"),1, 0);
-        transactions.add(t1);
-        transactions.add(t2);
+        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("100"),new BigInteger("42"),1),2);
+        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>(),8001);
         assertEquals(32,accountRunner.getBalance());
     }
 
     @Test
     public void shouldGetValueProof() {
-        CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
-        //Account gets 4 money
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1, 0);
-        // Account sends 3 money
-        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("42"),new BigInteger("43"),2, 0);
-        //Account gets 2 money
-        Transaction t3 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("44"),3, 0);
-        // Account sends 1 money
-        Transaction t4 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("45"),4, 0);
-        //Account gets 2 money
-        Transaction t5 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("46"),5, 0);
-        // Account sends 1 money
-        Transaction t6 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6, 0);
-        //Balance of 3
 
-        transactions.add(t1);
-        transactions.add(t2);
-        transactions.add(t3);
-        transactions.add(t4);
-        transactions.add(t5);
-        transactions.add(t6);
+        //Account gets 4 money
+        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1),2);
+        // Account sends 3 money
+        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("42"),new BigInteger("43"),2),3);
+        //Account gets 2 money
+        ConfirmedTransaction t3 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("44"),3),4);
+        // Account sends 1 money
+        ConfirmedTransaction t4 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("45"),4),5);
+        //Account gets 2 money
+        ConfirmedTransaction t5 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("46"),5),6);
+        // Account sends 1 money
+        ConfirmedTransaction t6 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6),7);
+        //Balance of 3
+        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);add(t3);add(t4);add(t5);add(t6);}},new CopyOnWriteArrayList<>());
         try {
             accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>(),8002);
             assertEquals(3, accountRunner.getBalance());
-            assertEquals(new Pair<>(new BigInteger("100"), 1).toString(), accountRunner.getValueProof(1).toString());
+            assertEquals(new Pair<>(t1.transActionHash(), 2).toString(), accountRunner.getValueProof(1).toString());
         }catch (NotEnoughMoneyException e){
             e.printStackTrace();
         }

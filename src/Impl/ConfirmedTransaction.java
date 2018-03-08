@@ -6,34 +6,27 @@ import Interfaces.Transaction;
 
 import java.math.BigInteger;
 /*
-* This class is an implementation of a standard transaction of money from one user to another.
- * It uses the SHA-256 hashing function.
+* A ConfirmedTransaction is a transaction that has been put on the blockchain and therefore has a block number.
+* This type of transaction is for communicating a transaction that has been verified and is valid.
 * */
-public class StandardTransaction implements Transaction {
+public class ConfirmedTransaction implements Transaction {
     private Address sender;
     private Address receiver;
     private int value;
     private BigInteger valueProof;
     private BigInteger signature;
     private int blockNumberValueProof;
+    private int blockNumber;
 
 
-    /**
-     * @param sender        The "address" or id of the sender of the transaction.
-     * @param receiver      The "address" or id of the receiver of the transaction.
-     * @param value         The value of the transaction.
-     * @param valueProof    The transaction where the sender has proof of funds for this transaction.
-     * @param signature     The signature of the sender on this transaction.
-     * @param blockNumberValueProof     The block number where there is proof of funds.
-
-     */
-    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof) {
-        this.sender = sender;
-        this.receiver = receiver;
-        this.value = value;
-        this.valueProof = valueProof;
-        this.signature = signature;
-        this.blockNumberValueProof = blockNumberValueProof;
+    public ConfirmedTransaction(Transaction transaction,int blockNumber) {
+        sender= transaction.getSenderAddress();
+        receiver=transaction.getReceiverAddress();
+        value=transaction.getValue();
+        valueProof=transaction.getValueProof();
+        signature = transaction.getSignature();
+        blockNumberValueProof=transaction.getBlockNumberOfValueProof();
+        this.blockNumber = blockNumber;
     }
 
     /**
@@ -41,7 +34,7 @@ public class StandardTransaction implements Transaction {
      */
     @Override
     public BigInteger transActionHash() {
-            return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
+        return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
     }
 
     @Override
@@ -83,5 +76,7 @@ public class StandardTransaction implements Transaction {
                 "Signature: "+signature+"\n";
     }
 
-
+    public int getBlockNumber() {
+        return blockNumber;
+    }
 }

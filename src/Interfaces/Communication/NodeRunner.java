@@ -1,5 +1,7 @@
 package Interfaces.Communication;
 
+import External.Pair;
+import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
@@ -29,4 +31,6 @@ public interface NodeRunner {
     Block getBlock(int number);
 
     void rollback(Deque<Block> chain, int blockNumber);
+
+    Pair getTransactionHistory(Address address, int index);
 }

@@ -1,6 +1,7 @@
 package Interfaces;
 
 import External.Pair;
+import Impl.ConfirmedTransaction;
 
 import java.util.Collection;
 
@@ -32,7 +33,7 @@ public interface BlockChain {
      * @param address       The address involved in transactions.
      * @return              All transactions where the address is involved
      */
-    Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address);
+    Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address);
 
 
     /**
@@ -40,6 +41,6 @@ public interface BlockChain {
      * @param blockNumber   The blocknumber from where you want to get the history, inclusive.
      * @return              A collection of all the transactions the address has been involved in since a given block.
      */
-    Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber);
+    Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber);
     Block removeBlock();
 }

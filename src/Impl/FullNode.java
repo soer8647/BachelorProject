@@ -80,7 +80,7 @@ public class FullNode implements Node {
         if(!verifyTransactionSignature(t)) {
             return false;
         }
-        Pair<Collection<Transaction>,Collection<CoinBaseTransaction>> transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
+        Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
         int valueToVerify = t.getValue();
         int counter = 0;
 
@@ -90,9 +90,10 @@ public class FullNode implements Node {
 
         for (int i=trans.length-1;i>=0;i--){
             CoinBaseTransaction cbt;
-            Transaction tr = (Transaction) trans[i];
+            ConfirmedTransaction tr = (ConfirmedTransaction) trans[i];
             if (coinBaseElementNr>=0){
                 cbt = ((CoinBaseTransaction)coinBases[coinBaseElementNr]);
+                //TODO MAKE A NEW TYPE OF TRANSACTIONS THAT ARE CONFIRMED.
                 if(cbt.getBlockNumber()>=tr.getBlockNumber()){
                     counter+=cbt.getValue();
                     coinBaseElementNr--;
@@ -156,7 +157,7 @@ public class FullNode implements Node {
     }
 
     @Override
-    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
         return blockChain.getTransactionHistory(address);
     }
 
@@ -170,5 +171,9 @@ public class FullNode implements Node {
     public void addBlock(Block block) {
         blockChain.addBlock(block);
         hardnessManager.notifyOfMining();
+    }
+
+    public Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> getTransactionHistory(Address address,int index){
+        return blockChain.getTransactionHistory(address,index);
     }
 }

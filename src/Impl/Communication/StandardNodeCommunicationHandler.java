@@ -1,5 +1,6 @@
 package Impl.Communication;
 
+import External.Pair;
 import Impl.Communication.Events.*;
 import Interfaces.Block;
 import Interfaces.Communication.Event;
@@ -8,6 +9,8 @@ import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
 import Interfaces.Transaction;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 
@@ -61,7 +64,19 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             handleRequest((RequestEvent) event);
         } else if (event instanceof RequestedEvent) {
             handleRequested((RequestedEvent) event);
-        }    }
+        }else if (event instanceof TransactionHistoryRequestEvent){
+            TransactionHistoryRequestEvent e = (TransactionHistoryRequestEvent) event;
+            //TODO GET THE TRANSACTION HISTORY
+            Pair p = nodeRunner.getTransactionHistory(e.getAddress(),e.getIndex());
+            try {
+                //TODO why do i have to send the ip and port with the event?
+                publisher.sendEvent(new TransactionHistoryResponseEvent(InetAddress.getLocalHost(),0,p,e.getIndex()), e.getIp(), e.getPort());
+            } catch (UnknownHostException e1) {
+                e1.printStackTrace();
+            }
+            //SEND BACK THE HISTORY
+        }
+    }
 
     private void handleRequest(RequestEvent event) {
         int number = event.getNumber();

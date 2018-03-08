@@ -27,7 +27,7 @@ public class TestStandardTransaction {
 
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
-        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0, 0);
+        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0);
     }
 
     @Test

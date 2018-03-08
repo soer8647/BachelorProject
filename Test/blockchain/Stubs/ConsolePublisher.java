@@ -1,6 +1,7 @@
 package blockchain.Stubs;
 
 import Interfaces.Block;
+import Interfaces.Communication.Event;
 import Interfaces.Communication.Publisher;
 
 import java.net.InetAddress;
@@ -26,6 +27,11 @@ public class ConsolePublisher implements Publisher {
 
     @Override
     public void answerRequest(Block block, InetAddress ip, int port) {
+
+    }
+
+    @Override
+    public void sendEvent(Event event, InetAddress ip, int port) {
 
     }
 }

@@ -57,8 +57,4 @@ public class TransactionStub implements Transaction{
         return new BigInteger("8080");
     }
 
-    @Override
-    public int getBlockNumber() {
-        return 0;
-    }
 }

@@ -55,7 +55,7 @@ public class UDPPublisher implements Publisher{
         }
     }
 
-    private void sendEvent(Event event, InetAddress ip, int port) {
+    public void sendEvent(Event event, InetAddress ip, int port) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);

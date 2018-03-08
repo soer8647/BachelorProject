@@ -1,90 +1,65 @@
 package Impl.Communication;
 
+import External.Pair;
+import Impl.Communication.Events.TransactionEvent;
+import Impl.Communication.Events.TransactionHistoryRequestEvent;
 import Impl.Communication.Events.TransactionHistoryResponseEvent;
+import Impl.ConfirmedTransaction;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
-import Interfaces.Transaction;
-import External.Pair;
 
 import java.net.InetAddress;
 import java.util.Collection;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
-public class AccountEventHandler implements EventHandler{
+public class AccountEventHandler implements EventHandler,Runnable{
 
-    private final LinkedBlockingQueue<Event> outGoingEventQueue;
-    private final LinkedBlockingQueue<Event> incomingEventQueue;
-    private CopyOnWriteArrayList<Transaction> transactionHistory;
+    private LinkedBlockingQueue<Event> eventQueue;
+    private Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory;
     private int port;
     //TODO release resources from receiver
     private UDPReceiver receiver;
     private UDPEventPublisher publisher;
-    private boolean running;
-    private Thread incoming;
-    private Thread outgoing;
+    private Thread t;
 
 
-    public AccountEventHandler(CopyOnWriteArrayList<Transaction> transactionHistory, LinkedBlockingQueue<Event> outGoingEventQueue, int portNumber, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection) {
+
+    public AccountEventHandler(Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection) {
         this.transactionHistory = transactionHistory;
         port = portNumber;
-        incomingEventQueue = new LinkedBlockingQueue<>();
-        receiver = new UDPReceiver(incomingEventQueue,port);
+        receiver = new UDPReceiver(eventQueue,port);
         publisher = new UDPEventPublisher(nodeIpAndPortCollection);
-        this.outGoingEventQueue = outGoingEventQueue;
-        running = true;
-        start();
+        this.eventQueue=eventQueue;
     }
 
-    @Override
-    public void handleIncomingEvent(Event event) {
-        //TODO RUNNER TAKES EVENT FROM QUEUE
+    public void handleEvent(Event event){
         if (event instanceof TransactionHistoryResponseEvent){
             TransactionHistoryResponseEvent the = (TransactionHistoryResponseEvent)event;
-            if (transactionHistory.size()+1==the.getIndex()){
-                transactionHistory.addAll(the.getTransactions());
+            if (transactionHistory.getKey().size()+transactionHistory.getValue().size()==the.getIndex()){
+                //TODO UPDATE HISTORY
+                System.out.println("GOT AN UPDATE!!!!!!!!!!");
             }else {
                 //TODO find out how to merge history
             }
-        }else{
-            System.out.println("NOT IMPLEMENTED");
+        }else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent){
+            publisher.broadcastEvent(event);
         }
     }
 
+
     @Override
-    public void handleOutGoingEvent(Event event) {
-        //TODO RUNNER TAKES FROM QUEUE AND CALLS THIS
-        publisher.broadcastEvent(event);
-    }
-
-    private void start(){
-        incoming = new Thread(()->{
-            while (running){
-                try {
-                    handleIncomingEvent(incomingEventQueue.take());
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
+    public void run() {
+        while (!Thread.currentThread().isInterrupted()){
+            try{handleEvent(eventQueue.take());
+            } catch (InterruptedException e) {
+                e.printStackTrace();
             }
-        });
-        incoming.start();
-        outgoing = new Thread(()->{
-          while (running){
-              try {
-                  handleOutGoingEvent(outGoingEventQueue.take());
-              } catch (InterruptedException e) {
-                  e.printStackTrace();
-              }
-          }
-        });
-        outgoing.start();
+        }
     }
 
-    public void stop(){
-        running = false;
-        incoming.interrupt();
-        outgoing.interrupt();
+    public void start(){
+        t = new Thread(this);
+        t.start();
     }
-
-
 }

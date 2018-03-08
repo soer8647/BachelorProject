@@ -1,7 +1,9 @@
 package Impl.Communication.Events;
 
+import External.Pair;
+import Impl.ConfirmedTransaction;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
-import Interfaces.Transaction;
 
 import java.net.InetAddress;
 import java.util.Collection;
@@ -9,10 +11,10 @@ import java.util.Collection;
 public class TransactionHistoryResponseEvent implements Event {
     private InetAddress inetAddress;
     private int port;
-    private Collection<Transaction> transactions;
+    private Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> transactions;
     private int index;
 
-    public TransactionHistoryResponseEvent(InetAddress inetAddress, int port, Collection<Transaction> transactions, int requestedStartIndex) {
+    public TransactionHistoryResponseEvent(InetAddress inetAddress, int port, Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactions, int requestedStartIndex) {
         this.inetAddress = inetAddress;
         this.port = port;
         this.transactions = transactions;
@@ -33,7 +35,7 @@ public class TransactionHistoryResponseEvent implements Event {
         return inetAddress;
     }
 
-    public Collection<Transaction> getTransactions() {
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactions() {
         return transactions;
     }
 

@@ -1,15 +1,15 @@
 package Impl.Communication;
 
+import External.Pair;
 import GUI.Display;
 import Impl.Communication.Events.MinedBlockEvent;
-import Impl.FullNode;
-import Impl.StandardBlockChain;
+import Impl.ConfirmedTransaction;
 import Interfaces.*;
 import Interfaces.Communication.Event;
-import Interfaces.Communication.HardnessManager;
 import Interfaces.Communication.NodeRunner;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -76,6 +76,10 @@ public class StandardNodeRunner implements NodeRunner {
             }
         });
         thread.start();
+    }
+
+    public Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int index){
+      return node.getTransactionHistory(address,index);
     }
 
     @Override

@@ -49,19 +49,19 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
         return getTransactionHistory(address,0);
     }
 
     @Override
-    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
-        ArrayList<Transaction> transactions = new ArrayList();
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
+        ArrayList<ConfirmedTransaction> transactions = new ArrayList<>();
         ArrayList<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
         for (Block b : blocks){
             if(b.getBlockNumber()>=blockNumber) {
                 for (Transaction t : b.getTransactions().getTransactions()) {
                     if (t.getSenderAddress().toString().equals(address.toString()) || t.getReceiverAddress().toString().equals(address.toString())) {
-                        transactions.add(t);
+                        transactions.add(new ConfirmedTransaction(t,b.getBlockNumber()));
                     }
                 }
             }
@@ -69,7 +69,7 @@ public class StandardBlockChain implements BlockChain{
                 coinBaseTransactions.add(b.getCoinBase());
             }
         }
-        //TODO GET COINBASE TRANSACTIONS
+
         return new Pair<>(transactions,coinBaseTransactions);
     }
 

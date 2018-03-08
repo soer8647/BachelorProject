@@ -10,11 +10,6 @@ import Database.BlockchainDatabase;
 import Impl.*;
 import Impl.Hashing.SHA256;
 import Interfaces.*;
-import Impl.ArrayListTransactions;
-import Impl.FullNode;
-import Impl.StandardBlockChain;
-import Interfaces.Block;
-import Interfaces.BlockChain;
 import Interfaces.Communication.ConstantHardnessManager;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.TransactionStub;
@@ -24,6 +19,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.Collection;
 
 import static org.junit.Assert.*;
 
@@ -50,8 +46,8 @@ public class TestFullNode {
     public void setUp(){
         //SETUP FROM DB
         tx = new TransactionStub();
-        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
-        ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10, 0);
+        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());
+        ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
         //SETUP ACCOUNTS AND TRANSACTIONS
@@ -143,16 +139,23 @@ public class TestFullNode {
         blockChain.addBlock(block);
         node = new FullNode(blockChain, new AddressStub(),new ConstantHardnessManager());
 
+        // Receiver has 5
+        // Sender has 0
+
         //Make new transaction to verify by value
         Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);
-        Transactions transactionsToVerify = new ArrayListTransactions();
+        Transactions<Collection<Transaction>> transactionsToVerify = new ArrayListTransactions();
         transactionsToVerify.add(validTransaction);
         assertTrue(node.validateTransactions(transactionsToVerify));
 
+        // Receiver sends 5. Valid, Not added to blockchain though
+
         //Make transaction to deny by value
-        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,6,transaction.transActionHash(), 1);
+        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,11,transaction.transActionHash(), 1);
         Transactions transactionsToDeny = new ArrayListTransactions();
         transactionsToDeny.add(invalidTransaction);
+
+        // Receiver sends 11. invalid, has 5.
 
         //Remove invalid transactions
         assertFalse(node.validateTransactions(transactionsToDeny));
@@ -161,6 +164,18 @@ public class TestFullNode {
 
         //Validate transaction by signature
         assertTrue(node.verifyTransactionSignature(validTransaction));
+
+
+        validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,15,transaction.transActionHash(), 1);
+        transactionsToVerify = new ArrayListTransactions();
+        transactionsToVerify.add(validTransaction);
+
+        CoinBaseTransaction cb = new StandardCoinBaseTransaction(receiverAddress,10,2);
+        blockChain.addBlock(new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayListTransactions(),2,cb));
+
+        // Receiver sends 11. Valid has 15.
+
+        assertTrue(node.validateTransactions(transactionsToVerify));
 
     }
 

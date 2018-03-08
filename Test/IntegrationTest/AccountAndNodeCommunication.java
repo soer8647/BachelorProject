@@ -74,7 +74,7 @@ public class AccountAndNodeCommunication {
 
         account = new StandardAccount(cryptoSystem,privateKeyAccount,publicKeyAccount,new SHA256());
         Transaction tx = new TransactionStub();
-        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
+        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
 
@@ -85,12 +85,13 @@ public class AccountAndNodeCommunication {
     }
 
     public static void main(String[] args) {
+        //Not so much an integrationtest, but manual testing is done here.
         new AccountAndNodeCommunication();
 
-        BlockingQueue<Event> incoming = new LinkedBlockingQueue<>();
-        nodeRunner = new StandardNodeRunner(node,incoming,new StandardTransactionManager());
-        UDPReceiver receiver = new UDPReceiver(incoming,8008);
-        NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new ConsolePublisher(),incoming);
+        BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
+        nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager());
+        UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
+        NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new ConsolePublisher(),eventQueue);
 
 
 
@@ -100,10 +101,16 @@ public class AccountAndNodeCommunication {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        CopyOnWriteArrayList transactionHistory = new CopyOnWriteArrayList<>();
-        transactionHistory.add(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1, 0));
+        ConfirmedTransaction ct = new ConfirmedTransaction(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1),1);
+        Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory = new Pair<>(new CopyOnWriteArrayList(){{add(ct);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
         accountRunner.makeTransaction(nodeAddress,10);
+        //Look in print to see the transaction is sent to the node and mined.
+
+
+        //Now pull history from node
+        accountRunner.updateTransactionHistory();
+
 
     }
 }

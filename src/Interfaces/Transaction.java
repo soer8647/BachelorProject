@@ -41,6 +41,4 @@ public interface Transaction extends Serializable {
     int getBlockNumberOfValueProof();
 
     BigInteger getSignature();
-
-    int getBlockNumber();
 }

@@ -12,4 +12,6 @@ public interface Publisher {
     void requestMaxBlock(InetAddress ip, int port);
 
     void answerRequest(Block block, InetAddress ip, int port);
+
+    void sendEvent(Event event, InetAddress ip, int port);
 }

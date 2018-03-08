@@ -65,8 +65,6 @@ public class BlockchainDatabase implements BlockChain{
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
                 +  " ) " ;
 
-
-
         //TODO MAKE FOREIGN KEY CONSTRAINT ON UNSPEND_TRANSACTIONS
         String unspent = "CREATE TABLE %s"
                         +"(UNSPENT_TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT UNSPENT_TRANS_HASH PRIMARY KEY,"
@@ -95,6 +93,8 @@ public class BlockchainDatabase implements BlockChain{
             createTableIfNotExists("PENDING_TRANSACTIONS", pending_transactions);
 
             createTableIfNotExists("UNSPENT_TRANSACTIONS", unspent);
+
+
             //  Beginning of the primary catch block: prints stack trace
         }  catch (Throwable e)  {
             /*       Catch all exceptions and pass them to
@@ -163,16 +163,12 @@ public class BlockchainDatabase implements BlockChain{
             for (Transaction t:block.getTransactions().getTransactions()){
                 addTransaction(t,block.getBlockNumber());
             }
-            //TODO ADD THE COINBASE TRANSACTION
-            addCoinBaseTransaction(block.getCoinBase());
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-    private void addCoinBaseTransaction(CoinBaseTransaction coinBaseTransaction) {
-
-    }
 
     @Override
     public Block getGenesisBlock() {
@@ -184,13 +180,13 @@ public class BlockchainDatabase implements BlockChain{
      * @return      A collection of all the transactions where this address is involved.
      */
     @Override
-    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
         return getTransactionHistory(address,0);
     }
 
     @Override
-    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
-        Collection<Transaction> transactions = new ArrayList<>();
+    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
+        Collection<ConfirmedTransaction> transactions = new ArrayList<>();
         Collection<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
 
         Statement s;
@@ -200,7 +196,7 @@ public class BlockchainDatabase implements BlockChain{
                     "WHERE (SENDER='"+address+"' OR RECEIVER='"+address+"') AND BLOCKNR >="+blockNumber;
             ResultSet r = s.executeQuery(query);
             while (r.next()) {
-                transactions.add( getTransactionFromResultSet(r,s,false));
+                transactions.add( getConfirmedTransactionFromResultSet(r,s,false));
             }
             s.close();
             r.close();
@@ -210,10 +206,35 @@ public class BlockchainDatabase implements BlockChain{
             e.printStackTrace();
         }
 
-        //TODO GET COINBASETRANSACTIONS
-
+        try {
+            s = conn.createStatement();
+            String query = "SELECT COINBASE_TRANS FROM BLOCKCHAIN WHERE BLOCKNR >="+blockNumber ;
+            ResultSet r = s.executeQuery(query);
+            while (r.next()){
+                coinBaseTransactions.add(new StandardCoinBaseTransaction(r.getString("COINBASE_TRANS")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
         return new Pair<>(transactions,coinBaseTransactions);
     }
+
+    private ConfirmedTransaction getConfirmedTransactionFromResultSet(ResultSet set, Statement s, boolean close) throws SQLException {
+        // Get the data from the resultset.
+        Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
+        int value = set.getInt("VALUE");
+        int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
+        BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
+        BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
+        int blockNr = set.getInt("BLOCKNR");
+        if (close){
+            s.close();
+            set.close();
+        }
+        return new ConfirmedTransaction(new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof),blockNr);
+    }
+
 
     @Override
     public Block removeBlock() {
@@ -233,7 +254,7 @@ public class BlockchainDatabase implements BlockChain{
             s.close();
             set.close();
         }
-        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, 0);
+        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
     }
 
     /**
@@ -345,7 +366,7 @@ public class BlockchainDatabase implements BlockChain{
                 int blocknr_value_proof = setT.getInt("BLOCKNR_VALUE_PROOF");
                 BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
-                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, 0));
+                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof));
             }
             setT.close();
             s.close();
