@@ -1,9 +1,7 @@
 package blockchain.Stubs;
 
 import Crypto.Impl.RSA;
-import Crypto.Impl.RSAKeyPair;
 import Crypto.Interfaces.KeyPair;
-import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.PublicKeyAddress;
 import Interfaces.Address;
@@ -57,5 +55,10 @@ public class TransactionStub implements Transaction{
     @Override
     public BigInteger getSignature() {
         return new BigInteger("8080");
+    }
+
+    @Override
+    public int getBlockNumber() {
+        return 0;
     }
 }

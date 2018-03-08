@@ -2,6 +2,7 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import External.Pair;
 import Interfaces.*;
 
 import java.math.BigInteger;
@@ -33,7 +34,7 @@ public class FullNode implements Node {
         //set nonce
         BigInteger nonce = new BigInteger("0");
         BigInteger hash;
-        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(address,Configuration.getBlockReward());
+        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(address,Configuration.getBlockReward(), 0);
         do{
             if (this.interrupted) {
                 this.interrupted = false;
@@ -76,25 +77,34 @@ public class FullNode implements Node {
         if(!verifyTransactionSignature(t)) {
             return false;
         }
-        //Get the block where there should be proof of funds.
-        Block block = blockChain.getBlock(t.getBlockNumberOfValueProof());
-        Transaction proofTransaction=null;
-        //Validate that the block holds the transaction with the given hash
-        for (Transaction tx:block.getTransactions().getTransactions()){ //TODO change retarded naming.
-            if (tx.transActionHash().equals(t.getValueProof())){
-                proofTransaction = tx;
-                break;
+        Pair<Collection<Transaction>,Collection<CoinBaseTransaction>> transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
+        int valueToVerify = t.getValue();
+        int counter = 0;
+
+        Object[] trans = transactions.getKey().toArray();
+        Object[] coinBases = transactions.getValue().toArray();
+        int coinBaseElementNr = coinBases.length-1;
+
+        for (int i=trans.length-1;i>=0;i--){
+            CoinBaseTransaction cbt;
+            Transaction tr = (Transaction) trans[i];
+            if (coinBaseElementNr>=0){
+                cbt = ((CoinBaseTransaction)coinBases[coinBaseElementNr]);
+                if(cbt.getBlockNumber()>=tr.getBlockNumber()){
+                    counter+=cbt.getValue();
+                    coinBaseElementNr--;
+                }
+            }
+            if (tr.getReceiverAddress().toString().equals(t.getSenderAddress().toString())){
+                counter+=tr.getValue();
+                if (counter>=valueToVerify) return true;
+            }else if(tr.getSenderAddress().toString().equals(t.getSenderAddress().toString())){
+                counter -=tr.getValue();
             }
         }
-        if (proofTransaction==null){
-            return false;
-        }
-        //validate that the receiver of the funds is the sender of the new transaction
-        Address receiverOfFunds = proofTransaction.getReceiverAddress();
-        if(!receiverOfFunds.equals(t.getSenderAddress())){
-            return false;}
-        //Validate that the received funds not are less than sending funds
-        return t.getValue()<=proofTransaction.getValue();
+        // If we looked at all the transactions since the proof of funds transaction
+        // and it does not sum to at least the transaction value, the transaction is invalid.
+        return false;
     }
 
     @Override
@@ -143,7 +153,7 @@ public class FullNode implements Node {
     }
 
     @Override
-    public Collection<Transaction> getTransactionHistory(Address address) {
+    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
         return blockChain.getTransactionHistory(address);
     }
 

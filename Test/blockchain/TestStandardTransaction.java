@@ -4,7 +4,6 @@ import Crypto.Impl.RSAPublicKey;
 import Impl.PublicKeyAddress;
 import Impl.StandardTransaction;
 import Interfaces.Address;
-import blockchain.Stubs.CryptoSystemStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
@@ -28,7 +27,7 @@ public class TestStandardTransaction {
 
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
-        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0);
+        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0, 0);
     }
 
     @Test

@@ -1,11 +1,8 @@
 package Impl;
 
-import Interfaces.Address;
-import Interfaces.Block;
-import Interfaces.BlockChain;
-import Interfaces.Transaction;
+import External.Pair;
+import Interfaces.*;
 
-import java.awt.image.ByteLookupTable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -52,14 +49,28 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public Collection<Transaction> getTransactionHistory(Address address) {
+    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+        return getTransactionHistory(address,0);
+    }
+
+    @Override
+    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
         ArrayList<Transaction> transactions = new ArrayList();
+        ArrayList<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
         for (Block b : blocks){
-            for (Transaction t: b.getTransactions().getTransactions()){
-                if (t.getSenderAddress().toString().equals(address.toString()) || t.getReceiverAddress().toString().equals(address.toString())) transactions.add(t);
+            if(b.getBlockNumber()>=blockNumber) {
+                for (Transaction t : b.getTransactions().getTransactions()) {
+                    if (t.getSenderAddress().toString().equals(address.toString()) || t.getReceiverAddress().toString().equals(address.toString())) {
+                        transactions.add(t);
+                    }
+                }
+            }
+            if(b.getCoinBase().getMinerAddress().toString().equals(address.toString())){
+                coinBaseTransactions.add(b.getCoinBase());
             }
         }
-        return transactions;
+        //TODO GET COINBASE TRANSACTIONS
+        return new Pair<>(transactions,coinBaseTransactions);
     }
 
     @Override

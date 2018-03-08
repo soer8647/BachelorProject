@@ -1,5 +1,6 @@
 package Impl.Communication;
 
+import External.Pair;
 import Impl.Communication.Events.TransactionEvent;
 import Interfaces.Account;
 import Interfaces.Address;
@@ -7,7 +8,6 @@ import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 import Interfaces.Transaction;
-import External.Pair;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
@@ -20,7 +20,6 @@ public class StandardAccountRunner implements AccountRunner {
     private Account account;
     private LinkedBlockingQueue<Event> outGoingEventQueue;
     private CopyOnWriteArrayList<Transaction> transactionHistory;
-    private int balance;
     private EventHandler eventHandler;
     private Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
 
@@ -31,7 +30,6 @@ public class StandardAccountRunner implements AccountRunner {
         this.nodeIpAndPortCollection = nodeIpAndPortCollection;
         transactionHistory = new CopyOnWriteArrayList<>();
         eventHandler = new AccountEventHandler(transactionHistory,outGoingEventQueue,listeningPort,nodeIpAndPortCollection);
-        balance = getBalance();
     }
 
     public StandardAccountRunner(Account account, CopyOnWriteArrayList<Transaction> transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
@@ -40,7 +38,6 @@ public class StandardAccountRunner implements AccountRunner {
         this.outGoingEventQueue = new LinkedBlockingQueue<>();
         this.eventHandler = new AccountEventHandler(transactionHistory,outGoingEventQueue,listeningPort,nodeIpAndPortCollection);
         this.nodeIpAndPortCollection = nodeIpAndPortCollection;
-        balance = getBalance();
     }
 
     @Override

@@ -6,6 +6,7 @@ import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Communication.StandardAccountRunner;
 import Impl.Hashing.SHA256;
@@ -16,7 +17,6 @@ import Interfaces.Account;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Transaction;
-import External.Pair;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -87,7 +87,7 @@ public class TestStandardAccountRunner {
     @Test
     public void shouldDelegateTransaction() {
         //Transaction transaction = account.makeTransaction(account.getAddress(), receiverAddress,1,new BigInteger("42"),1);
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1);
+        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1, 0);
         // Account sends 3 money
         CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<Transaction>(){{add(t1);}};
         accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection,8003);
@@ -100,9 +100,9 @@ public class TestStandardAccountRunner {
         //Setup fake history for account
         CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
         // Account receives 42 money
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("42"),new BigInteger("42"),1);
+        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("42"),new BigInteger("42"),1, 0);
         // Account sends 10 money
-        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("42"),new BigInteger("42"),1);
+        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("42"),new BigInteger("42"),1, 0);
         transactions.add(t1);
         transactions.add(t2);
         accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>(),8001);
@@ -113,17 +113,17 @@ public class TestStandardAccountRunner {
     public void shouldGetValueProof() {
         CopyOnWriteArrayList<Transaction> transactions = new CopyOnWriteArrayList<>();
         //Account gets 4 money
-        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1);
+        Transaction t1 = new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1, 0);
         // Account sends 3 money
-        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("42"),new BigInteger("43"),2);
+        Transaction t2 = new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("42"),new BigInteger("43"),2, 0);
         //Account gets 2 money
-        Transaction t3 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("44"),3);
+        Transaction t3 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("44"),3, 0);
         // Account sends 1 money
-        Transaction t4 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("45"),4);
+        Transaction t4 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("45"),4, 0);
         //Account gets 2 money
-        Transaction t5 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("46"),5);
+        Transaction t5 = new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("46"),5, 0);
         // Account sends 1 money
-        Transaction t6 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6);
+        Transaction t6 = new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6, 0);
         //Balance of 3
 
         transactions.add(t1);

@@ -1,8 +1,10 @@
 package Database;
+
 import Configuration.Configuration;
+import Crypto.Impl.RSAPublicKey;
+import External.Pair;
 import Impl.*;
 import Interfaces.*;
-import Crypto.Impl.RSAPublicKey;
 import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
@@ -161,9 +163,15 @@ public class BlockchainDatabase implements BlockChain{
             for (Transaction t:block.getTransactions().getTransactions()){
                 addTransaction(t,block.getBlockNumber());
             }
+            //TODO ADD THE COINBASE TRANSACTION
+            addCoinBaseTransaction(block.getCoinBase());
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    private void addCoinBaseTransaction(CoinBaseTransaction coinBaseTransaction) {
+
     }
 
     @Override
@@ -176,16 +184,23 @@ public class BlockchainDatabase implements BlockChain{
      * @return      A collection of all the transactions where this address is involved.
      */
     @Override
-    public Collection<Transaction> getTransactionHistory(Address address) {
+    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+        return getTransactionHistory(address,0);
+    }
+
+    @Override
+    public Pair<Collection<Transaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
         Collection<Transaction> transactions = new ArrayList<>();
+        Collection<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
+
         Statement s;
         try {
             s = conn.createStatement();
             String query = "SELECT * FROM TRANSACTIONS " +
-                    "WHERE SENDER='"+address+"' OR RECEIVER='"+address+"'";
+                    "WHERE (SENDER='"+address+"' OR RECEIVER='"+address+"') AND BLOCKNR >="+blockNumber;
             ResultSet r = s.executeQuery(query);
             while (r.next()) {
-               transactions.add( getTransactionFromResultSet(r,s,false));
+                transactions.add( getTransactionFromResultSet(r,s,false));
             }
             s.close();
             r.close();
@@ -194,7 +209,10 @@ public class BlockchainDatabase implements BlockChain{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return transactions;
+
+        //TODO GET COINBASETRANSACTIONS
+
+        return new Pair<>(transactions,coinBaseTransactions);
     }
 
     @Override
@@ -215,7 +233,7 @@ public class BlockchainDatabase implements BlockChain{
             s.close();
             set.close();
         }
-        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
+        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, 0);
     }
 
     /**
@@ -327,7 +345,7 @@ public class BlockchainDatabase implements BlockChain{
                 int blocknr_value_proof = setT.getInt("BLOCKNR_VALUE_PROOF");
                 BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
-                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof));
+                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, 0));
             }
             setT.close();
             s.close();

@@ -15,6 +15,11 @@ public class CoinBaseTransactionStub implements CoinBaseTransaction{
     }
 
     @Override
+    public int getBlockNumber() {
+        return 0;
+    }
+
+    @Override
     public String toString() {
         return "CoinBaseTransactionStub{}";
     }

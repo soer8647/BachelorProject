@@ -16,6 +16,7 @@ public class StandardTransaction implements Transaction {
     private BigInteger valueProof;
     private BigInteger signature;
     private int blockNumberValueProof;
+    private int blockNumber;
 
     /**
      * @param sender        The "address" or id of the sender of the transaction.
@@ -24,14 +25,16 @@ public class StandardTransaction implements Transaction {
      * @param valueProof    The transaction where the sender has proof of funds for this transaction.
      * @param signature     The signature of the sender on this transaction.
      * @param blockNumberValueProof     The block number where there is proof of funds.
+     * @param blockNumber
      */
-    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof) {
+    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof, int blockNumber) {
         this.sender = sender;
         this.receiver = receiver;
         this.value = value;
         this.valueProof = valueProof;
         this.signature = signature;
         this.blockNumberValueProof = blockNumberValueProof;
+        this.blockNumber = blockNumber;
     }
 
     /**
@@ -70,6 +73,11 @@ public class StandardTransaction implements Transaction {
 
     public BigInteger getSignature() {
         return signature;
+    }
+
+    @Override
+    public int getBlockNumber() {
+        return blockNumber;
     }
 
     @Override

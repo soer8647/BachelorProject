@@ -11,8 +11,6 @@ import Impl.*;
 import Impl.Hashing.SHA256;
 import Interfaces.*;
 import blockchain.Stubs.AddressStub;
-import blockchain.Stubs.CoinBaseTransactionStub;
-import blockchain.Stubs.GenesisBlockStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -46,8 +44,8 @@ public class TestFullNode {
     public void setUp(){
         //SETUP FROM DB
         tx = new TransactionStub();
-        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());
-        ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10);
+        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
+        ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10, 0);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
         //SETUP ACCOUNTS AND TRANSACTIONS
@@ -132,8 +130,8 @@ public class TestFullNode {
 
 
         //make block with the transaction
-        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1, new CoinBaseTransactionStub());
-        Block genesis = new GenesisBlockStub();
+        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1, ct);
+        Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayListTransactions(),0, ct);
 
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(block);
@@ -184,7 +182,7 @@ public class TestFullNode {
         transactions.add(transaction2);
 
         node.mine(valueProofFake,transactions);
-        assertEquals(2,node.getTransactionHistory(senderAddress).size());
+        assertEquals(2,node.getTransactionHistory(senderAddress).getKey().size());
     }
 
     @AfterClass

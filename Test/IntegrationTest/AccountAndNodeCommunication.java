@@ -77,8 +77,8 @@ public class AccountAndNodeCommunication {
 
         account = new StandardAccount(cryptoSystem,privateKeyAccount,publicKeyAccount,new SHA256());
         Transaction tx = new TransactionStub();
-        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
-        CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10);
+        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
+        CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
 
         transactionQueue = new LinkedBlockingQueue<>();
@@ -104,7 +104,7 @@ public class AccountAndNodeCommunication {
             e.printStackTrace();
         }
         CopyOnWriteArrayList transactionHistory = new CopyOnWriteArrayList<>();
-        transactionHistory.add(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1));
+        transactionHistory.add(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1, 0));
         accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
         accountRunner.makeTransaction(nodeAddress,10);
 

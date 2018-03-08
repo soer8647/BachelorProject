@@ -10,10 +10,12 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
 
     private Address minerAddress;
     private int value;
+    private int blockNumber;
 
-    public StandardCoinBaseTransaction(Address minerAddress, int value) {
+    public StandardCoinBaseTransaction(Address minerAddress, int value, int blockNumber) {
         this.minerAddress = minerAddress;
         this.value = value;
+        this.blockNumber = blockNumber;
     }
 
     /**
@@ -39,6 +41,11 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
     @Override
     public Address getMinerAddress() {
         return minerAddress;
+    }
+
+    @Override
+    public int getBlockNumber() {
+        return blockNumber;
     }
 
     @Override

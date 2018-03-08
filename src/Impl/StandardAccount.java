@@ -73,7 +73,7 @@ public class StandardAccount implements Account{
         String transaction = sender.toString()+receiver.toString()+value+valueProof.toString();
         BigInteger signature = getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
 
-        return new StandardTransaction(sender,receiver,value,valueProof,signature, blockValueProof);
+        return new StandardTransaction(sender,receiver,value,valueProof,signature, blockValueProof, 0);
     }
 
     public HashingAlgorithm getHashingAlgorithm() {

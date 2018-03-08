@@ -7,7 +7,6 @@ import Impl.StandardTransaction;
 import Interfaces.Address;
 import Interfaces.Transaction;
 import Interfaces.Transactions;
-import blockchain.Stubs.CryptoSystemStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
@@ -32,8 +31,8 @@ public class TestArrayListTransactions {
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
 
-        t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"), 0);
-        t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"), 0);
+        t1 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("42"), 0, 0);
+        t2 = new StandardTransaction(sender, receiver, 1, valueProof, new BigInteger("24"), 0, 0);
         transactions = new ArrayListTransactions();
 
     }
