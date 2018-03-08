@@ -8,19 +8,27 @@ import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 
 import java.math.BigInteger;
+import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.Semaphore;
 
 public class StandardNodeRunner implements NodeRunner {
     private final TransactionManager transactionManager;
+    private final Display display;
     private Node node;
     private boolean interrupted = false;
     private Block specialBlock;
+    private Semaphore lock = new Semaphore(0);
 
     public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, Address address) {
         this(genesisBlock, eventQueue, transactionManager, address, new Display() {
             @Override
             public void addToDisplay(Object o) {
+            }
+
+            @Override
+            public void removeLatestFromDisplay() {
             }
         });
     }
@@ -28,6 +36,7 @@ public class StandardNodeRunner implements NodeRunner {
     public StandardNodeRunner(Block genesisBlock, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, Address address,Display display) {
         this.node = new FullNode(new StandardBlockChain(genesisBlock), address);
         this.transactionManager = transactionManager;
+        this.display = display;
         Thread thread = new Thread(new Runnable() {
             @Override
             public void run() {
@@ -36,7 +45,13 @@ public class StandardNodeRunner implements NodeRunner {
                     Transactions trans = transactionManager.getSomeTransactions();
 
                  //   System.out.println(getBlockNumber() + ",,, " + newBlock);
+                    lock.release();
                     newBlock = node.mine(newBlock.hash(), trans);
+                    try {
+                        lock.acquire();
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
                     if (newBlock==null) {
                         if (specialBlock==null) {
                             System.out.println("Chaos");
@@ -94,12 +109,32 @@ public class StandardNodeRunner implements NodeRunner {
     }
 
     @Override
-    public void rollback(Deque<Block> chain, int blockNumber) {
+    public void rollback(Deque<Block> newBlocks, int blockNumber) {
         //reset Chain
+        try {
+            lock.acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        Deque<Block> removedBlocks = new ArrayDeque<>(); //needed for reseting transactions, probably
+        node.interrupt();
 
-        //reset unspent   transactions
+        //remove the old fork
+        while (node.getBlockChain().getBlockNumber() > blockNumber) {
+            Block removedBlock = node.removeBlock();
+            removedBlocks.addFirst(removedBlock);
+            display.removeLatestFromDisplay();
+        }
 
-        //reset potential transactions
-
+        //insert the new
+        do {
+            Block new_block = newBlocks.pop();
+            node.addBlock(new_block);
+            display.addToDisplay(new_block);
+        } while (newBlocks.peekFirst() != null);
+        //TODO: reset unspent transactions
+        //TODO: transactionManager.rollback();
+        //TODO  reset Display
+        lock.release();
     }
 }

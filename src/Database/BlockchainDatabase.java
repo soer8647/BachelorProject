@@ -197,6 +197,12 @@ public class BlockchainDatabase implements BlockChain{
         return transactions;
     }
 
+    @Override
+    public Block removeBlock() {
+        //TODO: IMPLEMENT
+        return null;
+    }
+
     private Transaction getTransactionFromResultSet(ResultSet set,Statement s,boolean close) throws SQLException {
         // Get the data from the resultset.
         Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));

@@ -62,4 +62,11 @@ public class StandardBlockChain implements BlockChain{
         return transactions;
     }
 
+    @Override
+    public Block removeBlock() {
+        Block block = getBlock(getBlockNumber());
+        blocks.remove(block);
+        return block;
+    }
+
 }

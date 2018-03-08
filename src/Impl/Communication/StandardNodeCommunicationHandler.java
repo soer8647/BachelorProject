@@ -86,10 +86,11 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                 Deque<Block> chain = orphanage.getChain(key);
                 //TODO: perform rollback (if it's the best chain)
                 if (chain.peekLast().getBlockNumber() > nodeRunner.getBlockNumber()) {
+                    System.out.println("what we do here is go Back!");
                     nodeRunner.rollback(chain,chain.peekFirst().getBlockNumber());
                 }
-             //   System.out.println("Alternative chain built");
             } else {
+                System.out.println("this happens?");
                 orphanage.addBlock(block,key);
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }

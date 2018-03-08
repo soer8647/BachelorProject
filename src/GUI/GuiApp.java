@@ -54,4 +54,9 @@ public class GuiApp implements Display{
             model.add(0,o);
         }
     }
+
+    @Override
+    public void removeLatestFromDisplay() {
+        model.removeElementAt(0);
+    }
 }

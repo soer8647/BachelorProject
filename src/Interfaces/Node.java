@@ -74,4 +74,8 @@ public interface Node {
      * @return              A collection of all transactions where this address is involved.
      */
     Collection<Transaction> getTransactionHistory(Address address);
+
+    Block removeBlock();
+
+    void addBlock(Block block);
 }

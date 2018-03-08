@@ -31,4 +31,6 @@ public interface BlockChain {
      * @return              All transactions where the address is involved
      */
     Collection<Transaction> getTransactionHistory(Address address);
+
+    Block removeBlock();
 }
