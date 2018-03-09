@@ -10,7 +10,7 @@ import java.time.temporal.Temporal;
 public class FlexibleHardnessManager implements HardnessManager {
 
     private int currentHardness = Configuration.getHardnessParameter();        //TODO: Make this change
-    private Duration timeTarget = Duration.ofSeconds(10);
+    private Duration timeTarget = Duration.ofSeconds(4);
     private Instant lastTime = Instant.now();
     private int buffer;
     private int adjustInterval = 10;
@@ -28,12 +28,11 @@ public class FlexibleHardnessManager implements HardnessManager {
             Instant thisTime = Instant.now();
 
             Duration timeElapsed = Duration.between(lastTime, thisTime);
+            System.out.println( (double) (timeElapsed.toMillis()) / 1000);
             if (timeElapsed.compareTo(timeTarget) < 0) {
                 currentHardness++;
-                System.out.println("hardness HARDER " + allCounter );
             } else {
                 currentHardness--;
-                System.out.println("hardness easier " + allCounter );
             }
             this.lastTime = thisTime;
             counter = 0;
