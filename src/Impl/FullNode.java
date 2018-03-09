@@ -66,7 +66,6 @@ public class FullNode implements Node {
 
     @Override
     public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
-        //TODO remove invalid transaction in stead of returning false for all
         //For each transaction
         for (Transaction t: transactions.getTransactions()) {
             if(!validateTransaction(t)) {
@@ -93,7 +92,6 @@ public class FullNode implements Node {
             ConfirmedTransaction tr = (ConfirmedTransaction) trans[i];
             if (coinBaseElementNr>=0){
                 cbt = ((CoinBaseTransaction)coinBases[coinBaseElementNr]);
-                //TODO MAKE A NEW TYPE OF TRANSACTIONS THAT ARE CONFIRMED.
                 if(cbt.getBlockNumber()>=tr.getBlockNumber()){
                     counter+=cbt.getValue();
                     coinBaseElementNr--;

@@ -9,17 +9,13 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Database.BlockchainDatabase;
 import External.Pair;
 import Impl.*;
-import Impl.Communication.StandardAccountRunner;
-import Impl.Communication.StandardNodeCommunicationHandler;
-import Impl.Communication.StandardNodeRunner;
-import Impl.Communication.UDPReceiver;
+import Impl.Communication.*;
 import Impl.Hashing.SHA256;
 import Interfaces.Account;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.*;
 import Interfaces.Transaction;
-import blockchain.Stubs.ConsolePublisher;
 import blockchain.Stubs.TransactionStub;
 
 import java.math.BigInteger;
@@ -91,8 +87,11 @@ public class AccountAndNodeCommunication {
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
         nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager());
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
-        NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new ConsolePublisher(),eventQueue);
-
+        try {
+            NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisher(InetAddress.getLocalHost(),8008, new InetAddress[0], new int[0]),eventQueue);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
 
 
         nodeIpAndPortCollection = new ArrayList<>();
@@ -101,16 +100,29 @@ public class AccountAndNodeCommunication {
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
+        // Accounts first transaction to have proof of funds
         ConfirmedTransaction ct = new ConfirmedTransaction(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1),1);
         Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory = new Pair<>(new CopyOnWriteArrayList(){{add(ct);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
+       //Account make transaction
         accountRunner.makeTransaction(nodeAddress,10);
         //Look in print to see the transaction is sent to the node and mined.
 
-
+        System.out.println("TRANSACTIONHISTORY " + accountRunner.getTransactionHistory());
         //Now pull history from node
         accountRunner.updateTransactionHistory();
 
+        while(true){
+            Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> th = accountRunner.getTransactionHistory();
+            System.out.println("TRANSACTIONHISTORY :Confirmed nr:" + th.getKey().size()+" CoinBase " +th.getValue().size()+"\n");
+            accountRunner.updateTransactionHistory();
+            System.out.println("BALANCE: " +accountRunner.getBalance());
+            try {
+                Thread.sleep(5000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
 
     }
 }

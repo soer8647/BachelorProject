@@ -66,7 +66,6 @@ public class StandardAccountRunner implements AccountRunner {
             else if(t.getSenderAddress().toString().equals(account.getAddress().toString())) amount-=t.getValue();
         }
         for (CoinBaseTransaction c:getTransactionHistory().getValue()){
-            System.out.println("WE DID HAVE A COINBASE");
             amount+=c.getValue();
         }
         return amount;

@@ -36,11 +36,12 @@ public class AccountEventHandler implements EventHandler,Runnable{
     public void handleEvent(Event event){
         if (event instanceof TransactionHistoryResponseEvent){
             TransactionHistoryResponseEvent the = (TransactionHistoryResponseEvent)event;
+            Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> th = the.getTransactions();
             if (transactionHistory.getKey().size()+transactionHistory.getValue().size()==the.getIndex()){
-                //TODO UPDATE HISTORY
-                System.out.println("GOT AN UPDATE!!!!!!!!!!");
+                transactionHistory.getKey().addAll(th.getKey());
+                transactionHistory.getValue().addAll(th.getValue());
             }else {
-                //TODO find out how to merge history
+                //TODO find out how to merge history. Idea : save history and merge when the full history is seen.
             }
         }else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent){
             publisher.broadcastEvent(event);

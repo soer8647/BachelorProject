@@ -14,7 +14,7 @@ import java.net.*;
 
 public class UDPPublisher implements Publisher{
     private InetAddress[] ips;
-    private DatagramSocket Socket;
+    private DatagramSocket socket;
     private int[] ports;
     private InetAddress localAdress;
     private int localPort;
@@ -28,7 +28,7 @@ public class UDPPublisher implements Publisher{
         this.ips = ip;
         this.ports = port;
         try {
-            Socket = new DatagramSocket();
+            socket = new DatagramSocket();
         } catch (SocketException e) {
             e.printStackTrace();
         }
@@ -46,7 +46,7 @@ public class UDPPublisher implements Publisher{
                 InetAddress ip = this.ips[i];
                 int port = this.ports[i];
                 DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
-                Socket.send(sendPacket);
+                socket.send(sendPacket);
             }
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -62,7 +62,7 @@ public class UDPPublisher implements Publisher{
             os.writeObject(event);
             byte[] data = outputStream.toByteArray();
             DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
-            Socket.send(sendPacket);
+            socket.send(sendPacket);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         } catch (IOException e) {

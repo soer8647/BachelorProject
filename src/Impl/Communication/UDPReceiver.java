@@ -23,8 +23,9 @@ public class UDPReceiver {
 
     private void createAndListenSocket() {
         try {
+            System.out.println("LISTENING ON: "+ port);
             socket = new DatagramSocket(this.port);
-            byte[] incomingData = new byte[2048];
+            byte[] incomingData = new byte[8192];
 
             while (true) {
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
