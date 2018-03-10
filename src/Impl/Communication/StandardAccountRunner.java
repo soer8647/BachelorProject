@@ -3,6 +3,7 @@ package Impl.Communication;
 import External.Pair;
 import Impl.Communication.Events.TransactionEvent;
 import Impl.Communication.Events.TransactionHistoryRequestEvent;
+import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
@@ -23,7 +24,7 @@ public class StandardAccountRunner implements AccountRunner {
 
     private Account account;
     private LinkedBlockingQueue<Event> eventQueue;
-    private Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory;
+    private TransactionHistory transactionHistory;
     private AccountEventHandler eventHandler;
     private Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
     private int listeningPort;
@@ -33,12 +34,12 @@ public class StandardAccountRunner implements AccountRunner {
         this.account = account;
         this.eventQueue = eventQueue;
         this.nodeIpAndPortCollection = nodeIpAndPortCollection;
-        transactionHistory = new Pair<>(new CopyOnWriteArrayList<ConfirmedTransaction>(),new CopyOnWriteArrayList<CoinBaseTransaction>());
+        transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<>(),new CopyOnWriteArrayList<>());
         eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,nodeIpAndPortCollection);
         eventHandler.start();
     }
 
-    public StandardAccountRunner(Account account,Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
+    public StandardAccountRunner(Account account,TransactionHistory transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
         this.listeningPort=listeningPort;
         this.account = account;
         this.transactionHistory = transactionHistory;
@@ -54,18 +55,18 @@ public class StandardAccountRunner implements AccountRunner {
     }
 
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory() {
+    public TransactionHistory getTransactionHistory() {
         return transactionHistory;
     }
 
     @Override
     public int getBalance() {
         int amount = 0;
-        for (Transaction t:getTransactionHistory().getKey()){
+        for (Transaction t:getTransactionHistory().getConfirmedTransactions()){
             if (t.getReceiverAddress().toString().equals(account.getAddress().toString())) amount+=t.getValue();
             else if(t.getSenderAddress().toString().equals(account.getAddress().toString())) amount-=t.getValue();
         }
-        for (CoinBaseTransaction c:getTransactionHistory().getValue()){
+        for (CoinBaseTransaction c:getTransactionHistory().getCoinBaseTransactions()){
             amount+=c.getValue();
         }
         return amount;
@@ -84,18 +85,15 @@ public class StandardAccountRunner implements AccountRunner {
             for (Pair<InetAddress,Integer> p:nodeIpAndPortCollection) {
                 eventQueue.put(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), p.getValue(),p.getKey()));
             }
-        } catch (NotEnoughMoneyException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
-            //TODO Make transaction again?
+        } catch (NotEnoughMoneyException | InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     public Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException {
         int bal = getBalance();
-        Object[] th = getTransactionHistory().getKey().toArray();
-        Object[] cb = getTransactionHistory().getValue().toArray();
+        Object[] th = getTransactionHistory().getConfirmedTransactions().toArray();
+        Object[] cb = getTransactionHistory().getCoinBaseTransactions().toArray();
 
         int coinBaseCounter=cb.length-1;
         int counter =0;
@@ -136,12 +134,11 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public void updateTransactionHistory() {
         try {
-            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.getKey().size()+transactionHistory.getValue().size(),account.getAddress()));
-        } catch (InterruptedException e) {
+            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.getConfirmedTransactions().size()+transactionHistory.getCoinBaseTransactions().size(),account.getAddress()));
+        } catch (InterruptedException | UnknownHostException e) {
             e.printStackTrace();
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
-        } ;
+        }
+
     }
 
     public Collection<Pair<InetAddress, Integer>> getNodeIpAndPortCollection() {

@@ -2,7 +2,6 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
-import External.Pair;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
@@ -15,13 +14,13 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class BlockchainDatabase implements BlockChain{
+public class BlockChainDatabase implements BlockChain{
 
     private static String connectionURL;
     private static Connection conn;
     private final String driver;
 
-    public BlockchainDatabase(String databaseName, Block genesisblock) {
+    public BlockChainDatabase(String databaseName, Block genesisblock) {
 
         //   ## DEFINE VARIABLES SECTION ##
         // define the driver to use
@@ -183,12 +182,12 @@ public class BlockchainDatabase implements BlockChain{
      * @return      A collection of all the transactions where this address is involved.
      */
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public TransactionHistory getTransactionHistory(Address address) {
         return getTransactionHistory(address,0);
     }
 
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
+    public TransactionHistory getTransactionHistory(Address address, int blockNumber) {
         Collection<ConfirmedTransaction> transactions = new ArrayList<>();
         Collection<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
 
@@ -219,7 +218,7 @@ public class BlockchainDatabase implements BlockChain{
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        return new Pair<>(transactions,coinBaseTransactions);
+        return new TransactionHistory(transactions,coinBaseTransactions);
     }
 
     private ConfirmedTransaction getConfirmedTransactionFromResultSet(ResultSet set, Statement s, boolean close) throws SQLException {
@@ -309,7 +308,6 @@ public class BlockchainDatabase implements BlockChain{
 
     /**
      * @param sql       The string equivalence of a SQL statement.
-     * @return          True if the query was successful. False otherwise.
      */
     private void query(String sql) throws SQLException {
         Statement s = conn.createStatement();

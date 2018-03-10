@@ -1,6 +1,6 @@
 package Database;
 
-import Impl.BlockchainDatabase;
+import Impl.BlockChainDatabase;
 import Impl.StandardBlock;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
@@ -17,9 +17,9 @@ import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 
-public class TestBlockchainDatabase {
+public class TestBlockChainDatabase {
 
-    private static BlockchainDatabase db;
+    private static BlockChainDatabase db;
     private Transaction tx;
     private Transaction stx;
     private Block block;
@@ -34,7 +34,7 @@ public class TestBlockchainDatabase {
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         block = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),1,ct);
         block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),2,ct);
-        db = new BlockchainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct));
+        db = new BlockChainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct));
     }
 
 

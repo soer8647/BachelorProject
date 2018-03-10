@@ -32,7 +32,8 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 public class AccountAndNodeCommunication {
 
-    private PublicKeyCryptoSystem cryptoSystem;
+    private static boolean running = true;
+    private PublicKeyCryptoSystem<RSAPublicKey, RSAPrivateKey> cryptoSystem;
 
     private KeyPair keyPair1;
     private RSAPublicKey publicKeyAccount;
@@ -78,7 +79,7 @@ public class AccountAndNodeCommunication {
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
 
         transactionQueue = new LinkedBlockingQueue<>();
-        node = new FullNode(new BlockchainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress,new ConstantHardnessManager());
+        node = new FullNode(new BlockChainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress,new ConstantHardnessManager());
         Configuration.setHardnessParameter(17);
 
     }
@@ -105,7 +106,7 @@ public class AccountAndNodeCommunication {
         }
         // Accounts first transaction to have proof of funds
         ConfirmedTransaction ct = new ConfirmedTransaction(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1),1);
-        Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactionHistory = new Pair<>(new CopyOnWriteArrayList(){{add(ct);}},new CopyOnWriteArrayList<>());
+        TransactionHistory transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(ct);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
        //Account make transaction
         accountRunner.makeTransaction(nodeAddress,10);
@@ -115,9 +116,9 @@ public class AccountAndNodeCommunication {
         //Now pull history from node
         accountRunner.updateTransactionHistory();
 
-        while(true){
-            Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> th = accountRunner.getTransactionHistory();
-            System.out.println("TRANSACTIONHISTORY :Confirmed nr:" + th.getKey().size()+" CoinBase " +th.getValue().size()+"\n");
+        while(running){
+            TransactionHistory th = accountRunner.getTransactionHistory();
+            System.out.println("TRANSACTIONHISTORY :Confirmed nr:" + th.getConfirmedTransactions().size()+" CoinBase " +th.getCoinBaseTransactions().size()+"\n");
             accountRunner.updateTransactionHistory();
             System.out.println("BALANCE: " +accountRunner.getBalance());
             try {

@@ -28,7 +28,7 @@ import static org.junit.Assert.*;
 
 public class TestFullNode {
     private FullNode node;
-    private static BlockchainDatabase blockChain;
+    private static BlockChainDatabase blockChain;
     private Block block;
     private Address nodeAddress;
     private Transaction tx;
@@ -64,7 +64,7 @@ public class TestFullNode {
         publicKeyReceiver = keyPair2.getPublicKey();
 
 
-        blockChain = new BlockchainDatabase("FULLNODETEST",block);
+        blockChain = new BlockChainDatabase("FULLNODETEST",block);
         nodeAddress = stx.getSenderAddress();
         node = new FullNode(blockChain, nodeAddress,new ConstantHardnessManager());
         Configuration.setHardnessParameter(10);
@@ -205,7 +205,7 @@ public class TestFullNode {
         transactions.add(transaction2);
 
         node.mine(valueProofFake,transactions);
-        assertEquals(2,node.getTransactionHistory(senderAddress).getKey().size());
+        assertEquals(2,node.getTransactionHistory(senderAddress).getConfirmedTransactions().size());
     }
 
     @AfterClass

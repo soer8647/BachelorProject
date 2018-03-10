@@ -1,6 +1,6 @@
 package blockchain;
 
-import Impl.BlockchainDatabase;
+import Impl.BlockChainDatabase;
 import Impl.StandardBlock;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
@@ -18,7 +18,7 @@ public class TestFullNodeWithBlockChainDB {
 
 
 
-    private static BlockchainDatabase bcdb;
+    private static BlockChainDatabase bcdb;
     private Transaction tx;
     private Transaction stx;
     private Block block;
@@ -28,7 +28,7 @@ public class TestFullNodeWithBlockChainDB {
 
     @Before
     public void setUp() {
-        bcdb = new BlockchainDatabase("TESTFULLNODEDB", block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct));
+        bcdb = new BlockChainDatabase("TESTFULLNODEDB", block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct));
         System.out.println("Running setup");
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());

@@ -12,10 +12,10 @@ import Impl.Communication.StandardAccountRunner;
 import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
+import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Account;
-import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import org.junit.Before;
@@ -70,7 +70,7 @@ public class TestStandardAccountRunner {
         account = new StandardAccount(cryptoSystem,privateKeySender,publicKeySender,new SHA256());
         transactionQueue = new LinkedBlockingQueue<>();
         nodeIpAndPortCollection = new ArrayList<>();
-        nodeIpAndPortCollection.add(new Pair<InetAddress, Integer>(InetAddress.getLocalHost(),1));
+        nodeIpAndPortCollection.add(new Pair<>(InetAddress.getLocalHost(),1));
 
     }
 
@@ -90,7 +90,7 @@ public class TestStandardAccountRunner {
         //Transaction transaction = account.makeTransaction(account.getAddress(), receiverAddress,1,new BigInteger("42"),1);
         ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1),2);
         // Account sends 3 money
-        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);}},new CopyOnWriteArrayList<>());
+        TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);}},new CopyOnWriteArrayList<>());
         accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection,8003);
         accountRunner.makeTransaction(receiverAddress,1);
         assertEquals(1,accountRunner.getEventQueue().size());
@@ -104,7 +104,7 @@ public class TestStandardAccountRunner {
         ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("100"),new BigInteger("42"),1),2);
         // Account sends 10 money
         ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("100"),new BigInteger("42"),1),2);
-        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);}},new CopyOnWriteArrayList<>());
+        TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>(),8001);
         assertEquals(32,accountRunner.getBalance());
     }
@@ -125,7 +125,7 @@ public class TestStandardAccountRunner {
         // Account sends 1 money
         ConfirmedTransaction t6 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6),7);
         //Balance of 3
-        Pair transactions = new Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>>(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);add(t3);add(t4);add(t5);add(t6);}},new CopyOnWriteArrayList<>());
+        TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);add(t3);add(t4);add(t5);add(t6);}},new CopyOnWriteArrayList<>());
         try {
             accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>(),8002);
             assertEquals(3, accountRunner.getBalance());

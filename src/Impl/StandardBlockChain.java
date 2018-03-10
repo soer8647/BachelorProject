@@ -1,6 +1,5 @@
 package Impl;
 
-import External.Pair;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.*;
 
@@ -50,12 +49,12 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public TransactionHistory getTransactionHistory(Address address) {
         return getTransactionHistory(address,0);
     }
 
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int blockNumber) {
+    public TransactionHistory getTransactionHistory(Address address, int blockNumber) {
         ArrayList<ConfirmedTransaction> transactions = new ArrayList<>();
         ArrayList<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
         for (Block b : blocks){
@@ -71,7 +70,7 @@ public class StandardBlockChain implements BlockChain{
             }
         }
 
-        return new Pair<>(transactions,coinBaseTransactions);
+        return new TransactionHistory(transactions,coinBaseTransactions);
     }
 
     @Override

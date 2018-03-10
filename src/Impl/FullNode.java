@@ -2,7 +2,6 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import External.Pair;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.*;
@@ -93,12 +92,12 @@ public class FullNode implements Node {
         if(!verifyTransactionSignature(t)) {
             return false;
         }
-        Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
+        TransactionHistory transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
         int valueToVerify = t.getValue();
         int counter = 0;
 
-        Object[] trans = transactions.getKey().toArray();
-        Object[] coinBases = transactions.getValue().toArray();
+        Object[] trans = transactions.getConfirmedTransactions().toArray();
+        Object[] coinBases = transactions.getCoinBaseTransactions().toArray();
         int coinBaseElementNr = coinBases.length-1;
 
         for (int i=trans.length-1;i>=0;i--){
@@ -160,7 +159,7 @@ public class FullNode implements Node {
     }
 
     @Override
-    public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address) {
+    public TransactionHistory getTransactionHistory(Address address) {
         return blockChain.getTransactionHistory(address);
     }
 
@@ -179,7 +178,7 @@ public class FullNode implements Node {
         hardnessManager.notifyOfMining();
     }
 
-    public Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> getTransactionHistory(Address address,int index){
+    public TransactionHistory getTransactionHistory(Address address, int index){
         return blockChain.getTransactionHistory(address,index);
     }
 }

@@ -2,13 +2,11 @@ package Interfaces.Communication;
 
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
-import Impl.Transactions.ConfirmedTransaction;
+import Impl.TransactionHistory;
 import Interfaces.Account;
 import Interfaces.Address;
-import Interfaces.CoinBaseTransaction;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public interface AccountRunner {
@@ -21,7 +19,7 @@ public interface AccountRunner {
     /**
      * @return      A collection of all transactions for the linked account.
      */
-    Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory();
+    TransactionHistory getTransactionHistory();
 
     /**
      * @return      The balance of the linked account.
@@ -39,7 +37,7 @@ public interface AccountRunner {
     /**
      * @param value         The value to find proof of funds for
      * @return              A pair on a transaction hash and a blocknumber.
-     * @throws NotEnoughMoneyException
+     * @throws NotEnoughMoneyException  If there is not enough funds, this exception is thrown.
      */
     Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException;
 

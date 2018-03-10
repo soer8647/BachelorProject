@@ -1,7 +1,6 @@
 package Interfaces;
 
-import External.Pair;
-import Impl.Transactions.ConfirmedTransaction;
+import Impl.TransactionHistory;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -66,11 +65,11 @@ public interface Node {
      * @param address       The address involved in transactions.
      * @return              A collection of all transactions where this address is involved.
      */
-    Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactionHistory(Address address);
+    TransactionHistory getTransactionHistory(Address address);
 
     Block removeBlock();
 
     void addBlock(Block block);
 
-    Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> getTransactionHistory(Address address, int index);
+    TransactionHistory getTransactionHistory(Address address, int index);
 }

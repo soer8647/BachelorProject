@@ -1,6 +1,6 @@
 package Interfaces.Communication;
 
-import External.Pair;
+import Impl.TransactionHistory;
 import Interfaces.Address;
 import Interfaces.Block;
 import Interfaces.Transaction;
@@ -14,7 +14,8 @@ public interface NodeRunner {
     /**
      * This method interrupts the inner node in it's mining process, and if no block has been found, puts the incomingBlock on the chain (and it is now the latest block)
      * When a new block is received from the outside, this method should be called.
-     * @param incomingBlock
+     *
+     * @param incomingBlock     The block that was received.
      */
     void interruptReceivedBlock(Block incomingBlock);
 
@@ -32,5 +33,5 @@ public interface NodeRunner {
 
     void rollback(Deque<Block> chain, int blockNumber);
 
-    Pair getTransactionHistory(Address address, int index);
+    TransactionHistory getTransactionHistory(Address address, int index);
 }
