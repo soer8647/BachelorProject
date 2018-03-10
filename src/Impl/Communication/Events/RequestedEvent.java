@@ -1,10 +1,9 @@
 package Impl.Communication.Events;
 
 import Interfaces.Block;
-import Interfaces.Communication.Event;
 
 import java.net.InetAddress;
-
+//TODO Respone event?
 public class RequestedEvent extends ProtoEvent {
     private Block block;
 

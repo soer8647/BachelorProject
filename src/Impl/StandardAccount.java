@@ -4,6 +4,7 @@ import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import Impl.Transactions.StandardTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.HashingAlgorithm;

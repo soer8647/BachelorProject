@@ -1,9 +1,9 @@
 package blockchain;
 
 import Crypto.Impl.RSAPublicKey;
-import Impl.ArrayListTransactions;
 import Impl.PublicKeyAddress;
-import Impl.StandardTransaction;
+import Impl.Transactions.ArrayListTransactions;
+import Impl.Transactions.StandardTransaction;
 import Interfaces.Address;
 import Interfaces.Transaction;
 import Interfaces.Transactions;

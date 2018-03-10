@@ -1,6 +1,7 @@
 package Impl;
 
 import External.Pair;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.*;
 
 import java.util.ArrayList;

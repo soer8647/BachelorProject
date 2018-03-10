@@ -1,6 +1,5 @@
 package Impl.Communication.Events;
 
-import Interfaces.Communication.Event;
 import Interfaces.Transaction;
 
 import java.net.InetAddress;

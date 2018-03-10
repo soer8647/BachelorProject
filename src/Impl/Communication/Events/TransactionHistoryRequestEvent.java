@@ -1,32 +1,21 @@
 package Impl.Communication.Events;
 
 import Interfaces.Address;
-import Interfaces.Communication.Event;
 
 import java.net.InetAddress;
+/*
+* A event for a client in the network to request all transactions where a given address is involved.
+* */
 
-public class TransactionHistoryRequestEvent implements Event{
+public class TransactionHistoryRequestEvent extends ProtoEvent{
 
-    private InetAddress ip;
-    private int port;
     private int index;
     private Address address;
 
     public TransactionHistoryRequestEvent(InetAddress ip, int port ,int index, Address address) {
-        this.ip = ip;
-        this.port = port;
+        super(port,ip);
         this.index = index;
         this.address = address;
-    }
-
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public InetAddress getIp() {
-        return ip;
     }
 
     public int getIndex() {

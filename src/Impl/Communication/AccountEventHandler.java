@@ -4,7 +4,7 @@ import External.Pair;
 import Impl.Communication.Events.TransactionEvent;
 import Impl.Communication.Events.TransactionHistoryRequestEvent;
 import Impl.Communication.Events.TransactionHistoryResponseEvent;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;

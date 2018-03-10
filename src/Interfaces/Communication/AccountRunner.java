@@ -2,7 +2,7 @@ package Interfaces.Communication;
 
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;

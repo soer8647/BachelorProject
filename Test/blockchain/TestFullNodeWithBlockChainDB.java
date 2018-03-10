@@ -1,10 +1,10 @@
 package blockchain;
 
-import Database.BlockchainDatabase;
-import Impl.ArrayListTransactions;
+import Impl.BlockchainDatabase;
 import Impl.StandardBlock;
-import Impl.StandardCoinBaseTransaction;
-import Impl.StandardTransaction;
+import Impl.Transactions.ArrayListTransactions;
+import Impl.Transactions.StandardCoinBaseTransaction;
+import Impl.Transactions.StandardTransaction;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Transaction;

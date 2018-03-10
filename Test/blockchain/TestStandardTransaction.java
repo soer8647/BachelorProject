@@ -2,7 +2,7 @@ package blockchain;
 
 import Crypto.Impl.RSAPublicKey;
 import Impl.PublicKeyAddress;
-import Impl.StandardTransaction;
+import Impl.Transactions.StandardTransaction;
 import Interfaces.Address;
 import blockchain.Stubs.TransactionStub;
 import org.junit.Before;

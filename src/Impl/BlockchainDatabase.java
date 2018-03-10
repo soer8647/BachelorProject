@@ -1,9 +1,12 @@
-package Database;
+package Impl;
 
 import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import External.Pair;
-import Impl.*;
+import Impl.Transactions.ArrayListTransactions;
+import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.StandardCoinBaseTransaction;
+import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
 import org.apache.derby.jdbc.EmbeddedDriver;
 

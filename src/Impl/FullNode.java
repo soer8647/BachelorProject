@@ -3,6 +3,8 @@ package Impl;
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import External.Pair;
+import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.*;
 import Interfaces.Communication.HardnessManager;
 
@@ -10,8 +12,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 
 /*
-* This class is meant to implement a node, that holds the whole blockchain.
-* It uses the SHA256 hashing algorithm
+* This class is meant to implement a node, that holds the full block chain.
+* It uses the SHA256 hashing algorithm.
 * */
 public class FullNode implements Node {
     private BlockChain blockChain;
@@ -26,6 +28,14 @@ public class FullNode implements Node {
         this.hardnessManager = hardnessManager;
     }
 
+    /**
+     * The method for mining a single block and append it to the block chain.
+     * If the node receives an incoming block in the meantime, the mining stops and the received block is appended to the block chain.
+     *
+     * @param previousBlockHash The hash of the previous block
+     * @param transactions      The transactions to validate and mine in this block
+     * @return                  The new block that was mined
+     */
     @Override
     public Block mine(BigInteger previousBlockHash, Transactions transactions) {
         //Set the hardness parameter
@@ -64,6 +74,10 @@ public class FullNode implements Node {
     }
 
 
+    /**
+     * @param transactions When mining a block or validating a block one should be able to validate that the transactions are valid.
+     * @return              True if all the transactions are valid.
+     */
     @Override
     public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
         //For each transaction
@@ -109,21 +123,12 @@ public class FullNode implements Node {
         return false;
     }
 
-    @Override
-    public Transactions getPendingTransactions() {
-        return null;
-    }
-
 
     @Override
     public boolean validateBlock(Block incomingBlock) {
             return blockChain.getBlock(incomingBlock.getBlockNumber()-1).hash().equals(incomingBlock.getPreviousHash())
                     && validateTransactions(incomingBlock.getTransactions());
         }
-
-    @Override
-    public void removeTransaction(Transaction transaction) {
-    }
 
     @Override
     public BlockChain getBlockChain() {
@@ -165,6 +170,9 @@ public class FullNode implements Node {
         return blockChain.removeBlock();
     }
 
+    /**
+     * @param block     The block to append to the block chain.
+     */
     @Override
     public void addBlock(Block block) {
         blockChain.addBlock(block);

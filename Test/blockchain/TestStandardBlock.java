@@ -1,8 +1,8 @@
 package blockchain;
 
 import Configuration.Configuration;
-import Impl.ArrayListTransactions;
 import Impl.StandardBlock;
+import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import org.junit.Before;
@@ -12,7 +12,6 @@ import java.math.BigInteger;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
 
 public class TestStandardBlock {
     private Block block;

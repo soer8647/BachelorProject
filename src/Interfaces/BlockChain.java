@@ -1,7 +1,7 @@
 package Interfaces;
 
 import External.Pair;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 
 import java.util.Collection;
 

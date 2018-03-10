@@ -1,12 +1,15 @@
 package Impl;
 
 import Configuration.Configuration;
-import Interfaces.Block;
+import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
 import Interfaces.Transactions;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class StandardTransactionManager implements TransactionManager {
     private Queue<Transaction> transactions;

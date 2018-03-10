@@ -3,7 +3,7 @@ package Impl.Communication;
 import External.Pair;
 import GUI.Display;
 import Impl.Communication.Events.MinedBlockEvent;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.*;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;

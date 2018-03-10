@@ -1,9 +1,9 @@
 package FakeClients;
 
-import Impl.ArrayListTransactions;
 import Impl.FullNode;
 import Impl.StandardBlock;
 import Impl.StandardBlockChain;
+import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
 import Interfaces.BlockChain;
 import Interfaces.Communication.ConstantHardnessManager;

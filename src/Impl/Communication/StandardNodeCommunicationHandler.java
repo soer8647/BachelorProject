@@ -2,7 +2,7 @@ package Impl.Communication;
 
 import External.Pair;
 import Impl.Communication.Events.*;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;

@@ -1,39 +1,24 @@
 package Impl.Communication.Events;
 
 import External.Pair;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.CoinBaseTransaction;
-import Interfaces.Communication.Event;
 
 import java.net.InetAddress;
 import java.util.Collection;
-
-public class TransactionHistoryResponseEvent implements Event {
-    private InetAddress inetAddress;
-    private int port;
+/*
+* An event for a server to respond to a TransactionHistoryRequest.
+* */
+public class TransactionHistoryResponseEvent extends ProtoEvent {
     private Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> transactions;
     private int index;
 
     public TransactionHistoryResponseEvent(InetAddress inetAddress, int port, Pair<Collection<ConfirmedTransaction>,Collection<CoinBaseTransaction>> transactions, int requestedStartIndex) {
-        this.inetAddress = inetAddress;
-        this.port = port;
+        super(port,inetAddress);
         this.transactions = transactions;
         this.index = requestedStartIndex;
     }
 
-    @Override
-    public int getPort() {
-        return port;
-    }
-
-    @Override
-    public InetAddress getIp() {
-        return inetAddress;
-    }
-
-    public InetAddress getInetAddress() {
-        return inetAddress;
-    }
 
     public Pair<Collection<ConfirmedTransaction>, Collection<CoinBaseTransaction>> getTransactions() {
         return transactions;

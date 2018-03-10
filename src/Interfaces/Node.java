@@ -1,7 +1,7 @@
 package Interfaces;
 
 import External.Pair;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -21,15 +21,13 @@ public interface Node {
     Block mine(BigInteger previousBlockHash, Transactions transactions);
 
     /**
-     * @param transactions          When mining a block or validating a block one should be able to validate that the transactions are valid.
-     * @return                      true is all transactions are valid, false otherwise.
+     * When mining a block or validating a block one should be able to validate that the transactions are valid.
+     *
+     * @param transactions          The transactions to verify.
+     * @return                      True is all transactions are valid, false otherwise.
      */
     boolean validateTransactions(Transactions<Collection<Transaction>> transactions);
 
-    /**
-     * @return                      All the transactions that this node has not yes incorporated in a block.
-     */
-    Transactions getPendingTransactions();
 
     /**
      * When a block is mined on another node it is propagated to the network. You have to validate this block before accepting it.
@@ -39,16 +37,8 @@ public interface Node {
      */
     boolean validateBlock(Block incomingBlock);
 
-
     /**
-     * A transaction have to be removed if it is mined in one of this nodes blocks or if you accept another block where it is in.
-     *
-     * @param transaction            The transaction to remove from the pending transaction.
-     */
-    void removeTransaction(Transaction transaction);
-
-    /**
-     * @return      The blockchain of this node
+     * @return      The block chain of this node
      */
     BlockChain getBlockChain();
 
@@ -60,7 +50,7 @@ public interface Node {
     void interrupt();
 
     /**
-     * @return      The address in the blockchain for this node. This is where the blockreward is transferred to.
+     * @return      The address in the block chain for this node. This is where the block reward is transferred to.
      */
     Address getAddress();
 

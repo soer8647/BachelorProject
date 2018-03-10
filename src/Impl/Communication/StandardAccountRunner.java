@@ -3,7 +3,7 @@ package Impl.Communication;
 import External.Pair;
 import Impl.Communication.Events.TransactionEvent;
 import Impl.Communication.Events.TransactionHistoryRequestEvent;
-import Impl.ConfirmedTransaction;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
