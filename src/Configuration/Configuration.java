@@ -18,7 +18,7 @@ public class Configuration {
     private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
     private static int transactionLimit=10;
     private static HashingAlgorithm hasher = new SHA256();
-
+    private static int max_package_size = 8192;
 
     /**
      * @return The corresponding Biginteger of a hash
@@ -57,5 +57,9 @@ public class Configuration {
 
     public static int getTransactionLimit() {
         return transactionLimit;
+    }
+
+    public static int getMax_package_size() {
+        return max_package_size;
     }
 }

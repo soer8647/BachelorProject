@@ -4,27 +4,27 @@ import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.CoinBaseTransaction;
 
 import java.io.Serializable;
-import java.util.Collection;
+import java.util.List;
 
 public class TransactionHistory implements Serializable
 {
-    private Collection<ConfirmedTransaction> confirmedTransactions;
-    private Collection<CoinBaseTransaction> coinBaseTransactions;
+    private List<ConfirmedTransaction> confirmedTransactions;
+    private List<CoinBaseTransaction> coinBaseTransactions;
 
-    public TransactionHistory(Collection<ConfirmedTransaction> confirmedTransactions, Collection<CoinBaseTransaction> coinBaseTransactions) {
+    public TransactionHistory(List<ConfirmedTransaction> confirmedTransactions, List<CoinBaseTransaction> coinBaseTransactions) {
         this.confirmedTransactions = confirmedTransactions;
         this.coinBaseTransactions = coinBaseTransactions;
     }
 
-    public Collection<ConfirmedTransaction> getConfirmedTransactions() {
+    public List<ConfirmedTransaction> getConfirmedTransactions() {
         return confirmedTransactions;
     }
 
-    public Collection<CoinBaseTransaction> getCoinBaseTransactions() {
+    public List<CoinBaseTransaction> getCoinBaseTransactions() {
         return coinBaseTransactions;
     }
 
     public int size(){
-        return coinBaseTransactions.size()+coinBaseTransactions.size();
+        return coinBaseTransactions.size()+confirmedTransactions.size();
     }
 }

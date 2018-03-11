@@ -3,7 +3,7 @@ package Interfaces;
 import java.io.Serializable;
 
 public
-interface CoinBaseTransaction extends Serializable{
+interface CoinBaseTransaction  extends Serializable,VerifiableTransaction{
 
     /**
      * @return      The block mining reward

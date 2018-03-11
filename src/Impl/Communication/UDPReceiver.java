@@ -1,5 +1,6 @@
 package Impl.Communication;
 
+import Configuration.Configuration;
 import Interfaces.Communication.Event;
 
 import java.io.ByteArrayInputStream;
@@ -25,7 +26,7 @@ public class UDPReceiver {
         try {
             System.out.println("LISTENING ON: "+ port);
             socket = new DatagramSocket(this.port);
-            byte[] incomingData = new byte[8192];
+            byte[] incomingData = new byte[Configuration.getMax_package_size()];
 
             while (true) {
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);

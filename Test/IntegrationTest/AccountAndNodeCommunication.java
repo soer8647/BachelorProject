@@ -80,14 +80,13 @@ public class AccountAndNodeCommunication {
 
         transactionQueue = new LinkedBlockingQueue<>();
         node = new FullNode(new BlockChainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress,new ConstantHardnessManager());
-        Configuration.setHardnessParameter(17);
+        Configuration.setHardnessParameter(18);
 
     }
 
     public static void main(String[] args) {
         //Not so much an integrationtest, but manual testing is done here.
         new AccountAndNodeCommunication();
-
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
         nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager());
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
@@ -107,25 +106,26 @@ public class AccountAndNodeCommunication {
         // Accounts first transaction to have proof of funds
         ConfirmedTransaction ct = new ConfirmedTransaction(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1),1);
         TransactionHistory transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(ct);}},new CopyOnWriteArrayList<>());
-        accountRunner = new StandardAccountRunner(account,transactionHistory,nodeIpAndPortCollection,8000);
+
+
+        accountRunner = new StandardAccountRunner(account,new TransactionHistory(new ArrayList<>(),new ArrayList<>()),nodeIpAndPortCollection,8000);
        //Account make transaction
-        accountRunner.makeTransaction(nodeAddress,10);
         //Look in print to see the transaction is sent to the node and mined.
 
         System.out.println("TRANSACTIONHISTORY " + accountRunner.getTransactionHistory());
         //Now pull history from node
-        accountRunner.updateTransactionHistory();
-
+        //TODO BLOCK 0 is on blockchain 2 times.....
         while(running){
             TransactionHistory th = accountRunner.getTransactionHistory();
             System.out.println("TRANSACTIONHISTORY :Confirmed nr:" + th.getConfirmedTransactions().size()+" CoinBase " +th.getCoinBaseTransactions().size()+"\n");
             accountRunner.updateTransactionHistory();
-            System.out.println("BALANCE: " +accountRunner.getBalance());
             try {
                 Thread.sleep(5000);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
+
+            accountRunner.makeTransaction(nodeAddress,10);
         }
 
     }

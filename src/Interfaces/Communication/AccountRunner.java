@@ -3,6 +3,7 @@ package Interfaces.Communication;
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.TransactionHistory;
+import Impl.Transactions.IllegalTransactionException;
 import Interfaces.Account;
 import Interfaces.Address;
 
@@ -39,7 +40,7 @@ public interface AccountRunner {
      * @return              A pair on a transaction hash and a blocknumber.
      * @throws NotEnoughMoneyException  If there is not enough funds, this exception is thrown.
      */
-    Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException;
+    Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException, IllegalTransactionException;
 
     LinkedBlockingQueue<Event> getEventQueue();
 

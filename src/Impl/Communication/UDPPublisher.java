@@ -3,7 +3,11 @@ package Impl.Communication;
 import Impl.Communication.Events.ReceivedBlockEvent;
 import Impl.Communication.Events.RequestEvent;
 import Impl.Communication.Events.RequestedEvent;
+import Impl.Communication.Events.TransactionHistoryResponseEvent;
+import Impl.TransactionHistory;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Block;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.Publisher;
 
@@ -11,6 +15,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
+import java.time.LocalDateTime;
+import java.util.List;
 
 public class UDPPublisher implements Publisher{
     private InetAddress[] ips;
@@ -54,6 +60,41 @@ public class UDPPublisher implements Publisher{
             e.printStackTrace();
         }
     }
+    public void sendTransactionHistoryEvent(TransactionHistoryResponseEvent event, InetAddress inetAddress, int port){
+        try{
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ObjectOutputStream os = new ObjectOutputStream(outputStream);
+        os.writeObject(event);
+        byte[] data = outputStream.toByteArray();
+        //TODO MAYBE NOT HARDCODE THIS
+        if (data.length>8192){
+            int splits = data.length / 8192;
+            List<ConfirmedTransaction> ctl = event.getTransactions().getConfirmedTransactions();
+            List<CoinBaseTransaction> cbl = event.getTransactions().getCoinBaseTransactions();
+            int splitSizeClt = ctl.size()/splits;
+            int splitSizeCbl = cbl.size()/splits;
+            for (int i = 0;i<=splits;i++ ){
+                List<ConfirmedTransaction> ctlst = null;
+                if (i==splits-1){
+                    ctlst = ctl.subList(i*splitSizeClt,ctl.size()-1);
+                }else {
+                    ctlst = ctl.subList(i *splitSizeClt,(i+1)*splitSizeClt);
+                }
+                List<CoinBaseTransaction> cblst = null;
+                if (i==splits-1){
+                    cblst =cbl.subList(i*splitSizeCbl,cbl.size()-1);
+                }else {
+                    cblst = cbl.subList(i*splitSizeCbl,(i+1)*splitSizeCbl);
+                }
+                sendEvent(new TransactionHistoryResponseEvent(inetAddress,port,new TransactionHistory(ctlst,cblst),event.getIndex(),i,splits, LocalDateTime.now()),inetAddress,port);
+            }
+
+        }
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
 
     public void sendEvent(Event event, InetAddress ip, int port) {
         try {
@@ -68,6 +109,12 @@ public class UDPPublisher implements Publisher{
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    @Override
+    public void sendTransactionHistoryResponse(TransactionHistory transactionHistory, LocalDateTime time, int index, int part, int parts, InetAddress ip, int port) {
+        TransactionHistoryResponseEvent event = new TransactionHistoryResponseEvent(localAdress,localPort,transactionHistory,index,part,parts, time);
+        sendEvent(event,ip,port);
     }
 
     @Override

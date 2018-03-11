@@ -12,7 +12,7 @@ import org.apache.derby.jdbc.EmbeddedDriver;
 import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 
 public class BlockChainDatabase implements BlockChain{
 
@@ -188,8 +188,8 @@ public class BlockChainDatabase implements BlockChain{
 
     @Override
     public TransactionHistory getTransactionHistory(Address address, int blockNumber) {
-        Collection<ConfirmedTransaction> transactions = new ArrayList<>();
-        Collection<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
+        List<ConfirmedTransaction> transactions = new ArrayList<>();
+        List<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
 
         Statement s;
         try {

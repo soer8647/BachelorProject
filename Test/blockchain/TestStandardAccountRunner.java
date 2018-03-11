@@ -14,6 +14,7 @@ import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.IllegalTransactionException;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Account;
 import Interfaces.Communication.AccountRunner;
@@ -130,7 +131,7 @@ public class TestStandardAccountRunner {
             accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>(),8002);
             assertEquals(3, accountRunner.getBalance());
             assertEquals(new Pair<>(t1.transActionHash(), 2).toString(), accountRunner.getValueProof(1).toString());
-        }catch (NotEnoughMoneyException e){
+        }catch (NotEnoughMoneyException | IllegalTransactionException e){
             e.printStackTrace();
         }
             }

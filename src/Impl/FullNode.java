@@ -45,7 +45,7 @@ public class FullNode implements Node {
         //set nonce
         BigInteger nonce = new BigInteger("0");
         BigInteger hash;
-        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(address,Configuration.getBlockReward(), 0);
+        StandardCoinBaseTransaction coinBase = new StandardCoinBaseTransaction(address,Configuration.getBlockReward(), getBlockChain().getBlockNumber()+1);
         do{
             if (this.interrupted) {
                 this.interrupted = false;

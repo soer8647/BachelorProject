@@ -5,18 +5,18 @@ import Impl.Communication.Events.TransactionEvent;
 import Impl.Communication.Events.TransactionHistoryRequestEvent;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
-import Interfaces.Account;
-import Interfaces.Address;
-import Interfaces.CoinBaseTransaction;
+import Impl.Transactions.IllegalTransactionException;
+import Interfaces.*;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
-import Interfaces.Transaction;
 
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -85,38 +85,39 @@ public class StandardAccountRunner implements AccountRunner {
             for (Pair<InetAddress,Integer> p:nodeIpAndPortCollection) {
                 eventQueue.put(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), p.getValue(),p.getKey()));
             }
-        } catch (NotEnoughMoneyException | InterruptedException e) {
+        } catch (NotEnoughMoneyException | InterruptedException |IllegalTransactionException e) {
             e.printStackTrace();
         }
     }
 
-    public Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException {
+    public Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException, IllegalTransactionException {
         int bal = getBalance();
         Object[] th = getTransactionHistory().getConfirmedTransactions().toArray();
         Object[] cb = getTransactionHistory().getCoinBaseTransactions().toArray();
-
-        int coinBaseCounter=cb.length-1;
         int counter =0;
-        for (int i =th.length-1;i>=0;i--){
 
-            ConfirmedTransaction t = (ConfirmedTransaction)th[i];
-            if(coinBaseCounter>=0){
-                CoinBaseTransaction cbt = (CoinBaseTransaction)cb[coinBaseCounter];
-                if (t.getBlockNumber()<=cbt.getBlockNumber()){
-                    counter+=cbt.getValue();
-                    if (counter>=bal) return new Pair<>(BigInteger.ZERO,cbt.getBlockNumber());
+        ArrayList<VerifiableTransaction> transactions = new ArrayList<>();
+        transactions.addAll(getTransactionHistory().getCoinBaseTransactions());
+        transactions.addAll(getTransactionHistory().getConfirmedTransactions());
+
+        //Sort the list on block number
+        transactions.sort(Comparator.comparing(VerifiableTransaction::getBlockNumber));
+        for (VerifiableTransaction vt : transactions){
+            if(vt instanceof CoinBaseTransaction){
+                counter+=vt.getValue();
+                if (counter>=bal) return new Pair<>(new BigInteger("0"),vt.getBlockNumber());
+            }else if (vt instanceof ConfirmedTransaction){
+                ConfirmedTransaction confirmed = (ConfirmedTransaction)vt;
+                // Account gets money
+                if(confirmed.getReceiverAddress().toString().equals(account.getAddress().toString())){
+                    counter+=confirmed.getValue();
+                    if (counter>=bal) return new Pair<>(confirmed.transActionHash(),vt.getBlockNumber());
+                }else if(confirmed.getSenderAddress().toString().equals(account.getAddress().toString())){
+                // Account spends money
+                    counter-=confirmed.getValue();
+                }else{
+                    throw new IllegalTransactionException();
                 }
-            }
-            //TODO we can have more coinbasetransactions in between transactions
-
-            if (t.getReceiverAddress().toString().equals(account.getAddress().toString())){
-                //gets money
-                counter+=t.getValue();
-                //spends money
-                if (counter>=bal) return new Pair<>(t.transActionHash(),t.getBlockNumber());
-            }
-            else if(t.getSenderAddress().toString().equals(account.getAddress().toString())){
-                counter-=t.getValue();
             }
         }
         throw new NotEnoughMoneyException();

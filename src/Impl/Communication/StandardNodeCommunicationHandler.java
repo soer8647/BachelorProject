@@ -1,17 +1,24 @@
 package Impl.Communication;
 
+import Configuration.Configuration;
 import Impl.Communication.Events.*;
 import Impl.TransactionHistory;
+import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Block;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
 import Interfaces.Communication.Publisher;
 import Interfaces.Transaction;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectOutputStream;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Deque;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardNodeCommunicationHandler implements NodeCommunicationHandler {
@@ -62,17 +69,57 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (event instanceof RequestedEvent) {
             handleRequested((RequestedEvent) event);
         }else if (event instanceof TransactionHistoryRequestEvent){
-            TransactionHistoryRequestEvent e = (TransactionHistoryRequestEvent) event;
-            TransactionHistory history = nodeRunner.getTransactionHistory(e.getAddress(),e.getIndex());
-            try {
-                //TODO why do i have to send the ip and port with the event?
-                //TODO split id history is more than 64kb
-                publisher.sendEvent(new TransactionHistoryResponseEvent(InetAddress.getLocalHost(),8000,history,e.getIndex()), e.getIp(), e.getPort());
-            } catch (UnknownHostException e1) {
-                e1.printStackTrace();
+            handleTransactionRequest((TransactionHistoryRequestEvent) event);
             }
-            //SEND BACK THE HISTORY
+    }
+
+    private void handleTransactionRequest(TransactionHistoryRequestEvent event) {
+        //Get the history
+        TransactionHistory history = nodeRunner.getTransactionHistory(event.getAddress(),event.getIndex());
+        List<ConfirmedTransaction> confirmedTransactions = history.getConfirmedTransactions();
+        List<CoinBaseTransaction> coinBaseTransactions = history.getCoinBaseTransactions();
+        //Check if it is valid size
+        TransactionHistoryResponseEvent the = new TransactionHistoryResponseEvent(event.getIp(),event.getPort(),history,event.getIndex(),1,1, LocalDateTime.now());
+        try {
+            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream(outputStream);
+            os.writeObject(the);
+            byte[] data = outputStream.toByteArray();
+            System.out.println("Requested index:" + event.getIndex());
+            LocalDateTime time = LocalDateTime.now();
+            if (data.length> Configuration.getMax_package_size()){
+                //Find nr of parts
+                int parts = data.length/Configuration.getMax_package_size()*2;
+                // Find part size for ConfirmedTransactions
+                int confirmed_size = confirmedTransactions.size()/parts;
+                // Find part size for CoinBaseTransactions
+                int coin_base_size = coinBaseTransactions.size()/parts;
+
+                for (int i = 0;i<parts;i++){
+                    int confirmed_end_index;
+                    int coinBase_end_index;
+                    if(i==parts-1){
+                        confirmed_end_index=confirmedTransactions.size();
+                        coinBase_end_index = coinBaseTransactions.size();
+                    }else{
+                        confirmed_end_index=(i+1)*confirmed_size;
+                        coinBase_end_index=(i+1)*coin_base_size;
+                    }
+                    ArrayList<ConfirmedTransaction> confirmed_part = new ArrayList<>(confirmedTransactions.subList(i*confirmed_size,confirmed_end_index));
+                    ArrayList<CoinBaseTransaction> coinBase_part = new ArrayList<>( coinBaseTransactions.subList(i*coin_base_size,coinBase_end_index));
+                    publisher.sendTransactionHistoryResponse(new TransactionHistory(confirmed_part,coinBase_part),time,event.getIndex(),i+1,parts,event.getIp(),event.getPort());
+                }
+            }else{
+                publisher.sendTransactionHistoryResponse(history, time, event.getIndex(),1,1,event.getIp(),event.getPort());
+            }
+
+
+
+        } catch (IOException e) {
+            e.printStackTrace();
         }
+
+
     }
 
     private void handleRequest(RequestEvent event) {
