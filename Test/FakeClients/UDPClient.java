@@ -27,7 +27,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 public class UDPClient{
     private final NodeRunner nodeRunner;
     private final UDPReceiver receiver;
-    private final UDPPublisher publisher;
+    private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
 
     public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
@@ -53,7 +53,7 @@ public class UDPClient{
         for (int i = 0;i<ips.length;i++){
             connectionsData.add(new UDPConnectionData(ips[i],otherPorts[i]));
         }
-        publisher = new UDPPublisher(myIp,myPort,connectionsData);
+        publisher = new UDPPublisherNode(myIp,myPort,connectionsData);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
 

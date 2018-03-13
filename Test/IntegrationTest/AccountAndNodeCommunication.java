@@ -101,7 +101,7 @@ public class AccountAndNodeCommunication {
 
 
         try {
-            NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisher(InetAddress.getLocalHost(),8008, new ArrayList<>()),eventQueue);
+            NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisherNode(InetAddress.getLocalHost(),8008, new ArrayList<>()),eventQueue);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

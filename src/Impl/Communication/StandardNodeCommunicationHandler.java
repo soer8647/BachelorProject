@@ -9,7 +9,6 @@ import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
-import Interfaces.Communication.Publisher;
 import Interfaces.Transaction;
 
 import java.io.ByteArrayOutputStream;
@@ -23,7 +22,7 @@ import java.util.concurrent.BlockingQueue;
 
 public class StandardNodeCommunicationHandler implements NodeCommunicationHandler {
     private NodeRunner nodeRunner;
-    private Publisher publisher;
+    private UDPPublisherNode publisher;
     private boolean interrupted;
     private OrphanChainHolder orphanage;
 
@@ -33,7 +32,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
      * @param publisher, The publisher of the network module
      * @param eventQueue, The queue which the SCH takes events from.
      */
-    public StandardNodeCommunicationHandler(NodeRunner nodeRunner, Publisher publisher, BlockingQueue<Event> eventQueue) {
+    public StandardNodeCommunicationHandler(NodeRunner nodeRunner, UDPPublisherNode publisher, BlockingQueue<Event> eventQueue) {
         this.nodeRunner = nodeRunner;
         this.publisher = publisher;
 

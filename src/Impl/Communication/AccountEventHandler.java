@@ -9,6 +9,8 @@ import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -18,7 +20,7 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
 /*
-* The Event handler for an account in the block chain network.
+* The Event handler for an account in the block chain network. Uses the localhost ip.
 * */
 public class AccountEventHandler implements EventHandler,Runnable{
 
@@ -26,7 +28,7 @@ public class AccountEventHandler implements EventHandler,Runnable{
     private TransactionHistory transactionHistory;
     private int port;
     private UDPReceiver receiver;
-    private UDPEventPublisher publisher;
+    private UDPPublisher publisher;
     private Thread t;
     private Semaphore semaphore;
     private Map<LocalDateTime,List<TransactionHistory>> historyMap;
@@ -36,7 +38,12 @@ public class AccountEventHandler implements EventHandler,Runnable{
         this.transactionHistory = transactionHistory;
         port = portNumber;
         receiver = new UDPReceiver(eventQueue,port);
-        publisher = new UDPEventPublisher(connectionsData);
+        InetAddress address = null;
+        try{address= InetAddress.getLocalHost();
+            publisher = new UDPPublisher(address, port,connectionsData);
+        } catch (UnknownHostException e) {
+            e.printStackTrace();
+        }
         this.eventQueue=eventQueue;
         semaphore = new Semaphore(1);
         historyMap = new HashMap<>();
@@ -78,7 +85,7 @@ public class AccountEventHandler implements EventHandler,Runnable{
                     System.out.println("EVENT UPDATE TRANSACTION WAS REJECTED");
                 }
             } else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent) {
-                publisher.broadcastEvent(event);
+                publisher.broadCastEvent(event);
             }
             semaphore.release();
         } catch (InterruptedException e) {

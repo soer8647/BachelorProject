@@ -1,17 +1,18 @@
 package blockchain.Stubs;
 
+import Impl.Communication.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Interfaces.Block;
 import Interfaces.Communication.Event;
-import Interfaces.Communication.Publisher;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
 
-public class FauxPublisher implements Publisher {
+public class FauxPublisher extends UDPPublisherNode {
     private FauxReceiver receiver;
 
     public FauxPublisher(FauxReceiver receiver) {
+        super(null,0,null);
         this.receiver = receiver;
     }
 
