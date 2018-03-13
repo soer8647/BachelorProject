@@ -62,12 +62,12 @@ public class UDPPublisherNode extends UDPPublisher{
 
     public void sendTransactionHistoryResponse(TransactionHistory transactionHistory, LocalDateTime time, int index, int part, int parts, InetAddress ip, int port) {
         TransactionHistoryResponseEvent event = new TransactionHistoryResponseEvent(getLocalAddress(),getLocalPort(),transactionHistory,index,part,parts, time);
-        sendEvent(event,ip,port);
+        send(event,ip,port);
     }
 
     public void requestBlock(int number, InetAddress ip, int port) {
         Event event = new RequestEvent(number, getLocalPort(), getLocalAddress());
-        sendEvent(event,ip,port);
+        send(event,ip,port);
     }
 
     public void requestMaxBlock(InetAddress ip, int port) {
@@ -76,6 +76,6 @@ public class UDPPublisherNode extends UDPPublisher{
 
     public void answerRequest(Block block, InetAddress ip, int port) {
         Event event = new RequestedEvent(block,getLocalPort(), getLocalAddress());
-        sendEvent(event,ip,port);
+        send(event,ip,port);
     }
 }

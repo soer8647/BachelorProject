@@ -1,12 +1,14 @@
 package Impl.Communication;
 
-import Interfaces.Communication.Event;
 import Interfaces.Communication.Publisher;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
-import java.net.*;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
 import java.util.List;
 
 public class UDPPublisher implements Publisher{
@@ -31,31 +33,30 @@ public class UDPPublisher implements Publisher{
     /**
      * Send an event to a ip and port using the UDP protocol.
      *
-     * @param event     The event to send
+     * @param object    The object to send
      * @param ip        The ip to send the event to
      * @param port      The port were the receiver is listening
      */
-    public void sendEvent(Event event, InetAddress ip, int port) {
+    public void send(Object object, InetAddress ip, int port) {
         try {
+            System.out.println(object.getClass());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
-            os.writeObject(event);
+            os.writeObject(object);
             byte[] data = outputStream.toByteArray();
             DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
             socket.send(sendPacket);
-        } catch (UnknownHostException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * @param event     The event that is going to be send to all known connections.
+     * @param object     The object that is going to be send to all known connections.
      */
-    public void broadCastEvent(Event event){
+    public void broadCast(Object object){
         for (UDPConnectionData data : connectionsDataList){
-            sendEvent(event,data.getInetAddress(), data.getPort());
+            send(object,data.getInetAddress(), data.getPort());
         }
     }
 

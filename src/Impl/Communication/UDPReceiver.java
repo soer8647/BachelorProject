@@ -8,7 +8,7 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
-import java.net.SocketException;
+import java.rmi.activation.UnknownObjectException;
 import java.util.concurrent.BlockingQueue;
 
 public class UDPReceiver {
@@ -19,7 +19,7 @@ public class UDPReceiver {
     public UDPReceiver(BlockingQueue<Event> queue, int port) {
         this.queue = queue;
         this.port = port;
-        new Thread(() -> createAndListenSocket()).start();
+        new Thread(this::createAndListenSocket).start();
     }
 
     private void createAndListenSocket() {
@@ -35,14 +35,17 @@ public class UDPReceiver {
                 ByteArrayInputStream in = new ByteArrayInputStream(data);
                 ObjectInputStream is = new ObjectInputStream(in);
                 try {
-                    Event event = (Event) is.readObject();
-                    queue.put(event);
-                } catch (ClassNotFoundException | InterruptedException e) {
+                    Object o = is.readObject();
+                    if (o instanceof Event) {
+                        Event event = (Event) o;
+                        queue.put(event);
+                    }else{
+                        throw new UnknownObjectException("Unknown object received");
+                    }
+                } catch (InterruptedException | UnknownObjectException | ClassNotFoundException e) {
                     e.printStackTrace();
                 }
             }
-        } catch (SocketException e) {
-            e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
         }finally {

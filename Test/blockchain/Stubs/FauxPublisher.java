@@ -3,7 +3,6 @@ package blockchain.Stubs;
 import Impl.Communication.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Interfaces.Block;
-import Interfaces.Communication.Event;
 
 import java.net.InetAddress;
 import java.time.LocalDateTime;
@@ -37,7 +36,7 @@ public class FauxPublisher extends UDPPublisherNode {
     }
 
     @Override
-    public void sendEvent(Event event, InetAddress ip, int port) {
+    public void send(Object object, InetAddress ip, int port) {
 
     }
 

@@ -47,4 +47,14 @@ public class ConsolePublisher implements Publisher {
     public void sendTransactionHistoryResponse(TransactionHistory transactionHistory, LocalDateTime time, int index, int part, int parts, InetAddress ip, int port) {
 
     }
+
+    @Override
+    public void send(Object object, InetAddress ip, int port) {
+
+    }
+
+    @Override
+    public void broadCast(Object object) {
+
+    }
 }

@@ -85,7 +85,7 @@ public class AccountEventHandler implements EventHandler,Runnable{
                     System.out.println("EVENT UPDATE TRANSACTION WAS REJECTED");
                 }
             } else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent) {
-                publisher.broadCastEvent(event);
+                publisher.broadCast(event);
             }
             semaphore.release();
         } catch (InterruptedException e) {
