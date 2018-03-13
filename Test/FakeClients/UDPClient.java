@@ -19,6 +19,8 @@ import blockchain.Stubs.CoinBaseTransactionStub;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -47,7 +49,11 @@ public class UDPClient{
         Node node = new FullNode(new StandardBlockChain(genesisBlock),node1Address,new FlexibleHardnessManager());
         nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
         receiver = new UDPReceiver(queue,myPort);
-        publisher = new UDPPublisher(myIp,myPort,ips,otherPorts);
+        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
+        for (int i = 0;i<ips.length;i++){
+            connectionsData.add(new UDPConnectionData(ips[i],otherPorts[i]));
+        }
+        publisher = new UDPPublisher(myIp,myPort,connectionsData);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
 

@@ -5,9 +5,7 @@ import Impl.Communication.Events.RequestEvent;
 import Impl.Communication.Events.RequestedEvent;
 import Impl.Communication.Events.TransactionHistoryResponseEvent;
 import Impl.TransactionHistory;
-import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Block;
-import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.Publisher;
 
@@ -22,17 +20,14 @@ public class UDPPublisher implements Publisher{
     private InetAddress[] ips;
     private DatagramSocket socket;
     private int[] ports;
-    private InetAddress localAdress;
+    private InetAddress localAddress;
     private int localPort;
+    private List<UDPConnectionData> connectionsDataList;
 
-    public UDPPublisher(InetAddress localAdress, int localPort, InetAddress[] ip, int[] port) {
-        this.localAdress = localAdress;
+    public UDPPublisher(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList) {
+        this.localAddress = localAddress;
         this.localPort = localPort;
-        if (ip.length != port.length) {
-            throw new IllegalArgumentException();
-        }
-        this.ips = ip;
-        this.ports = port;
+        this.connectionsDataList = connectionsDataList;
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
@@ -42,16 +37,14 @@ public class UDPPublisher implements Publisher{
 
     @Override
     public void publishBlock(Block block) {
-        Event event = new ReceivedBlockEvent(block, localPort, localAdress);
+        Event event = new ReceivedBlockEvent(block, localPort, localAddress);
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(event);
             byte[] data = outputStream.toByteArray();
-            for (int i = 0; i < ips.length; i++) {
-                InetAddress ip = this.ips[i];
-                int port = this.ports[i];
-                DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
+            for (UDPConnectionData d:connectionsDataList){
+                DatagramPacket sendPacket = new DatagramPacket(data, data.length, d.getInetAddress(), d.getPort());
                 socket.send(sendPacket);
             }
         } catch (UnknownHostException e) {
@@ -60,42 +53,15 @@ public class UDPPublisher implements Publisher{
             e.printStackTrace();
         }
     }
-    public void sendTransactionHistoryEvent(TransactionHistoryResponseEvent event, InetAddress inetAddress, int port){
-        try{
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        ObjectOutputStream os = new ObjectOutputStream(outputStream);
-        os.writeObject(event);
-        byte[] data = outputStream.toByteArray();
-        //TODO MAYBE NOT HARDCODE THIS
-        if (data.length>8192){
-            int splits = data.length / 8192;
-            List<ConfirmedTransaction> ctl = event.getTransactions().getConfirmedTransactions();
-            List<CoinBaseTransaction> cbl = event.getTransactions().getCoinBaseTransactions();
-            int splitSizeClt = ctl.size()/splits;
-            int splitSizeCbl = cbl.size()/splits;
-            for (int i = 0;i<=splits;i++ ){
-                List<ConfirmedTransaction> ctlst = null;
-                if (i==splits-1){
-                    ctlst = ctl.subList(i*splitSizeClt,ctl.size()-1);
-                }else {
-                    ctlst = ctl.subList(i *splitSizeClt,(i+1)*splitSizeClt);
-                }
-                List<CoinBaseTransaction> cblst = null;
-                if (i==splits-1){
-                    cblst =cbl.subList(i*splitSizeCbl,cbl.size()-1);
-                }else {
-                    cblst = cbl.subList(i*splitSizeCbl,(i+1)*splitSizeCbl);
-                }
-                sendEvent(new TransactionHistoryResponseEvent(inetAddress,port,new TransactionHistory(ctlst,cblst),event.getIndex(),i,splits, LocalDateTime.now()),inetAddress,port);
-            }
 
-        }
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
+    /**
+     * Send an event to a ip and port using the UDP protocol.
+     *
+     * @param event     The event to send
+     * @param ip        The ip to send the event to
+     * @param port      The port were the receiver is listening
+     */
     public void sendEvent(Event event, InetAddress ip, int port) {
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -111,15 +77,26 @@ public class UDPPublisher implements Publisher{
         }
     }
 
+    /**
+     * A response for a requested transaction history, can be split in more parts because of receiver buffer size.
+     *
+     * @param transactionHistory        The transaction history to send
+     * @param time                      The timestamp for this response
+     * @param index                     The index from where the history was requested.
+     * @param part                      The part out of the total number of parts
+     * @param parts                     The total number of parts
+     * @param ip                        The ip to send the event to
+     * @param port                      The port where the requester is listening for a response.
+     */
     @Override
     public void sendTransactionHistoryResponse(TransactionHistory transactionHistory, LocalDateTime time, int index, int part, int parts, InetAddress ip, int port) {
-        TransactionHistoryResponseEvent event = new TransactionHistoryResponseEvent(localAdress,localPort,transactionHistory,index,part,parts, time);
+        TransactionHistoryResponseEvent event = new TransactionHistoryResponseEvent(localAddress,localPort,transactionHistory,index,part,parts, time);
         sendEvent(event,ip,port);
     }
 
     @Override
     public void requestBlock(int number, InetAddress ip, int port) {
-        Event event = new RequestEvent(number, localPort, localAdress);
+        Event event = new RequestEvent(number, localPort, localAddress);
         sendEvent(event,ip,port);
     }
 
@@ -130,7 +107,7 @@ public class UDPPublisher implements Publisher{
 
     @Override
     public void answerRequest(Block block, InetAddress ip, int port) {
-        Event event = new RequestedEvent(block,localPort,localAdress);
+        Event event = new RequestedEvent(block,localPort, localAddress);
         sendEvent(event,ip,port);
     }
 }

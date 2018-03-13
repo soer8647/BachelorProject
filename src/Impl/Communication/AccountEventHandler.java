@@ -1,6 +1,5 @@
 package Impl.Communication;
 
-import External.Pair;
 import Impl.Communication.Events.TransactionEvent;
 import Impl.Communication.Events.TransactionHistoryRequestEvent;
 import Impl.Communication.Events.TransactionHistoryResponseEvent;
@@ -10,18 +9,22 @@ import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 
-import java.net.InetAddress;
 import java.time.LocalDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.Semaphore;
 
+/*
+* The Event handler for an account in the block chain network.
+* */
 public class AccountEventHandler implements EventHandler,Runnable{
 
     private LinkedBlockingQueue<Event> eventQueue;
     private TransactionHistory transactionHistory;
     private int port;
-    //TODO release resources from receiver
     private UDPReceiver receiver;
     private UDPEventPublisher publisher;
     private Thread t;
@@ -29,16 +32,21 @@ public class AccountEventHandler implements EventHandler,Runnable{
     private Map<LocalDateTime,List<TransactionHistory>> historyMap;
 
 
-    public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection) {
+    public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, List<UDPConnectionData> connectionsData) {
         this.transactionHistory = transactionHistory;
         port = portNumber;
         receiver = new UDPReceiver(eventQueue,port);
-        publisher = new UDPEventPublisher(nodeIpAndPortCollection);
+        publisher = new UDPEventPublisher(connectionsData);
         this.eventQueue=eventQueue;
         semaphore = new Semaphore(1);
         historyMap = new HashMap<>();
     }
 
+    /**
+     *
+     *
+     * @param event     The event to handle.
+     */
     public void handleEvent(Event event){
         try {
             semaphore.acquire();
@@ -46,22 +54,16 @@ public class AccountEventHandler implements EventHandler,Runnable{
                 TransactionHistoryResponseEvent the = (TransactionHistoryResponseEvent) event;
                 TransactionHistory th = the.getTransactions();
 
-
-                System.out.println("SIZE "+ (transactionHistory.size()) +" and requested: "+the.getIndex());
-
                 if (transactionHistory.size() == the.getIndex() && the.getParts() == 1) {
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
                     transactionHistory.getCoinBaseTransactions().addAll(th.getCoinBaseTransactions());
-                    System.out.println("ADDING WITHOUT MERGING");
 
                 } else if(transactionHistory.size() == the.getIndex()){
                     // Get the histories with the same timestamp
-                    //TODO have a map<time,List<TH>>
                     List<TransactionHistory> histories = historyMap.get(the.getTime());
                     histories.add(transactionHistory);
-                    //If we have all the transactions
+                    //If we have all the transactions -> merge and update
                     if (the.getParts() == histories.size()) {
-                        System.out.println("MERGING");
                         ArrayList<ConfirmedTransaction> confirmedTransactions = new ArrayList<>();
                         ArrayList<CoinBaseTransaction> coinBaseTransactionArrayList = new ArrayList<>();
                         for (TransactionHistory t : histories) {
@@ -72,9 +74,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
                         transactionHistory.getCoinBaseTransactions().addAll(coinBaseTransactionArrayList);
                     }
 
-                    //TODO find out how to merge history. Idea : save history and merge when the full history is seen.
                 }else{
-                    System.out.println("EVENT UPDATETRANSACTION WAS REJECTED");
+                    System.out.println("EVENT UPDATE TRANSACTION WAS REJECTED");
                 }
             } else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent) {
                 publisher.broadcastEvent(event);

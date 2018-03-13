@@ -76,8 +76,8 @@ public class StandardNodeRunner implements NodeRunner {
         thread.start();
     }
 
-    public TransactionHistory getTransactionHistory(Address address, int index){
-      return node.getTransactionHistory(address,index);
+    public TransactionHistory getTransactionHistory(Address a, int index){
+      return node.getTransactionHistory(a,index);
     }
 
     @Override

@@ -85,7 +85,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(the);
             byte[] data = outputStream.toByteArray();
-            System.out.println("Requested index:" + event.getIndex());
             LocalDateTime time = LocalDateTime.now();
             if (data.length> Configuration.getMax_package_size()){
                 //Find nr of parts

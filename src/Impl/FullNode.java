@@ -159,8 +159,8 @@ public class FullNode implements Node {
     }
 
     @Override
-    public TransactionHistory getTransactionHistory(Address address) {
-        return blockChain.getTransactionHistory(address);
+    public TransactionHistory getTransactionHistory(Address a) {
+        return blockChain.getTransactionHistory(a);
     }
 
     @Override
@@ -178,7 +178,7 @@ public class FullNode implements Node {
         hardnessManager.notifyOfMining();
     }
 
-    public TransactionHistory getTransactionHistory(Address address, int index){
-        return blockChain.getTransactionHistory(address,index);
+    public TransactionHistory getTransactionHistory(Address a, int index){
+        return blockChain.getTransactionHistory(a,index);
     }
 }

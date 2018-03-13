@@ -31,7 +31,7 @@ public interface AccountRunner {
      * @param address       The address of teh receiver
      * @param value         The value to send
      */
-    void makeTransaction(Address address,int value);
+    void makeTransaction(Address address,int value) throws NotEnoughMoneyException;
 
     EventHandler getEventHandler();
 

@@ -17,6 +17,7 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -26,26 +27,26 @@ public class StandardAccountRunner implements AccountRunner {
     private LinkedBlockingQueue<Event> eventQueue;
     private TransactionHistory transactionHistory;
     private AccountEventHandler eventHandler;
-    private Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
+    private Collection<UDPConnectionData> udpConnectionsData;
     private int listeningPort;
 
-    public StandardAccountRunner(Account account, LinkedBlockingQueue<Event> eventQueue, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection, int listeningPort) {
+    public StandardAccountRunner(Account account, LinkedBlockingQueue<Event> eventQueue, List<UDPConnectionData> connectionsData, int listeningPort) {
         this.listeningPort=listeningPort;
         this.account = account;
         this.eventQueue = eventQueue;
-        this.nodeIpAndPortCollection = nodeIpAndPortCollection;
+        this.udpConnectionsData = connectionsData;
         transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<>(),new CopyOnWriteArrayList<>());
-        eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,nodeIpAndPortCollection);
+        eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,connectionsData);
         eventHandler.start();
     }
 
-    public StandardAccountRunner(Account account,TransactionHistory transactionHistory, Collection<Pair<InetAddress, Integer>> nodeIpAndPortCollection,int listeningPort) {
+    public StandardAccountRunner(Account account, TransactionHistory transactionHistory, List<UDPConnectionData> udpConnectionsData, int listeningPort) {
         this.listeningPort=listeningPort;
         this.account = account;
         this.transactionHistory = transactionHistory;
         this.eventQueue = new LinkedBlockingQueue<>();
-        this.eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,nodeIpAndPortCollection);
-        this.nodeIpAndPortCollection = nodeIpAndPortCollection;
+        this.eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort, udpConnectionsData);
+        this.udpConnectionsData = udpConnectionsData;
         eventHandler.start();
     }
 
@@ -79,21 +80,26 @@ public class StandardAccountRunner implements AccountRunner {
      * @param value   The value to send
      */
     @Override
-    public void makeTransaction(Address address, int value) {
+    public void makeTransaction(Address address, int value) throws NotEnoughMoneyException {
         try {
         Pair<BigInteger,Integer> proof = getValueProof(value);
-            for (Pair<InetAddress,Integer> p:nodeIpAndPortCollection) {
-                eventQueue.put(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), p.getValue(),p.getKey()));
+            for (UDPConnectionData d: udpConnectionsData) {
+                eventQueue.put(new TransactionEvent(account.makeTransaction(account.getAddress(), address, value, proof.getKey(), proof.getValue()), d.getPort(),d.getInetAddress()));
             }
-        } catch (NotEnoughMoneyException | InterruptedException |IllegalTransactionException e) {
+        } catch (InterruptedException |IllegalTransactionException e) {
             e.printStackTrace();
         }
     }
 
+    /**
+     *
+     * @param value The value to find proof of funds for.
+     * @return      A pair of the hash of the transaction and the block number, where the proof of funds are.
+     * @throws      NotEnoughMoneyException     If there is not enough funds.
+     * @throws      IllegalTransactionException If an illegal transaction is encountered in the history.
+     */
     public Pair<BigInteger, Integer> getValueProof(int value) throws NotEnoughMoneyException, IllegalTransactionException {
         int bal = getBalance();
-        Object[] th = getTransactionHistory().getConfirmedTransactions().toArray();
-        Object[] cb = getTransactionHistory().getCoinBaseTransactions().toArray();
         int counter =0;
 
         ArrayList<VerifiableTransaction> transactions = new ArrayList<>();
@@ -135,14 +141,14 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public void updateTransactionHistory() {
         try {
-            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.getConfirmedTransactions().size()+transactionHistory.getCoinBaseTransactions().size(),account.getAddress()));
+            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.size(),account.getAddress()));
         } catch (InterruptedException | UnknownHostException e) {
             e.printStackTrace();
         }
 
     }
 
-    public Collection<Pair<InetAddress, Integer>> getNodeIpAndPortCollection() {
-        return nodeIpAndPortCollection;
+    public Collection<UDPConnectionData> getUdpConnectionsData() {
+        return udpConnectionsData;
     }
 }

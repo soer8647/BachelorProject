@@ -4,6 +4,7 @@ import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.CoinBaseTransaction;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class TransactionHistory implements Serializable
@@ -14,6 +15,11 @@ public class TransactionHistory implements Serializable
     public TransactionHistory(List<ConfirmedTransaction> confirmedTransactions, List<CoinBaseTransaction> coinBaseTransactions) {
         this.confirmedTransactions = confirmedTransactions;
         this.coinBaseTransactions = coinBaseTransactions;
+    }
+
+    public TransactionHistory(){
+        confirmedTransactions = new ArrayList<>();
+        coinBaseTransactions= new ArrayList<>();
     }
 
     public List<ConfirmedTransaction> getConfirmedTransactions() {

@@ -1,23 +1,22 @@
 package Impl.Communication;
 
-import External.Pair;
 import Interfaces.Communication.Event;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.net.*;
-import java.util.Collection;
+import java.util.List;
 
 public class UDPEventPublisher {
 
-
-    private Collection<Pair<InetAddress, Integer>> connections;
     private DatagramSocket socket;
+    private List<UDPConnectionData> connectionDataList;
 
 
-    public UDPEventPublisher(Collection<Pair<InetAddress, Integer>> connections) {
-        this.connections = connections;
+    public UDPEventPublisher(List<UDPConnectionData> connectionDataList) {
+        this.connectionDataList = connectionDataList;
+
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {
@@ -49,8 +48,8 @@ public class UDPEventPublisher {
      * @param event     The event that is going to be send to all known connections.
      */
     public void broadcastEvent(Event event){
-        for (Pair<InetAddress,Integer> pair : connections){
-            sendEvent(event,pair.getKey(),pair.getValue());
+        for (UDPConnectionData data : connectionDataList){
+            sendEvent(event,data.getInetAddress(), data.getPort());
         }
     }
 }

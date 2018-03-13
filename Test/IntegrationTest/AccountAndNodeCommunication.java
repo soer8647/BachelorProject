@@ -11,7 +11,6 @@ import Impl.*;
 import Impl.Communication.*;
 import Impl.Hashing.SHA256;
 import Impl.Transactions.ArrayListTransactions;
-import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Account;
@@ -25,10 +24,11 @@ import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+
+import static org.junit.Assert.assertEquals;
 
 public class AccountAndNodeCommunication {
 
@@ -43,6 +43,9 @@ public class AccountAndNodeCommunication {
     private static Account account;
     private static AccountRunner accountRunner;
 
+    private static Account nodeAccount;
+    private static AccountRunner nodeAccountRunner;
+
     private KeyPair keyPair2;
     private RSAPrivateKey privateKeyNode;
     private RSAPublicKey publicKeyNode;
@@ -52,7 +55,7 @@ public class AccountAndNodeCommunication {
     private static FullNode node;
     private static NodeRunner nodeRunner;
 
-    static Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
+    static List<UDPConnectionData> udpConnectionsData;
 
     private static LinkedBlockingQueue<Event> transactionQueue;
 
@@ -73,6 +76,9 @@ public class AccountAndNodeCommunication {
         nodeAddress = new PublicKeyAddress(publicKeyNode);
 
         account = new StandardAccount(cryptoSystem,privateKeyAccount,publicKeyAccount,new SHA256());
+
+        nodeAccount = new StandardAccount(cryptoSystem,privateKeyNode,publicKeyNode,new SHA256());
+
         Transaction tx = new TransactionStub();
         Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
@@ -85,37 +91,35 @@ public class AccountAndNodeCommunication {
     }
 
     public static void main(String[] args) {
-        //Not so much an integrationtest, but manual testing is done here.
+        //Not so much an integration test, but manual testing is done here.
         new AccountAndNodeCommunication();
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
         nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager());
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
+
+
+
+
         try {
-            NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisher(InetAddress.getLocalHost(),8008, new InetAddress[0], new int[0]),eventQueue);
+            NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisher(InetAddress.getLocalHost(),8008, new ArrayList<>()),eventQueue);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
 
 
-        nodeIpAndPortCollection = new ArrayList<>();
+        udpConnectionsData = new ArrayList<UDPConnectionData>();
         try {
-            nodeIpAndPortCollection.add(new Pair<>(InetAddress.getLocalHost(),8008));
+            udpConnectionsData.add(new UDPConnectionData(InetAddress.getLocalHost(),8008));
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
-        // Accounts first transaction to have proof of funds
-        ConfirmedTransaction ct = new ConfirmedTransaction(new StandardTransaction(nodeAddress,accountAddress,10,new BigInteger("100"),new BigInteger("42"),1),1);
-        TransactionHistory transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(ct);}},new CopyOnWriteArrayList<>());
 
-
-        accountRunner = new StandardAccountRunner(account,new TransactionHistory(new ArrayList<>(),new ArrayList<>()),nodeIpAndPortCollection,8000);
+        nodeAccountRunner = new StandardAccountRunner(nodeAccount,new TransactionHistory(), udpConnectionsData,8042);
+        accountRunner = new StandardAccountRunner(account,new TransactionHistory(), udpConnectionsData,8000);
        //Account make transaction
         //Look in print to see the transaction is sent to the node and mined.
-
-        System.out.println("TRANSACTIONHISTORY " + accountRunner.getTransactionHistory());
         //Now pull history from node
-        //TODO BLOCK 0 is on blockchain 2 times.....
-        while(running){
+        for(int i =0;i<=3;i++){
             TransactionHistory th = accountRunner.getTransactionHistory();
             System.out.println("TRANSACTIONHISTORY :Confirmed nr:" + th.getConfirmedTransactions().size()+" CoinBase " +th.getCoinBaseTransactions().size()+"\n");
             accountRunner.updateTransactionHistory();
@@ -124,9 +128,25 @@ public class AccountAndNodeCommunication {
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
-
-            accountRunner.makeTransaction(nodeAddress,10);
+            try{
+                accountRunner.makeTransaction(nodeAddress,10);
+            }catch (Exception e){
+                assertEquals(NotEnoughMoneyException.class,e.getClass());
+            }
         }
-
+        for (int i=0;i<=5;i++){
+            nodeAccountRunner.updateTransactionHistory();
+            // Give the system 5 sec to respond
+            try {
+                Thread.sleep(5000);
+                //TODO If the last transaction has not been verified the same value proof will be used causing a duplicate transaction.
+                nodeAccountRunner.makeTransaction(accountAddress,10);
+            } catch (InterruptedException | NotEnoughMoneyException e) {
+                e.printStackTrace();
+            }
+            accountRunner.updateTransactionHistory();
+        }
+        // Account should now have 50!
+        System.out.println(accountRunner.getBalance());
     }
 }

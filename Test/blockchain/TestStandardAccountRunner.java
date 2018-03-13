@@ -9,6 +9,7 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Communication.StandardAccountRunner;
+import Impl.Communication.UDPConnectionData;
 import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
@@ -25,7 +26,7 @@ import org.junit.Test;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -50,7 +51,7 @@ public class TestStandardAccountRunner {
     private RSAPublicKey publicKeyReceiver;
     private PublicKeyAddress receiverAddress;
 
-    Collection<Pair<InetAddress,Integer>> nodeIpAndPortCollection;
+    List<UDPConnectionData> nodeIpAndPortCollection;
 
     private LinkedBlockingQueue<Event> transactionQueue;
 
@@ -70,8 +71,8 @@ public class TestStandardAccountRunner {
         senderAddress = new PublicKeyAddress(publicKeySender);
         account = new StandardAccount(cryptoSystem,privateKeySender,publicKeySender,new SHA256());
         transactionQueue = new LinkedBlockingQueue<>();
-        nodeIpAndPortCollection = new ArrayList<>();
-        nodeIpAndPortCollection.add(new Pair<>(InetAddress.getLocalHost(),1));
+        nodeIpAndPortCollection = new ArrayList<Impl.Communication.UDPConnectionData>();
+        nodeIpAndPortCollection.add(new UDPConnectionData(InetAddress.getLocalHost(),1));
 
     }
 
@@ -93,7 +94,11 @@ public class TestStandardAccountRunner {
         // Account sends 3 money
         TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);}},new CopyOnWriteArrayList<>());
         accountRunner=new StandardAccountRunner(account,transactions,nodeIpAndPortCollection,8003);
-        accountRunner.makeTransaction(receiverAddress,1);
+        try {
+            accountRunner.makeTransaction(receiverAddress,1);
+        } catch (NotEnoughMoneyException e) {
+            e.printStackTrace();
+        }
         assertEquals(1,accountRunner.getEventQueue().size());
     }
 

@@ -20,6 +20,10 @@ public class BlockChainDatabase implements BlockChain{
     private static Connection conn;
     private final String driver;
 
+    /**
+     * @param databaseName      The name of the database that you want to connect to or you want to create.
+     * @param genesisblock      The first block that is added to the block chain. Only added if you create a new database or connect to an empty one.
+     */
     public BlockChainDatabase(String databaseName, Block genesisblock) {
 
         //   ## DEFINE VARIABLES SECTION ##
@@ -40,8 +44,6 @@ public class BlockChainDatabase implements BlockChain{
                 +  " BLOCK_HASH VARCHAR(255) NOT NULL,"
                 +  " COINBASE_TRANS VARCHAR(255) NOT NULL"
                 +  " ) ";
-
-
 
         String transactions =  "CREATE TABLE %s"
                 +  "(SENDER VARCHAR(255) NOT NULL,"
@@ -139,6 +141,11 @@ public class BlockChainDatabase implements BlockChain{
     }
 
 
+    /**
+     * @param tableName     The name of the table that you want to check if exists.
+     * @return              True if the table with the given name exists. False otherwise.
+     * @throws SQLException Thrown if anything goes wrong during the queries to the database.
+     */
     private static boolean tableExists(String tableName) throws SQLException {
         //Check if table TRANSACTIONS exist
         conn = DriverManager.getConnection(connectionURL);
@@ -150,7 +157,7 @@ public class BlockChainDatabase implements BlockChain{
     }
 
     /**
-     * @param block     The block that your want to append to the blockchain.
+     * @param block     The block that your want to append to the block chain.
      */
     public void addBlock(Block block) {
         String query = "INSERT INTO BLOCKCHAIN " +
@@ -172,20 +179,20 @@ public class BlockChainDatabase implements BlockChain{
     }
 
 
-    @Override
-    public Block getGenesisBlock() {
-        return getBlock(0);
-    }
-
     /**
      * @param address The address involved in transactions.
-     * @return      A collection of all the transactions where this address is involved.
+     * @return      A history of all the transactions where this address is involved.
      */
     @Override
     public TransactionHistory getTransactionHistory(Address address) {
         return getTransactionHistory(address,0);
     }
 
+    /**
+     * @param address     The address involved in transactions.
+     * @param blockNumber The block number from where you want to get the history, inclusive.
+     * @return            The transaction history from a given block number.
+     */
     @Override
     public TransactionHistory getTransactionHistory(Address address, int blockNumber) {
         List<ConfirmedTransaction> transactions = new ArrayList<>();
@@ -209,11 +216,15 @@ public class BlockChainDatabase implements BlockChain{
         }
 
         try {
+            //TODO dont fetch all coin base transactions...
             s = conn.createStatement();
-            String query = "SELECT COINBASE_TRANS FROM BLOCKCHAIN WHERE BLOCKNR >="+blockNumber ;
+            String query = "SELECT COINBASE_TRANS FROM BLOCKCHAIN WHERE BLOCKNR >="+blockNumber;
             ResultSet r = s.executeQuery(query);
             while (r.next()){
-                coinBaseTransactions.add(new StandardCoinBaseTransaction(r.getString("COINBASE_TRANS")));
+                StandardCoinBaseTransaction cbt = new StandardCoinBaseTransaction(r.getString("COINBASE_TRANS"));
+                if (cbt.getMinerAddress().toString().equals(address.toString())){
+                    coinBaseTransactions.add(cbt);
+                }
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -419,5 +430,10 @@ public class BlockChainDatabase implements BlockChain{
             s.close();
         }
 
+    }
+
+    @Override
+    public Block getGenesisBlock() {
+        return getBlock(0);
     }
 }
