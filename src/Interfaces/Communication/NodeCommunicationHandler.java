@@ -1,15 +1,14 @@
 package Interfaces.Communication;
 
+import Impl.Communication.Events.MinedBlockEvent;
 import Impl.Communication.Events.ReceivedBlockEvent;
-import Interfaces.Block;
-import Interfaces.Transaction;
+import Impl.Communication.Events.TransactionEvent;
 
 /**
  *  This Should handle events and glue together the Node with network modules (see StandardNodeCommunicationHandler)
  */
 public interface NodeCommunicationHandler {
     void handleReceivedBlock(ReceivedBlockEvent event);
-    void handleNewTransaction(Transaction transaction);
-    void handleMinedBlock(Block block);
-//  void HandleNewUser(User user);
+    void handleNewTransaction(TransactionEvent transactionEvent);
+    void handleMinedBlock(MinedBlockEvent minedBlockEvent);
 }

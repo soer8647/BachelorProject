@@ -1,6 +1,6 @@
 package blockchain.Stubs;
 
-import Impl.Communication.UDPPublisherNode;
+import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Interfaces.Block;
 

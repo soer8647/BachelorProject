@@ -9,7 +9,7 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Communication.StandardAccountRunner;
-import Impl.Communication.UDPConnectionData;
+import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
@@ -71,7 +71,7 @@ public class TestStandardAccountRunner {
         senderAddress = new PublicKeyAddress(publicKeySender);
         account = new StandardAccount(cryptoSystem,privateKeySender,publicKeySender,new SHA256());
         transactionQueue = new LinkedBlockingQueue<>();
-        nodeIpAndPortCollection = new ArrayList<Impl.Communication.UDPConnectionData>();
+        nodeIpAndPortCollection = new ArrayList<UDPConnectionData>();
         nodeIpAndPortCollection.add(new UDPConnectionData(InetAddress.getLocalHost(),1));
 
     }

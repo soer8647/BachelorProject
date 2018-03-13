@@ -30,6 +30,7 @@ public class StandardNodeRunner implements NodeRunner {
             }
         });
     }
+
     public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager,Display display) {
         this.node = node;
         this.transactionManager = transactionManager;

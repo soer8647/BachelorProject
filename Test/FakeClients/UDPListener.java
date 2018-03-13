@@ -1,7 +1,7 @@
 package FakeClients;
 
 import Impl.Communication.Events.ReceivedBlockEvent;
-import Impl.Communication.UDPReceiver;
+import Impl.Communication.UDP.UDPReceiver;
 import Interfaces.Communication.Event;
 
 import java.util.concurrent.BlockingQueue;

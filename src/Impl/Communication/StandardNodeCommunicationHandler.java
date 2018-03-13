@@ -2,6 +2,7 @@ package Impl.Communication;
 
 import Configuration.Configuration;
 import Impl.Communication.Events.*;
+import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Block;
@@ -9,7 +10,6 @@ import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
-import Interfaces.Transaction;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -46,7 +46,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                handleEvent(event);
+                    handleEvent(event);
                 }
         });
         thread.start();
@@ -60,9 +60,9 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         if (event instanceof ReceivedBlockEvent) {
             handleReceivedBlock(((ReceivedBlockEvent) event));
         } else if (event instanceof TransactionEvent) {
-            handleNewTransaction(((TransactionEvent) event).getTransaction());
+            handleNewTransaction(((TransactionEvent) event));
         } else if (event instanceof MinedBlockEvent) {
-            handleMinedBlock(((MinedBlockEvent) event).getBlock());
+            handleMinedBlock(((MinedBlockEvent) event));
         } else if (event instanceof RequestEvent) {
             handleRequest((RequestEvent) event);
         } else if (event instanceof RequestedEvent) {
@@ -110,14 +110,9 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             }else{
                 publisher.sendTransactionHistoryResponse(history, time, event.getIndex(),1,1,event.getIp(),event.getPort());
             }
-
-
-
         } catch (IOException e) {
             e.printStackTrace();
         }
-
-
     }
 
     private void handleRequest(RequestEvent event) {
@@ -180,14 +175,14 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     @Override
-    public void handleNewTransaction(Transaction transaction) {
+    public void handleNewTransaction(TransactionEvent transactionEvent) {
         // put into Node's queue of potential transactions
-        nodeRunner.getTransactionManager().addTransaction(transaction);
+        nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction());
     }
 
     @Override
-    public void handleMinedBlock(Block block) {
+    public void handleMinedBlock(MinedBlockEvent block) {
  //       System.out.println("MinedBlock event");
-        publisher.publishBlock(block);
+        publisher.publishBlock(block.getBlock());
     }
 }

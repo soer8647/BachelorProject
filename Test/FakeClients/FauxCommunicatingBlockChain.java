@@ -5,7 +5,7 @@ import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
-import Impl.Communication.UDPPublisherNode;
+import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.FullNode;
 import Impl.PublicKeyAddress;
 import Impl.StandardBlock;
