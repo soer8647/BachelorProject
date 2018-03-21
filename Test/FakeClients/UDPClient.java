@@ -35,7 +35,12 @@ public class UDPClient{
     private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
 
-    public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
+    public UDPClient(int myPort, UDPConnectionData seed) {
+        this(myPort, new ArrayList<UDPConnectionData>());
+        publisher.sendJoin(seed.getInetAddress(),seed.getPort());
+    }
+
+    public UDPClient(int myPort, List<UDPConnectionData> connectionsData) {
         InetAddress myIp = null;
         try {
             myIp = InetAddress.getLocalHost();
@@ -54,10 +59,7 @@ public class UDPClient{
         Node node = new FullNode(new StandardBlockChain(genesisBlock),node1Address,new FlexibleHardnessManager());
         nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
         receiver = new UDPReceiver(queue,myPort);
-        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
-        for (int i = 0;i<ips.length;i++){
-            connectionsData.add(new UDPConnectionData(ips[i],otherPorts[i]));
-        }
+
         publisher = new UDPPublisherNode(myIp,myPort,connectionsData);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
@@ -74,6 +76,13 @@ public class UDPClient{
             e.printStackTrace();
         }
 //        startUDP(9876,6789,IPAddress);
-        UDPClient client = new UDPClient(6789, new int[]{9876}, new InetAddress[]{IPAddress});
+
+        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
+        connectionsData.add(new UDPConnectionData(IPAddress,9876));
+        UDPClient client = new UDPClient(6789, connectionsData );
+    }
+
+    public UDPPublisherNode getPublisher() {
+        return publisher;
     }
 }

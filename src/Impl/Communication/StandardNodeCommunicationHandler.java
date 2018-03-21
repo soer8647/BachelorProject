@@ -53,11 +53,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         thread.start();
     }
 
-    public StandardNodeCommunicationHandler(NodeRunner nodeRunner, UDPPublisherNode publisher, BlockingQueue<Event> eventQueue, UDPConnectionData seed) {
-        this(nodeRunner,publisher,eventQueue);
-        publisher.sendJoin(seed.getInetAddress(), seed.getPort());
-    }
-
     /**
      * This function determines the type of event and delegates to the appropriate function.
      * @param event, The event to be handled
@@ -83,10 +78,8 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     private void handleJoinResponseEvent(JoinResponseEvent event) {
+        publisher.addConnection(event.getIp(),event.getPort());
         publisher.addConnections(event.getConnectionsDataList());
-        for(UDPConnectionData d : event.getConnectionsDataList()) {
-            publisher.requestBlock(-1,d.getInetAddress(),d.getPort());
-        }
     }
 
     private void handleJoinEvent(JoinEvent event) {
@@ -150,11 +143,12 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         int key = event.getPort();
         Block child = orphanage.getBlock(key);
 
-        //TODO : remove
-        if (child.getBlockNumber() - block.getBlockNumber() != 1) {
-            System.out.println(child.getBlockNumber() + " > " + block.getBlockNumber());
-        }
+        if (child == null) {
+            if (orphanage.addChain(block,event.getPort())) {
+                publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
+            }
 
+        } else
         if (child.getPreviousHash().equals(block.hash())) {
             if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
                 Deque<Block> chain = orphanage.getChain(key);
@@ -164,7 +158,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                     nodeRunner.rollback(chain,chain.peekFirst().getBlockNumber());
                 }
             } else {
-                System.out.println("this happens?");
                 orphanage.addBlock(block,key);
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
@@ -175,6 +168,10 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
 
     @Override
     public void handleReceivedBlock(ReceivedBlockEvent event) {
+        // TODO: REMOVE
+        System.out.println(publisher.getLocalPort() + " received from " + event.getPort());
+        publisher.addConnection(event.getIp(),event.getPort());
+
         Block block = event.getBlock();
 //        System.out.println("ReceivedBlock event");
         if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {

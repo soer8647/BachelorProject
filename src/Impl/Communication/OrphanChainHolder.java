@@ -10,6 +10,9 @@ public class OrphanChainHolder {
 
     public Block getBlock(int key) {
         Deque<Block> stack = chains.get(key);
+        if (stack == null) {
+            return null;
+        }
         return stack.peekFirst();
     }
 

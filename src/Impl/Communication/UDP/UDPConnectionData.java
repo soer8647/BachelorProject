@@ -1,8 +1,9 @@
 package Impl.Communication.UDP;
 
+import java.io.Serializable;
 import java.net.InetAddress;
 
-public class UDPConnectionData {
+public class UDPConnectionData implements Serializable {
 
     private InetAddress inetAddress;
     private int port;
