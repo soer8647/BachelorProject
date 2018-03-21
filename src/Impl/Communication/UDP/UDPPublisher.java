@@ -75,4 +75,10 @@ public class UDPPublisher implements Publisher{
     public DatagramSocket getSocket() {
         return socket;
     }
+
+    public void addConnections(List<UDPConnectionData> connectionsDataList) {
+        // remove already known peers from adding list TODO: maybe not efficient, change?
+        connectionsDataList.removeAll(this.connectionsDataList);
+        this.connectionsDataList.addAll(connectionsDataList);
+    }
 }

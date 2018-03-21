@@ -1,9 +1,6 @@
 package Impl.Communication.UDP;
 
-import Impl.Communication.Events.ReceivedBlockEvent;
-import Impl.Communication.Events.RequestEvent;
-import Impl.Communication.Events.RequestedEvent;
-import Impl.Communication.Events.TransactionHistoryResponseEvent;
+import Impl.Communication.Events.*;
 import Impl.TransactionHistory;
 import Interfaces.Block;
 import Interfaces.Communication.Event;
@@ -78,4 +75,10 @@ public class UDPPublisherNode extends UDPPublisher{
         Event event = new RequestedEvent(block,getLocalPort(), getLocalAddress());
         send(event,ip,port);
     }
+
+    public void sendJoinResponse(InetAddress ip, int port) {
+        Event event = new JoinResponseEvent(getConnectionsDataList(),getLocalPort(), getLocalAddress());
+        send(event,ip,port);
+    }
+
 }

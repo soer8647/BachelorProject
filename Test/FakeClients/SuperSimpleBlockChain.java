@@ -6,7 +6,7 @@ import Impl.StandardBlockChain;
 import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
 import Interfaces.BlockChain;
-import Interfaces.Communication.ConstantHardnessManager;
+import Impl.ConstantHardnessManager;
 import Interfaces.Node;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.CoinBaseTransactionStub;

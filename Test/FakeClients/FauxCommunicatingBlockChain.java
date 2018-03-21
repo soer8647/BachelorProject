@@ -13,7 +13,7 @@ import Impl.StandardBlockChain;
 import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Address;
 import Interfaces.Block;
-import Interfaces.Communication.ConstantHardnessManager;
+import Impl.ConstantHardnessManager;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;

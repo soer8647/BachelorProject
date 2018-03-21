@@ -1,11 +1,10 @@
-package Impl.Communication;
+package Impl;
 
 import Configuration.Configuration;
-import Interfaces.Communication.HardnessManager;
+import Interfaces.HardnessManager;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.Temporal;
 
 public class FlexibleHardnessManager implements HardnessManager {
 

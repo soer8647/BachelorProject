@@ -12,7 +12,7 @@ import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
-import Interfaces.Communication.ConstantHardnessManager;
+import Impl.ConstantHardnessManager;
 import blockchain.Stubs.AddressStub;
 import blockchain.Stubs.TransactionStub;
 import org.junit.AfterClass;

@@ -1,4 +1,4 @@
-package Interfaces.Communication;
+package Interfaces;
 
 public interface HardnessManager {
     void notifyOfMining();

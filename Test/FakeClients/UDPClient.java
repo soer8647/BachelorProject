@@ -4,7 +4,7 @@ import Configuration.Configuration;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import GUI.GuiApp;
-import Impl.Communication.FlexibleHardnessManager;
+import Impl.FlexibleHardnessManager;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;

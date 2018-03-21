@@ -5,7 +5,7 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.*;
-import Interfaces.Communication.HardnessManager;
+import Interfaces.HardnessManager;
 
 import java.math.BigInteger;
 import java.util.Collection;

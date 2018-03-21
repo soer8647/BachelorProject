@@ -2,6 +2,7 @@ package Impl.Communication;
 
 import Configuration.Configuration;
 import Impl.Communication.Events.*;
+import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
@@ -67,9 +68,24 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             handleRequest((RequestEvent) event);
         } else if (event instanceof RequestedEvent) {
             handleRequested((RequestedEvent) event);
-        }else if (event instanceof TransactionHistoryRequestEvent){
+        } else if (event instanceof TransactionHistoryRequestEvent){
             handleTransactionRequest((TransactionHistoryRequestEvent) event);
-            }
+        } else if (event instanceof JoinEvent) {
+            handleJoinEvent((JoinEvent) event);
+        } else if (event instanceof JoinResponseEvent) {
+            handleJoinResponseEvent((JoinResponseEvent) event);
+        }
+    }
+
+    private void handleJoinResponseEvent(JoinResponseEvent event) {
+        publisher.addConnections(event.getConnectionsDataList());
+        for(UDPConnectionData d : event.getConnectionsDataList()) {
+            publisher.requestBlock(-1,d.getInetAddress(),d.getPort());
+        }
+    }
+
+    private void handleJoinEvent(JoinEvent event) {
+        publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
 
     private void handleTransactionRequest(TransactionHistoryRequestEvent event) {
