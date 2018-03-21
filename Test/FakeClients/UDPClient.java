@@ -12,13 +12,10 @@ import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.Communication.UDP.UDPReceiver;
 import Impl.*;
 import Impl.Transactions.ArrayListTransactions;
-import Interfaces.Address;
-import Interfaces.Block;
+import Interfaces.*;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
-import Interfaces.Node;
-import Interfaces.TransactionManager;
 import blockchain.Stubs.CoinBaseTransactionStub;
 
 import java.math.BigInteger;
@@ -44,14 +41,17 @@ public class UDPClient{
         }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
         Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
-        TransactionManager transMan = new StandardTransactionManager();
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
         GuiApp display = new GuiApp(node1Address.getPublicKey());
-        Node node = new FullNode(new StandardBlockChain(genesisBlock),node1Address,new FlexibleHardnessManager());
+
+
+        BlockChain blockChain = new StandardBlockChain(genesisBlock);
+        TransactionManager transMan = new StandardTransactionManager(blockChain);
+        Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
         nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
         receiver = new UDPReceiver(queue,myPort);
         List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();

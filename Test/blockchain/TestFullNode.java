@@ -66,7 +66,7 @@ public class TestFullNode {
 
         blockChain = new BlockChainDatabase("FULLNODETEST",block);
         nodeAddress = stx.getSenderAddress();
-        node = new FullNode(blockChain, nodeAddress,new ConstantHardnessManager());
+        node = new FullNode(blockChain, nodeAddress,new ConstantHardnessManager(), new StandardTransactionManager(blockChain));
         Configuration.setHardnessParameter(10);
     }
 
@@ -139,7 +139,7 @@ public class TestFullNode {
 
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(block);
-        node = new FullNode(blockChain, new AddressStub(),new ConstantHardnessManager());
+        node = new FullNode(blockChain, new AddressStub(),new ConstantHardnessManager(), new StandardTransactionManager(blockChain));
 
         // Receiver has 5
         // Sender has 0

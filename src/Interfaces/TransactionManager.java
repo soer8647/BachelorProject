@@ -1,7 +1,6 @@
 package Interfaces;
 
 import java.util.Collection;
-import java.util.Deque;
 
 public interface TransactionManager {
 
@@ -14,5 +13,9 @@ public interface TransactionManager {
      * @param transactions the list of transactions to be removed
      */
     void removeTransactions(Transactions<Collection<Transaction>> transactions);
+
+    boolean validateTransaction(Transaction transaction);
+
+    boolean validateTransactions(Transactions<Collection<Transaction>> transactions);
 
 }

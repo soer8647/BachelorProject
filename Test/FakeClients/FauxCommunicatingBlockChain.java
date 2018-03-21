@@ -6,19 +6,13 @@ import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPPublisherNode;
-import Impl.FullNode;
-import Impl.PublicKeyAddress;
-import Impl.StandardBlock;
-import Impl.StandardBlockChain;
+import Impl.*;
 import Impl.Transactions.ArrayListTransactions;
-import Interfaces.Address;
-import Interfaces.Block;
+import Interfaces.*;
 import Interfaces.Communication.ConstantHardnessManager;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
-import Interfaces.Node;
-import Interfaces.TransactionManager;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import blockchain.Stubs.FauxPublisher;
 import blockchain.Stubs.FauxReceiver;
@@ -42,9 +36,10 @@ public class FauxCommunicatingBlockChain {
 
         KeyPair node2KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node2Address = new PublicKeyAddress(node2KeyPair.getPublicKey());
-
-        Node node1 = new FullNode(new StandardBlockChain(genesisBlock),node1Address,new ConstantHardnessManager());
-        Node node2 = new FullNode(new StandardBlockChain(genesisBlock),node2Address,new ConstantHardnessManager());
+        BlockChain blockChain1 = new StandardBlockChain(genesisBlock);
+        BlockChain blockChain2 = new StandardBlockChain(genesisBlock);
+        Node node1 = new FullNode(blockChain1,node1Address,new ConstantHardnessManager(), new StandardTransactionManager(blockChain1));
+        Node node2 = new FullNode(blockChain2,node2Address,new ConstantHardnessManager(),new StandardTransactionManager(blockChain2) );
         NodeRunner nodeRunner_A = new StandardNodeRunner(node1,queue_A,transMan);
         NodeRunner nodeRunner_B = new StandardNodeRunner(node2,queue_B,transMan);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);

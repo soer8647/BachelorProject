@@ -2,7 +2,6 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.*;
 import Interfaces.Communication.HardnessManager;
@@ -19,12 +18,14 @@ public class FullNode implements Node {
     private boolean interrupted = false;
     private Address address;
     private HardnessManager hardnessManager;
+    private TransactionManager transactionManager;
 
 
-    public FullNode(BlockChain blockChain, Address address, HardnessManager hardnessManager) {
+    public FullNode(BlockChain blockChain, Address address, HardnessManager hardnessManager, TransactionManager transactionManager) {
         this.blockChain=blockChain;
         this.address = address;
         this.hardnessManager = hardnessManager;
+        this.transactionManager = transactionManager;
     }
 
     /**
@@ -79,47 +80,11 @@ public class FullNode implements Node {
      */
     @Override
     public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
-        //For each transaction
-        for (Transaction t: transactions.getTransactions()) {
-            if(!validateTransaction(t)) {
-                return false;
-            }
-        }
-        return true;
+        return transactionManager.validateTransactions(transactions);
     }
 
-    public boolean validateTransaction(Transaction t){
-        if(!verifyTransactionSignature(t)) {
-            return false;
-        }
-        TransactionHistory transactions = blockChain.getTransactionHistory(t.getSenderAddress(),t.getBlockNumberOfValueProof());
-        int valueToVerify = t.getValue();
-        int counter = 0;
-
-        Object[] trans = transactions.getConfirmedTransactions().toArray();
-        Object[] coinBases = transactions.getCoinBaseTransactions().toArray();
-        int coinBaseElementNr = coinBases.length-1;
-
-        for (int i=trans.length-1;i>=0;i--){
-            CoinBaseTransaction cbt;
-            ConfirmedTransaction tr = (ConfirmedTransaction) trans[i];
-            if (coinBaseElementNr>=0){
-                cbt = ((CoinBaseTransaction)coinBases[coinBaseElementNr]);
-                if(cbt.getBlockNumber()>=tr.getBlockNumber()){
-                    counter+=cbt.getValue();
-                    coinBaseElementNr--;
-                }
-            }
-            if (tr.getReceiverAddress().toString().equals(t.getSenderAddress().toString())){
-                counter+=tr.getValue();
-                if (counter>=valueToVerify) return true;
-            }else if(tr.getSenderAddress().toString().equals(t.getSenderAddress().toString())){
-                counter -=tr.getValue();
-            }
-        }
-        // If we looked at all the transactions since the proof of funds transaction
-        // and it does not sum to at least the transaction value, the transaction is invalid.
-        return false;
+    public boolean validateTransaction(Transaction transaction){
+        return transactionManager.validateTransaction(transaction);
     }
 
 
