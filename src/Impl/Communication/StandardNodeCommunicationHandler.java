@@ -170,6 +170,8 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     public void handleReceivedBlock(ReceivedBlockEvent event) {
         // TODO: REMOVE
         System.out.println(publisher.getLocalPort() + " received from " + event.getPort());
+
+        //TODO: maybe not necessary (find better way)
         publisher.addConnection(event.getIp(),event.getPort());
 
         Block block = event.getBlock();
@@ -179,6 +181,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
+            System.out.println("someone is ahead of " + publisher.getLocalPort());
             //TODO: Handle other nodes being more than 1 ahead (not done)
             if (orphanage.addChain(block,event.getPort())) {
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());

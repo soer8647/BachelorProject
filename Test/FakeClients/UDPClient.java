@@ -51,7 +51,7 @@ public class UDPClient{
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
-        GuiApp display = new GuiApp(node1Address.getPublicKey());
+        GuiApp display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
 
 
         BlockChain blockChain = new StandardBlockChain(genesisBlock);

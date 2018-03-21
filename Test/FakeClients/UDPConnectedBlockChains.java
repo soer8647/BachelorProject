@@ -21,11 +21,6 @@ public class UDPConnectedBlockChains {
         int portC = 7002;
         UDPClient clientA = new UDPClient(portA,new ArrayList<>());
         UDPClient clientB = new UDPClient(portB, new UDPConnectionData(IPAddress,portA));
-        try {
-            Thread.sleep(1000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
         UDPClient clientC = new UDPClient(portC, new UDPConnectionData(IPAddress,portB));
         try {
             Thread.sleep(3000);
