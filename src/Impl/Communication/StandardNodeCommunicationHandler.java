@@ -53,6 +53,11 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         thread.start();
     }
 
+    public StandardNodeCommunicationHandler(NodeRunner nodeRunner, UDPPublisherNode publisher, BlockingQueue<Event> eventQueue, UDPConnectionData seed) {
+        this(nodeRunner,publisher,eventQueue);
+        publisher.sendJoin(seed.getInetAddress(), seed.getPort());
+    }
+
     /**
      * This function determines the type of event and delegates to the appropriate function.
      * @param event, The event to be handled
@@ -85,6 +90,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     private void handleJoinEvent(JoinEvent event) {
+        publisher.addConnection(event.getIp(),event.getPort());
         publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
 

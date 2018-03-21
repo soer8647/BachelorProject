@@ -81,4 +81,8 @@ public class UDPPublisherNode extends UDPPublisher{
         send(event,ip,port);
     }
 
+    public void sendJoin(InetAddress inetAddress, int port) {
+        Event event = new JoinEvent(getLocalPort(), getLocalAddress());
+        send(event,inetAddress,port);
+    }
 }

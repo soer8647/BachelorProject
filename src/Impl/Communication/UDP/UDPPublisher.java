@@ -81,4 +81,11 @@ public class UDPPublisher implements Publisher{
         connectionsDataList.removeAll(this.connectionsDataList);
         this.connectionsDataList.addAll(connectionsDataList);
     }
+
+    public void addConnection(InetAddress ip, int port) {
+        UDPConnectionData newPeer = new UDPConnectionData(ip,port);
+        if (!connectionsDataList.contains(newPeer)) {
+            connectionsDataList.add(newPeer);
+        }
+    }
 }

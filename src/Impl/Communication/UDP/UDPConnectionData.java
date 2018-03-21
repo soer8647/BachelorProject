@@ -20,4 +20,17 @@ public class UDPConnectionData {
     public int getPort() {
         return port;
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof UDPConnectionData)) {
+            return false;
+        }
+        UDPConnectionData data = (UDPConnectionData) o;
+        if (data.getPort() != this.getPort()) {
+            return false;
+        }
+
+        return (this.getInetAddress().equals(data.getInetAddress()));
+    }
 }
