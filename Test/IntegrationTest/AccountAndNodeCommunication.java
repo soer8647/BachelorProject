@@ -19,11 +19,8 @@ import Impl.Hashing.SHA256;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
-import Interfaces.Account;
-import Interfaces.Block;
-import Interfaces.CoinBaseTransaction;
+import Interfaces.*;
 import Interfaces.Communication.*;
-import Interfaces.Transaction;
 import blockchain.Stubs.TransactionStub;
 
 import java.math.BigInteger;
@@ -39,6 +36,7 @@ import static org.junit.Assert.assertEquals;
 public class AccountAndNodeCommunication {
 
     private static boolean running = true;
+    private static BlockChain blockchain;
     private PublicKeyCryptoSystem<RSAPublicKey, RSAPrivateKey> cryptoSystem;
 
     private KeyPair keyPair1;
@@ -89,9 +87,9 @@ public class AccountAndNodeCommunication {
         Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
-
+        blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);
         transactionQueue = new LinkedBlockingQueue<>();
-        node = new FullNode(new BlockChainDatabase("ACCOUNTCONNTEST",genesis),nodeAddress,new ConstantHardnessManager());
+        node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new StandardTransactionManager(blockchain));
         Configuration.setHardnessParameter(18);
 
     }
@@ -100,7 +98,7 @@ public class AccountAndNodeCommunication {
         //Not so much an integration test, but manual testing is done here.
         new AccountAndNodeCommunication();
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
-        nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager());
+        nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager(blockchain));
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
 
 

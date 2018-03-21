@@ -69,7 +69,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (event instanceof RequestedEvent) {
             handleRequested((RequestedEvent) event);
         } else if (event instanceof TransactionHistoryRequestEvent){
-            handleTransactionRequest((TransactionHistoryRequestEvent) event);
+            handleTransactionHistoryRequest((TransactionHistoryRequestEvent) event);
         } else if (event instanceof JoinEvent) {
             handleJoinEvent((JoinEvent) event);
         } else if (event instanceof JoinResponseEvent) {
@@ -87,7 +87,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
 
-    private void handleTransactionRequest(TransactionHistoryRequestEvent event) {
+    private void handleTransactionHistoryRequest(TransactionHistoryRequestEvent event) {
         //Get the history
         TransactionHistory history = nodeRunner.getTransactionHistory(event.getAddress(),event.getIndex());
         List<ConfirmedTransaction> confirmedTransactions = history.getConfirmedTransactions();
@@ -195,6 +195,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
 
     @Override
     public void handleNewTransaction(TransactionEvent transactionEvent) {
+        //TODO validate transaction
         // put into Node's queue of potential transactions
         nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction());
     }
