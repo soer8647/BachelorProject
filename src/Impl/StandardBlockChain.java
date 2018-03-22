@@ -18,12 +18,17 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public Block getBlock(int blockNumber) {
+    public synchronized Block getBlock(int blockNumber) {
         Iterator<Block> iter = blocks.iterator();
         int index =0;
+        int lastnumber = -1;
         Block iterBlock;
         while(iter.hasNext()&&index<=blockNumber){
             iterBlock =  iter.next();
+            if (iterBlock.getBlockNumber() != lastnumber +1) {
+                System.out.println("BlockChain is not consistent!");
+            }
+            lastnumber = iterBlock.getBlockNumber();
             if (blockNumber==index){
                 return iterBlock;
             }
@@ -39,7 +44,11 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public void addBlock(Block block) {
+    public synchronized void addBlock(Block block) {
+        if (block.getBlockNumber() < getBlockNumber()) {
+            throw new IllegalArgumentException();
+        }
+
         blocks.add(block);
     }
 
@@ -74,7 +83,7 @@ public class StandardBlockChain implements BlockChain{
     }
 
     @Override
-    public Block removeBlock() {
+    public synchronized Block removeBlock() {
         Block block = getBlock(getBlockNumber());
         blocks.remove(block);
         return block;

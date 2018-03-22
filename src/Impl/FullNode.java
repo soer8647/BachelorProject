@@ -90,7 +90,10 @@ public class FullNode implements Node {
 
     @Override
     public boolean validateBlock(Block incomingBlock) {
-            return blockChain.getBlock(incomingBlock.getBlockNumber()-1).hash().equals(incomingBlock.getPreviousHash())
+        if (incomingBlock.getBlockNumber() == 0) {
+            return blockChain.getBlock(0).equals(incomingBlock);
+        }
+        return blockChain.getBlock(incomingBlock.getBlockNumber()-1).hash().equals(incomingBlock.getPreviousHash())
                     && validateTransactions(incomingBlock.getTransactions());
         }
 

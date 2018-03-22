@@ -45,7 +45,7 @@ public class UDPClient{
             e.printStackTrace();
         }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),0,new CoinBaseTransactionStub());
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));

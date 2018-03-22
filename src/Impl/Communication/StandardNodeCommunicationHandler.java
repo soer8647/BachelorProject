@@ -2,7 +2,6 @@ package Impl.Communication;
 
 import Configuration.Configuration;
 import Impl.Communication.Events.*;
-import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
@@ -151,7 +150,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else
         if (child.getPreviousHash().equals(block.hash())) {
             if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
-                Deque<Block> chain = orphanage.getChain(key);
+                Deque<Block> chain = orphanage.popChain(key);
                 //TODO: perform rollback (if it's the best chain)
                 if (chain.peekLast().getBlockNumber() > nodeRunner.getBlockNumber()) {
                     System.out.println("what we do here is go Back!");
@@ -162,15 +161,15 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
         } else {
-            System.out.println("Bad Requested");
+            orphanage.popChain(key);
+            System.out.println("child: " +child);
+            System.out.println("block: " +block);
+            System.out.println("Bad Request - " + block.getBlockNumber());
         }
     }
 
     @Override
     public void handleReceivedBlock(ReceivedBlockEvent event) {
-        // TODO: REMOVE
-        System.out.println(publisher.getLocalPort() + " received from " + event.getPort());
-
         //TODO: maybe not necessary (find better way)
         publisher.addConnection(event.getIp(),event.getPort());
 

@@ -21,7 +21,7 @@ public class OrphanChainHolder {
         stack.addFirst(block);
     }
 
-    public Deque<Block> getChain(int key) {
+    public Deque<Block> popChain(int key) {
         //TODO: convert to outside format
         Deque<Block> o =  chains.remove(key);
         return o;
@@ -39,7 +39,7 @@ public class OrphanChainHolder {
             if (stack.getLast().getBlockNumber() +1 == block.getBlockNumber()) {
                 stack.addLast(block);
             } else {
-                System.out.println("New attempted on: " + key + " , number: " + block.getBlockNumber() + ", vs " +stack.getLast().getBlockNumber() );
+                System.out.println("New attempted on: " + key + " , number: " + block.getBlockNumber() + ", vs " +stack.getLast().getBlockNumber() + " - " + stack.getFirst().getBlockNumber() );
             }
             return false;
         }
