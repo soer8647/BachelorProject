@@ -3,17 +3,14 @@ package Impl;
 import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
-import Impl.Transactions.ArrayListTransactions;
-import Impl.Transactions.ConfirmedTransaction;
-import Impl.Transactions.StandardCoinBaseTransaction;
-import Impl.Transactions.StandardTransaction;
+import Impl.Transactions.*;
 import Interfaces.*;
 import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Comparator;
 import java.util.List;
 
 public class BlockChainDatabase implements BlockChain{
@@ -170,32 +167,16 @@ public class BlockChainDatabase implements BlockChain{
 
         CoinBaseTransaction coinBaseTransaction = block.getCoinBase();
         // Add coinbase to unspent transactions
-        String coinbaseQuery = "INSERT INTO UNSPENT_TRANSACTIONS "+
-                    "VALUES ('"+coinBaseTransaction.transactionHash().toString()+"',"
-                    +coinBaseTransaction.getValue()+","
-                    +true+","
-                    +coinBaseTransaction.getBlockNumber()+","
-                    +"'"+coinBaseTransaction.getMinerAddress().toString()+"')";
-        try {
-        query(coinbaseQuery);
+        addUnspentTransaction(coinBaseTransaction.transactionHash(),coinBaseTransaction.getValue(),true,block.getBlockNumber(),coinBaseTransaction.getMinerAddress());
 
 
-
+        // Update the values of the unspent transactions
         for (Transaction transaction: block.getTransactions().getTransactions()){
             // Get the value proof rest value
-            int value = getUnspentTransactionValue(transaction.getValueProof());
-            int newValue = value - transaction.getValue();
-            if (newValue>0){
-                // Update the value in database
-                updateUnspentTransactionValue(transaction.getValueProof(),newValue);
-            }else{
-                // Remove the unspent transaction and u
-                throw new ToBeImplementedException();
-            }
+            updateUnspentTransactions(transaction.getValueProof(),transaction.getValue(),transaction.getSenderAddress());
+            addUnspentTransaction(transaction.transactionHash(),transaction.getValue(),false,block.getBlockNumber(),transaction.getReceiverAddress());
         }
-
-
-
+        try{
         String query = "INSERT INTO BLOCKCHAIN " +
                 "VALUES ("+block.getBlockNumber()+","
                 +block.getNonce()+","
@@ -216,25 +197,49 @@ public class BlockChainDatabase implements BlockChain{
         }
     }
 
+
+
+    private void addUnspentTransaction(BigInteger transactionHash, int value, boolean isCoinBase, int blockNumber, Address receiverAddress) {
+        String query = "INSERT INTO UNSPENT_TRANSACTIONS "+
+                "VALUES ('"+transactionHash.toString()+"',"
+                +value+","
+                +isCoinBase+","
+                +blockNumber+","
+                +"'"+receiverAddress.toString()+"')";
+        try {
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void removeUnspentTransaction(BigInteger valueProof) {
+        try {
+            String query = "DELETE FROM UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH='"+valueProof+"'";
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
     public int getUnspentTransactionValue(BigInteger transactionHash) {
         try {
             Statement s = conn.createStatement();
-            String query = "SELECT VALUE_LEFT from UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH="+"'"+transactionHash.toString()+"'";
+            String query = "SELECT VALUE_LEFT from UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH=" + "'" + transactionHash.toString() + "'";
             ResultSet r = s.executeQuery(query);
-            if (r.next()){
+            if (r.next()) {
                 int result = r.getInt("VALUE_LEFT");
                 s.close();
                 r.close();
                 return result;
-            }else {
+            } else {
                 s.close();
                 r.close();
-                throw new NotEnoughMoneyException("Unable to get value proof from database");
+                throw new NotEnoughMoneyException("Unable to get value proof from database, the transaction has been spent");
             }
 
         } catch (SQLException | NotEnoughMoneyException e) {
             e.printStackTrace();
-
         }
         return 0;
     }
@@ -460,7 +465,7 @@ public class BlockChainDatabase implements BlockChain{
         return countDataEntries("TRANSACTIONS");
     }
 
-    private int countDataEntries(String tablename){
+    public int countDataEntries(String tablename){
         try {
             String query = "SELECT COUNT(*) FROM "+tablename;
             Statement s = conn.createStatement();
@@ -506,22 +511,51 @@ public class BlockChainDatabase implements BlockChain{
         return getBlock(0);
     }
 
+     public void updateUnspentTransactions(BigInteger beginTransactionHash,int beginValue, Address address){
+         try {
+             Statement s = conn.createStatement();
+             String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address.toString()+"'";
+
+             ResultSet r = s.executeQuery(query);
+             ArrayList<UnspentTransaction> unspentTransactions = new ArrayList();
+             while(r.next()){
+                 BigInteger hash = new BigInteger(r.getString("UNSPENT_TRANS_HASH"));
+                 int valueLeft = r.getInt("VALUE_LEFT");
+                 int blockNr = r.getInt("BLOCKNR");
+                 boolean isCoinBase = r.getBoolean("IS_COINBASE");
+                 Address receiver = new PublicKeyAddress(new RSAPublicKey(r.getString("RECEIVER")));
+
+                unspentTransactions.add(new UnspentTransaction(valueLeft,hash,isCoinBase,blockNr,receiver));
+             }
+             unspentTransactions.sort(Comparator.comparing(UnspentTransaction::getBlockNumber));
+
+             int valueToUpdate=beginValue;
+             boolean after=false;
+             for (UnspentTransaction u: unspentTransactions){
+                 if (u.getUnspentTransactionHash().toString().equals(beginTransactionHash.toString())){
+                     after=true;
+                 }
+                 if (after) {
+                     int val = u.getValueLeft() - valueToUpdate;
+                     if (val > 0){
+                         updateUnspentTransactionValue(u.getUnspentTransactionHash(),val);
+                     }else if (val ==0){
+                         removeUnspentTransaction(u.getUnspentTransactionHash());
+                         break;
+                     }else {
+                         removeUnspentTransaction(u.getUnspentTransactionHash());
+                         valueToUpdate = -val;
+                     }
+                 }
+             }
+         } catch (SQLException e) {
+             e.printStackTrace();
+         }
 
 
-    public HashMap<BigInteger, Integer> getUnspentTransactionsFromAddress(Address address) {
-        try {
-            Statement s = conn.createStatement();
-            String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address.toString()+"'";
-            ResultSet r = s.executeQuery(query);
-            while (r.next()){
 
-            }
-
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
+
 
     public void updateUnspentTransactionValue(BigInteger transactionHash,int value){
         try{
