@@ -1,8 +1,8 @@
 package blockchain.Stubs;
 
+import Impl.ToBeImplementedException;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigInteger;
 
@@ -24,7 +24,7 @@ public class CoinBaseTransactionStub implements CoinBaseTransaction{
 
     @Override
     public BigInteger transactionHash() {
-        throw new NotImplementedException();
+        throw new ToBeImplementedException();
     }
 
     @Override

@@ -9,7 +9,6 @@ import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
 import org.apache.derby.jdbc.EmbeddedDriver;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigInteger;
 import java.sql.*;
@@ -191,7 +190,7 @@ public class BlockChainDatabase implements BlockChain{
                 updateUnspentTransactionValue(transaction.getValueProof(),newValue);
             }else{
                 // Remove the unspent transaction and u
-                throw new NotImplementedException();
+                throw new ToBeImplementedException();
             }
         }
 
