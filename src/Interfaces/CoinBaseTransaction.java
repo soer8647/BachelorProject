@@ -1,6 +1,7 @@
 package Interfaces;
 
 import java.io.Serializable;
+import java.math.BigInteger;
 
 public
 interface CoinBaseTransaction  extends Serializable,VerifiableTransaction{
@@ -16,4 +17,9 @@ interface CoinBaseTransaction  extends Serializable,VerifiableTransaction{
     Address getMinerAddress();
 
     int getBlockNumber();
+
+    /**
+     * @return      The hash of this transaction.
+     */
+    BigInteger transactionHash();
 }

@@ -1,10 +1,13 @@
 package Impl.Transactions;
 
+import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.PublicKey;
 import Impl.PublicKeyAddress;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
+
+import java.math.BigInteger;
 
 public class StandardCoinBaseTransaction implements CoinBaseTransaction {
 
@@ -49,6 +52,11 @@ public class StandardCoinBaseTransaction implements CoinBaseTransaction {
     @Override
     public int getBlockNumber() {
         return blockNumber;
+    }
+
+    @Override
+    public BigInteger transactionHash() {
+        return Configuration.hash(minerAddress.toString()+value+blockNumber);
     }
 
     @Override

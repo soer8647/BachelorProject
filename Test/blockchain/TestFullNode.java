@@ -123,7 +123,7 @@ public class TestFullNode {
 
         Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
         // Make a transaction
-        BigInteger valueProofFake = new TransactionStub().transActionHash();
+        BigInteger valueProofFake = new TransactionStub().transactionHash();
 
         Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
         Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
@@ -145,7 +145,7 @@ public class TestFullNode {
         // Sender has 0
 
         //Make new transaction to verify by value
-        Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transActionHash(), 1);
+        Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transactionHash(), 1);
         Transactions<Collection<Transaction>> transactionsToVerify = new ArrayListTransactions();
         transactionsToVerify.add(validTransaction);
         assertTrue(node.validateTransactions(transactionsToVerify));
@@ -153,7 +153,7 @@ public class TestFullNode {
         // Receiver sends 5. Valid, Not added to blockchain though
 
         //Make transaction to deny by value
-        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,11,transaction.transActionHash(), 1);
+        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,11,transaction.transactionHash(), 1);
         Transactions transactionsToDeny = new ArrayListTransactions();
         transactionsToDeny.add(invalidTransaction);
 
@@ -168,7 +168,7 @@ public class TestFullNode {
         assertTrue(node.verifyTransactionSignature(validTransaction));
 
 
-        validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,15,transaction.transActionHash(), 1);
+        validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,15,transaction.transactionHash(), 1);
         transactionsToVerify = new ArrayListTransactions();
         transactionsToVerify.add(validTransaction);
 
@@ -188,7 +188,7 @@ public class TestFullNode {
 
         Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
         // Make a transaction
-        BigInteger valueProofFake = new TransactionStub().transActionHash();
+        BigInteger valueProofFake = new TransactionStub().transactionHash();
 
         Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
         Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
@@ -216,7 +216,7 @@ public class TestFullNode {
         System.out.println("BLOCKCHAIN table cleared");
         blockChain.clearTable("TRANSACTIONS");
         System.out.println("TRANSACTION table cleared");
-
+        blockChain.clearTable("UNSPENT_TRANSACTIONS");
         blockChain.shutDown();
     }
 

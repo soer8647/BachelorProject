@@ -2,16 +2,19 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
+import Impl.Communication.NotEnoughMoneyException;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
 import org.apache.derby.jdbc.EmbeddedDriver;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class BlockChainDatabase implements BlockChain{
@@ -72,8 +75,10 @@ public class BlockChainDatabase implements BlockChain{
         //TODO MAKE FOREIGN KEY CONSTRAINT ON UNSPEND_TRANSACTIONS
         String unspent = "CREATE TABLE %s"
                         +"(UNSPENT_TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT UNSPENT_TRANS_HASH PRIMARY KEY,"
-                        +"VALUE_LEFT INT NOT NULL)";
-
+                        +"VALUE_LEFT INT NOT NULL,"
+                        +"IS_COINBASE BOOLEAN NOT NULL,"
+                        +"BLOCKNR INT NOT NULL,"
+                        +"RECEIVER VARCHAR(255) NOT NULL)";
         //  JDBC code sections
         //  Beginning of Primary DB access section
         //   ## BOOT DATABASE SECTION ##
@@ -84,19 +89,21 @@ public class BlockChainDatabase implements BlockChain{
             System.out.println("Connected to database " + databaseName);
 
             //   ## INITIAL SQL SECTION ##
+            createTableIfNotExists("UNSPENT_TRANSACTIONS", unspent);
 
             createTableIfNotExists("BLOCKCHAIN",blockchain);
             // If the table is empty add genesisblock
             if(getBlockNumber()==-1){
                 System.out.println("No block found,Adding block "+genesisblock.getBlockNumber()+" to blockchain");
                 addBlock(genesisblock);}
+
+
             //Check if table TRANSACTIONS exist
             //   ## INITIAL SQL SECTION ##
             createTableIfNotExists("TRANSACTIONS", transactions);
 
             createTableIfNotExists("PENDING_TRANSACTIONS", pending_transactions);
 
-            createTableIfNotExists("UNSPENT_TRANSACTIONS", unspent);
 
 
             //  Beginning of the primary catch block: prints stack trace
@@ -160,6 +167,36 @@ public class BlockChainDatabase implements BlockChain{
      * @param block     The block that your want to append to the block chain.
      */
     public void addBlock(Block block) {
+        //TODO UPDATE UNSPENT TRANSACTIONS
+
+        CoinBaseTransaction coinBaseTransaction = block.getCoinBase();
+        // Add coinbase to unspent transactions
+        String coinbaseQuery = "INSERT INTO UNSPENT_TRANSACTIONS "+
+                    "VALUES ('"+coinBaseTransaction.transactionHash().toString()+"',"
+                    +coinBaseTransaction.getValue()+","
+                    +true+","
+                    +coinBaseTransaction.getBlockNumber()+","
+                    +"'"+coinBaseTransaction.getMinerAddress().toString()+"')";
+        try {
+        query(coinbaseQuery);
+
+
+
+        for (Transaction transaction: block.getTransactions().getTransactions()){
+            // Get the value proof rest value
+            int value = getUnspentTransactionValue(transaction.getValueProof());
+            int newValue = value - transaction.getValue();
+            if (newValue>0){
+                // Update the value in database
+                updateUnspentTransactionValue(transaction.getValueProof(),newValue);
+            }else{
+                // Remove the unspent transaction and u
+                throw new NotImplementedException();
+            }
+        }
+
+
+
         String query = "INSERT INTO BLOCKCHAIN " +
                 "VALUES ("+block.getBlockNumber()+","
                 +block.getNonce()+","
@@ -167,8 +204,10 @@ public class BlockChainDatabase implements BlockChain{
                 +block.getPreviousHash().toString()+"','"
                 +block.hash().toString()+"','"
                 +block.getCoinBase().toString()+"')";
-        try {
+
+            // Add to block chain
             query(query);
+            // Add to transactions
             for (Transaction t:block.getTransactions().getTransactions()){
                 addTransaction(t,block.getBlockNumber());
             }
@@ -176,6 +215,29 @@ public class BlockChainDatabase implements BlockChain{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public int getUnspentTransactionValue(BigInteger transactionHash) {
+        try {
+            Statement s = conn.createStatement();
+            String query = "SELECT VALUE_LEFT from UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH="+"'"+transactionHash.toString()+"'";
+            ResultSet r = s.executeQuery(query);
+            if (r.next()){
+                int result = r.getInt("VALUE_LEFT");
+                s.close();
+                r.close();
+                return result;
+            }else {
+                s.close();
+                r.close();
+                throw new NotEnoughMoneyException("Unable to get value proof from database");
+            }
+
+        } catch (SQLException | NotEnoughMoneyException e) {
+            e.printStackTrace();
+
+        }
+        return 0;
     }
 
 
@@ -307,7 +369,7 @@ public class BlockChainDatabase implements BlockChain{
                 + blocknumber+","
                 + transaction.getBlockNumberOfValueProof()+",'"
                 + transaction.getValueProof().toString()+"','"
-                + transaction.transActionHash().toString()+"',"
+                + transaction.transactionHash().toString()+"',"
                 +"'"+transaction.getSignature().toString()+"')";
 
         try {
@@ -429,11 +491,47 @@ public class BlockChainDatabase implements BlockChain{
             System.out.println ("Creating table: "+ tableName);
             s.close();
         }
+    }
 
+    public void dropTable(String tablename){
+        String query = "DROP TABLE "+tablename;
+        try {
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
     @Override
     public Block getGenesisBlock() {
         return getBlock(0);
+    }
+
+
+
+    public HashMap<BigInteger, Integer> getUnspentTransactionsFromAddress(Address address) {
+        try {
+            Statement s = conn.createStatement();
+            String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address.toString()+"'";
+            ResultSet r = s.executeQuery(query);
+            while (r.next()){
+
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public void updateUnspentTransactionValue(BigInteger transactionHash,int value){
+        try{
+            Statement s = conn.createStatement();
+            String query = "UPDATE UNSPENT_TRANSACTIONS SET VALUE_LEFT="+value
+                    + " WHERE UNSPENT_TRANS_HASH='"+transactionHash.toString()+"'";
+            query(query);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 }

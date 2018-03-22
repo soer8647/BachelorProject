@@ -27,7 +27,7 @@ public class TestArrayListTransactions {
     private Transaction t2;
     @Before
     public void setUp(){
-        valueProof = new TransactionStub().transActionHash();
+        valueProof = new TransactionStub().transactionHash();
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
 

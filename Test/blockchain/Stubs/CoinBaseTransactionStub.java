@@ -2,6 +2,9 @@ package blockchain.Stubs;
 
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
+
+import java.math.BigInteger;
 
 public class CoinBaseTransactionStub implements CoinBaseTransaction{
     @Override
@@ -17,6 +20,11 @@ public class CoinBaseTransactionStub implements CoinBaseTransaction{
     @Override
     public int getBlockNumber() {
         return 0;
+    }
+
+    @Override
+    public BigInteger transactionHash() {
+        throw new NotImplementedException();
     }
 
     @Override

@@ -39,7 +39,6 @@ public class UDPPublisher implements Publisher{
      */
     public void send(Object object, InetAddress ip, int port) {
         try {
-            System.out.println(object.getClass());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(object);

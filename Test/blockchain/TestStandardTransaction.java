@@ -22,7 +22,7 @@ public class TestStandardTransaction {
     private BigInteger valueProof;
     @Before
     public void setUp(){
-        valueProof = new TransactionStub().transActionHash();
+        valueProof = new TransactionStub().transactionHash();
         signature = new BigInteger("42");
 
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
@@ -68,7 +68,7 @@ public class TestStandardTransaction {
             String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+valueProof.toString();
             byte[] hash = sha256.digest(s.getBytes());
             BigInteger hashValue = new BigInteger(1,hash);
-            assertEquals(hashValue,standardTransaction.transActionHash());
+            assertEquals(hashValue,standardTransaction.transactionHash());
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();
         }

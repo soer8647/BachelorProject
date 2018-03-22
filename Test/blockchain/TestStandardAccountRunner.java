@@ -135,7 +135,7 @@ public class TestStandardAccountRunner {
         try {
             accountRunner = new StandardAccountRunner(account, transactions, new ArrayList<>(),8002);
             assertEquals(3, accountRunner.getBalance());
-            assertEquals(new Pair<>(t1.transActionHash(), 2).toString(), accountRunner.getValueProof(1).toString());
+            assertEquals(new Pair<>(t1.transactionHash(), 2).toString(), accountRunner.getValueProof(1).toString());
         }catch (NotEnoughMoneyException | IllegalTransactionException e){
             e.printStackTrace();
         }

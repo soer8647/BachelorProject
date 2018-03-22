@@ -120,7 +120,7 @@ public class FullNode implements Node {
      */
     public boolean verifyTransactionSignature(Transaction transaction) {
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
-        return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transActionHash());
+        return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transactionHash());
     }
 
     @Override

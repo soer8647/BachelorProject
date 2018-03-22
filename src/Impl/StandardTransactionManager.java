@@ -23,15 +23,17 @@ public class StandardTransactionManager implements TransactionManager {
 
     @Override
     public Transactions getSomeTransactions() {
-        //TODO VERIFY TRANSACTION. incomming blocks could have invalidated some transactions
         Transactions result = new ArrayListTransactions();
         Iterator<Transaction> iter = transactions.iterator();
-        for (int i = 0; i < Configuration.getTransactionLimit(); i++) {
+        while (result.size() < Configuration.getTransactionLimit()) {
             if (!iter.hasNext()) {
                 break;
             }
             Transaction tran = iter.next();
-            result.add(tran);
+            if (validateTransaction(tran)){
+                //TODO validate transaction with the transactions in result. If value proof is reused: throw both transactions away.
+                result.add(tran);
+            }
         }
         return result;
     }
@@ -43,8 +45,11 @@ public class StandardTransactionManager implements TransactionManager {
      */
     @Override
     public void addTransaction(Transaction transaction) {
-        //TODO VERIFY TRANSACTION validate
-        this.transactions.add(transaction);
+        if (validateTransaction(transaction)){
+            this.transactions.add(transaction);
+        }else {
+            System.out.println(" Invalid transaction received");
+        }
     }
 
     @Override
@@ -57,6 +62,7 @@ public class StandardTransactionManager implements TransactionManager {
         if(!verifyTransactionSignature(transaction)) {
             return false;
         }
+        //TODO Get unspend transactions as a transactionhistory en stead.
         TransactionHistory transactions = blockChain.getTransactionHistory(transaction.getSenderAddress(),transaction.getBlockNumberOfValueProof());
         int valueToVerify = transaction.getValue();
         int counter = 0;
@@ -104,6 +110,6 @@ public class StandardTransactionManager implements TransactionManager {
      */
     private boolean verifyTransactionSignature(Transaction transaction) {
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
-        return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transActionHash());
+        return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transactionHash());
     }
 }

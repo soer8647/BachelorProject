@@ -34,7 +34,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
      * @return      The hash of the transaction without the signature.
      */
     @Override
-    public BigInteger transActionHash() {
+    public BigInteger transactionHash() {
         return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
     }
 

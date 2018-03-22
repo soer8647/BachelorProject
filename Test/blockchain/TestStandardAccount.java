@@ -1,8 +1,8 @@
 package blockchain;
 
+import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
-import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Hashing.SHA256;
@@ -18,9 +18,7 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 public class TestStandardAccount {
     PublicKeyCryptoSystem cryptoSystem;
@@ -63,7 +61,7 @@ public class TestStandardAccount {
 
     @Test
     public void shouldBeAbleToMakeTransaction() {
-        BigInteger valueProof = new TransactionStub().transActionHash();
+        BigInteger valueProof = new TransactionStub().transactionHash();
         Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
 
@@ -72,7 +70,7 @@ public class TestStandardAccount {
 
     @Test
     public void shouldBeVerifiableSignatureOnTransaction() {
-        BigInteger valueProof = new TransactionStub().transActionHash();
+        BigInteger valueProof = new TransactionStub().transactionHash();
         Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
         RSAPublicKey publicKey = account.getPublicKey();

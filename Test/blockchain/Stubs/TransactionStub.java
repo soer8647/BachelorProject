@@ -22,7 +22,7 @@ public class TransactionStub implements Transaction{
     }
 
     @Override
-    public BigInteger transActionHash() {
+    public BigInteger transactionHash() {
         return new BigInteger("404");
     }
 

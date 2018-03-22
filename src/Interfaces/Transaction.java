@@ -16,7 +16,7 @@ public interface Transaction extends Serializable {
     /**
      * @return      The hash of this transaction.
      */
-    BigInteger transActionHash();
+    BigInteger transactionHash();
 
     /**
      * @return The "address" or identifier of the sender of this transaction.

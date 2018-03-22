@@ -118,7 +118,7 @@ public class StandardAccountRunner implements AccountRunner {
                 // Account gets money
                 if(confirmed.getReceiverAddress().toString().equals(account.getAddress().toString())){
                     counter+=confirmed.getValue();
-                    if (counter>=bal) return new Pair<>(confirmed.transActionHash(),vt.getBlockNumber());
+                    if (counter>=bal) return new Pair<>(confirmed.transactionHash(),vt.getBlockNumber());
                 }else if(confirmed.getSenderAddress().toString().equals(account.getAddress().toString())){
                 // Account spends money
                     counter-=confirmed.getValue();
@@ -127,7 +127,7 @@ public class StandardAccountRunner implements AccountRunner {
                 }
             }
         }
-        throw new NotEnoughMoneyException();
+        throw new NotEnoughMoneyException("Not enough money to get a value proof");
     }
 
     @Override
