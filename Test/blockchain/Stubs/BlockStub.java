@@ -7,6 +7,8 @@ import Interfaces.Transactions;
 import java.math.BigInteger;
 
 public class BlockStub implements Block {
+    private int blockNumber;
+
     @Override
     public Transactions getTransactions() {
         return null;
@@ -14,7 +16,7 @@ public class BlockStub implements Block {
 
     @Override
     public int getBlockNumber() {
-        return 0;
+        return blockNumber;
     }
 
     @Override
@@ -45,5 +47,9 @@ public class BlockStub implements Block {
     @Override
     public CoinBaseTransaction getCoinBase() {
         return null;
+    }
+
+    public void setBlockNumber(int blockNumber) {
+        this.blockNumber = blockNumber;
     }
 }
