@@ -37,9 +37,13 @@ public class TestStandardBlockchain {
     @Test
     public void shouldBeAbleToAddBlockToBlockChain() {
         assertEquals(blockChain.getBlockNumber(), 0);
-        blockChain.addBlock(new BlockStub());
+        BlockStub newBlockStub = new BlockStub();
+        newBlockStub.setBlockNumber(1);
+        blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 1);
-        blockChain.addBlock(new BlockStub());
+        newBlockStub = new BlockStub();
+        newBlockStub.setBlockNumber(2);
+        blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 2);
     }
 
