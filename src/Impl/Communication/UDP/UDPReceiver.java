@@ -12,6 +12,7 @@ import java.rmi.activation.UnknownObjectException;
 import java.util.concurrent.BlockingQueue;
 
 public class UDPReceiver {
+    private boolean notDone;
     private DatagramSocket socket = null;
     private BlockingQueue<Event> queue;
     private int port;
@@ -19,15 +20,26 @@ public class UDPReceiver {
     public UDPReceiver(BlockingQueue<Event> queue, int port) {
         this.queue = queue;
         this.port = port;
+        notDone = true;
         new Thread(this::createAndListenSocket).start();
+        while(notDone) {
+            //Busy wait
+            try {
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+
     }
 
     private void createAndListenSocket() {
         try {
-            System.out.println("LISTENING ON: "+ port);
             socket = new DatagramSocket(this.port);
             byte[] incomingData = new byte[Configuration.getMax_package_size()];
 
+            System.out.println("LISTENING ON: "+ port);
+            notDone = false;
             while (true) {
                 DatagramPacket incomingPacket = new DatagramPacket(incomingData, incomingData.length);
                 socket.receive(incomingPacket);

@@ -124,7 +124,7 @@ public class StandardNodeRunner implements NodeRunner {
         node.interrupt();
 
         //remove the old fork
-        while (node.getBlockChain().getBlockNumber() > blockNumber) {
+        while (node.getBlockChain().getBlockNumber() >= blockNumber) {
             Block removedBlock = node.removeBlock();
             removedBlocks.addFirst(removedBlock);
             display.removeLatestFromDisplay();
@@ -147,6 +147,7 @@ public class StandardNodeRunner implements NodeRunner {
                 }
             }
         }
+        specialBlock = null;
         lock.release();
     }
 }

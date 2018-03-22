@@ -16,6 +16,7 @@ public class UDPPublisher implements Publisher{
     private final InetAddress localAddress;
     private final int localPort;
     private final List<UDPConnectionData> connectionsDataList;
+    private final UDPConnectionData Localdata;
     protected DatagramSocket socket;
 
     public UDPPublisher(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList) {
@@ -27,6 +28,7 @@ public class UDPPublisher implements Publisher{
         } catch (SocketException e) {
             e.printStackTrace();
         }
+        Localdata = new UDPConnectionData(localAddress,localPort);
     }
 
 
@@ -39,6 +41,7 @@ public class UDPPublisher implements Publisher{
      */
     public void send(Object object, InetAddress ip, int port) {
         try {
+            System.out.println("from (port: " +localPort+") UDPPublisher.send(): " + object.getClass());
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
             os.writeObject(object);
@@ -73,5 +76,25 @@ public class UDPPublisher implements Publisher{
 
     public DatagramSocket getSocket() {
         return socket;
+    }
+
+    public void addConnections(List<UDPConnectionData> connectionsDataList) {
+        // remove already known peers from adding list TODO: maybe not efficient, change?
+        System.out.println(localPort + " got size " + connectionsDataList.size());
+        for (UDPConnectionData d: connectionsDataList) {
+            if (!this.connectionsDataList.contains(d) && !d.equals(Localdata)) {
+                this.connectionsDataList.add(d);
+                System.out.println("added: " + d.getPort());
+            }
+        }
+    }
+
+    public void addConnection(InetAddress ip, int port) {
+        //System.out.println("adding someone");
+        UDPConnectionData newPeer = new UDPConnectionData(ip,port);
+        if (!connectionsDataList.contains(newPeer) && !newPeer.equals(Localdata)) {
+            System.out.println("they got added");
+            connectionsDataList.add(newPeer);
+        }
     }
 }

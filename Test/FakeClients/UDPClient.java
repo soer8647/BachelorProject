@@ -4,7 +4,7 @@ import Configuration.Configuration;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import GUI.GuiApp;
-import Impl.Communication.FlexibleHardnessManager;
+import Impl.FlexibleHardnessManager;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;
@@ -32,7 +32,12 @@ public class UDPClient{
     private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
 
-    public UDPClient(int myPort, int[] otherPorts, InetAddress[] ips) {
+    public UDPClient(int myPort, UDPConnectionData seed) {
+        this(myPort, new ArrayList<UDPConnectionData>());
+        publisher.sendJoin(seed.getInetAddress(),seed.getPort());
+    }
+
+    public UDPClient(int myPort, List<UDPConnectionData> connectionsData) {
         InetAddress myIp = null;
         try {
             myIp = InetAddress.getLocalHost();
@@ -40,13 +45,13 @@ public class UDPClient{
             e.printStackTrace();
         }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),0,new CoinBaseTransactionStub());
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
-        GuiApp display = new GuiApp(node1Address.getPublicKey());
+        GuiApp display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
 
 
         BlockChain blockChain = new StandardBlockChain(genesisBlock);
@@ -54,10 +59,7 @@ public class UDPClient{
         Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
         nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
         receiver = new UDPReceiver(queue,myPort);
-        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
-        for (int i = 0;i<ips.length;i++){
-            connectionsData.add(new UDPConnectionData(ips[i],otherPorts[i]));
-        }
+
         publisher = new UDPPublisherNode(myIp,myPort,connectionsData);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
@@ -74,6 +76,13 @@ public class UDPClient{
             e.printStackTrace();
         }
 //        startUDP(9876,6789,IPAddress);
-        UDPClient client = new UDPClient(6789, new int[]{9876}, new InetAddress[]{IPAddress});
+
+        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
+        connectionsData.add(new UDPConnectionData(IPAddress,9876));
+        UDPClient client = new UDPClient(6789, connectionsData );
+    }
+
+    public UDPPublisherNode getPublisher() {
+        return publisher;
     }
 }

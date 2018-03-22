@@ -1,6 +1,7 @@
-package Interfaces.Communication;
+package Impl;
 
 import Configuration.Configuration;
+import Interfaces.HardnessManager;
 
 public class ConstantHardnessManager implements HardnessManager {
     @Override

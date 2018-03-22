@@ -11,13 +11,13 @@ public class GuiApp implements Display{
 
     private final DefaultListModel model;
 
-    public GuiApp(PublicKey publicKey)
+    public GuiApp(String title)
     {
         JFrame guiFrame = new JFrame();
 
         //make sure the program exits when the frame closes
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        guiFrame.setTitle(publicKey+"");
+        guiFrame.setTitle(title);
         guiFrame.setSize(3000,250);
 
         //This will center the JFrame in the middle of the screen

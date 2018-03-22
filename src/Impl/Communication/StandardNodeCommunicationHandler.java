@@ -67,9 +67,23 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             handleRequest((RequestEvent) event);
         } else if (event instanceof RequestedEvent) {
             handleRequested((RequestedEvent) event);
-        }else if (event instanceof TransactionHistoryRequestEvent){
+        } else if (event instanceof TransactionHistoryRequestEvent){
             handleTransactionHistoryRequest((TransactionHistoryRequestEvent) event);
-            }
+        } else if (event instanceof JoinEvent) {
+            handleJoinEvent((JoinEvent) event);
+        } else if (event instanceof JoinResponseEvent) {
+            handleJoinResponseEvent((JoinResponseEvent) event);
+        }
+    }
+
+    private void handleJoinResponseEvent(JoinResponseEvent event) {
+        publisher.addConnection(event.getIp(),event.getPort());
+        publisher.addConnections(event.getConnectionsDataList());
+    }
+
+    private void handleJoinEvent(JoinEvent event) {
+        publisher.addConnection(event.getIp(),event.getPort());
+        publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
 
     private void handleTransactionHistoryRequest(TransactionHistoryRequestEvent event) {
@@ -128,31 +142,37 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         int key = event.getPort();
         Block child = orphanage.getBlock(key);
 
-        //TODO : remove
-        if (child.getBlockNumber() - block.getBlockNumber() != 1) {
-            System.out.println(child.getBlockNumber() + " > " + block.getBlockNumber());
-        }
+        if (child == null) {
+            if (orphanage.addChain(block,event.getPort())) {
+                publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
+            }
 
+        } else
         if (child.getPreviousHash().equals(block.hash())) {
             if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
-                Deque<Block> chain = orphanage.getChain(key);
+                Deque<Block> chain = orphanage.popChain(key);
                 //TODO: perform rollback (if it's the best chain)
                 if (chain.peekLast().getBlockNumber() > nodeRunner.getBlockNumber()) {
                     System.out.println("what we do here is go Back!");
                     nodeRunner.rollback(chain,chain.peekFirst().getBlockNumber());
                 }
             } else {
-                System.out.println("this happens?");
                 orphanage.addBlock(block,key);
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
         } else {
-            System.out.println("Bad Requested");
+            orphanage.popChain(key);
+            System.out.println("child: " +child);
+            System.out.println("block: " +block);
+            System.out.println("Bad Request - " + block.getBlockNumber());
         }
     }
 
     @Override
     public void handleReceivedBlock(ReceivedBlockEvent event) {
+        //TODO: maybe not necessary (find better way)
+        publisher.addConnection(event.getIp(),event.getPort());
+
         Block block = event.getBlock();
 //        System.out.println("ReceivedBlock event");
         if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {
@@ -160,6 +180,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
+            System.out.println("someone is ahead of " + publisher.getLocalPort());
             //TODO: Handle other nodes being more than 1 ahead (not done)
             if (orphanage.addChain(block,event.getPort())) {
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
