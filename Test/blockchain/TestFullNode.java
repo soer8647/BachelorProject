@@ -12,9 +12,10 @@ import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
-import Impl.ConstantHardnessManager;
 import blockchain.Stubs.AddressStub;
+import blockchain.Stubs.BlockStub;
 import blockchain.Stubs.TransactionStub;
+import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.Test;
@@ -187,36 +188,47 @@ public class TestFullNode {
         Address senderAddress = new PublicKeyAddress(publicKeySender);
 
         Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
-        // Make a transaction
-        BigInteger valueProofFake = new TransactionStub().transactionHash();
 
         Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
         Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
+        System.out.println(node.getBlockChain().getBlockNumber());
+
+        CoinBaseTransaction valueProof1 = new StandardCoinBaseTransaction(senderAddress,100,1);
+        node.addBlock(new BlockStub(valueProof1));
+
+
+        CoinBaseTransaction valueProof2 = new StandardCoinBaseTransaction(senderAddress,100,2);
+        node.addBlock(new BlockStub(valueProof2));
 
 
         //Make transaction from sender
-        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProofFake, 0);
+        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProof1.transactionHash(), 0);
         Transactions transactions = new ArrayListTransactions();
         transactions.add(transaction);
 
         //Make transaction from receiver to sender
-        Transaction transaction2 = sender.makeTransaction(receiverAddress,senderAddress,5,valueProofFake, 0);
+        Transaction transaction2 = sender.makeTransaction(receiverAddress,senderAddress,5,valueProof2.transactionHash(), 0);
         Transactions transactions2 = new ArrayListTransactions();
         transactions.add(transaction2);
 
-        node.mine(valueProofFake,transactions);
+        node.mine(new BigInteger("42"),transactions);
         assertEquals(2,node.getTransactionHistory(senderAddress).getConfirmedTransactions().size());
     }
 
-    @AfterClass
-    public static void tearDown(){
-        System.out.println("Running teardown");
-
+    @After
+    public void tearDown(){
         blockChain.clearTable("BLOCKCHAIN");
         System.out.println("BLOCKCHAIN table cleared");
         blockChain.clearTable("TRANSACTIONS");
         System.out.println("TRANSACTION table cleared");
         blockChain.clearTable("UNSPENT_TRANSACTIONS");
+    }
+
+
+    @AfterClass
+    public static void tearDownLast(){
+        System.out.println("Running teardown");
+
         blockChain.shutDown();
     }
 

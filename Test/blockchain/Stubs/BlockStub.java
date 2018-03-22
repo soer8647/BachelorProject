@@ -1,5 +1,6 @@
 package blockchain.Stubs;
 
+import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Transactions;
@@ -8,10 +9,15 @@ import java.math.BigInteger;
 
 public class BlockStub implements Block {
     private int blockNumber;
+    private CoinBaseTransaction coinbase;
+
+    public BlockStub(CoinBaseTransaction coinbase) {
+        this.coinbase = coinbase;
+    }
 
     @Override
     public Transactions getTransactions() {
-        return null;
+        return new ArrayListTransactions();
     }
 
     @Override
@@ -46,7 +52,7 @@ public class BlockStub implements Block {
 
     @Override
     public CoinBaseTransaction getCoinBase() {
-        return null;
+        return coinbase;
     }
 
     public void setBlockNumber(int blockNumber) {

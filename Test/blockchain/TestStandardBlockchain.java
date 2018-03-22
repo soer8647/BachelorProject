@@ -8,10 +8,7 @@ import blockchain.Stubs.GenesisBlockStub;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.hamcrest.core.Is.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotEquals;
-import static org.junit.Assert.assertThat;
 
 public class TestStandardBlockchain {
 
@@ -37,11 +34,11 @@ public class TestStandardBlockchain {
     @Test
     public void shouldBeAbleToAddBlockToBlockChain() {
         assertEquals(blockChain.getBlockNumber(), 0);
-        BlockStub newBlockStub = new BlockStub();
+        BlockStub newBlockStub = new BlockStub(null);
         newBlockStub.setBlockNumber(1);
         blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 1);
-        newBlockStub = new BlockStub();
+        newBlockStub = new BlockStub(null);
         newBlockStub.setBlockNumber(2);
         blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 2);
