@@ -5,4 +5,6 @@ public interface Display {
     void addToDisplay(Object o);
 
     void removeLatestFromDisplay();
+
+    void stop();
 }

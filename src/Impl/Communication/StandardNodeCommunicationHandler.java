@@ -1,6 +1,7 @@
 package Impl.Communication;
 
 import Configuration.Configuration;
+import Configuration.GlobalCounter;
 import Impl.Communication.Events.*;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.TransactionHistory;
@@ -21,6 +22,7 @@ import java.util.List;
 import java.util.concurrent.BlockingQueue;
 
 public class StandardNodeCommunicationHandler implements NodeCommunicationHandler {
+    private final Thread thread;
     private NodeRunner nodeRunner;
     private UDPPublisherNode publisher;
     private boolean interrupted;
@@ -38,13 +40,13 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
 
         this.orphanage = new OrphanChainHolder();
 
-        Thread thread = new Thread(() -> {
+        thread = new Thread(() -> {
             while(!interrupted) {
                 Event event = null;
                 try {
                     event = eventQueue.take();
                 } catch (InterruptedException e) {
-                    e.printStackTrace();
+                    System.out.println("CommunicationHandler down");
                 }
                     handleEvent(event);
                 }
@@ -180,6 +182,9 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
+
+            GlobalCounter.reportConflict();
+
             System.out.println("someone is ahead of " + publisher.getLocalPort());
             //TODO: Handle other nodes being more than 1 ahead (not done)
             if (orphanage.addChain(block,event.getPort())) {
@@ -206,5 +211,11 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     public void handleMinedBlock(MinedBlockEvent block) {
  //       System.out.println("MinedBlock event");
         publisher.publishBlock(block.getBlock());
+    }
+
+    @Override
+    public void stop() {
+        this.interrupted = true;
+        thread.interrupt();
     }
 }

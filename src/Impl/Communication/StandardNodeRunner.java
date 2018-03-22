@@ -28,6 +28,11 @@ public class StandardNodeRunner implements NodeRunner {
             @Override
             public void removeLatestFromDisplay() {
             }
+
+            @Override
+            public void stop() {
+
+            }
         });
     }
 
@@ -79,6 +84,12 @@ public class StandardNodeRunner implements NodeRunner {
 
     public TransactionHistory getTransactionHistory(Address a, int index){
       return node.getTransactionHistory(a,index);
+    }
+
+    @Override
+    public void stop() {
+        this.interrupted = true;
+        node.interrupt();
     }
 
     @Override

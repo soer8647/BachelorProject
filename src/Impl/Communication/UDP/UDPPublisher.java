@@ -11,15 +11,20 @@ import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.List;
 
-public class UDPPublisher implements Publisher{
+public class UDPPublisher implements Publisher {
 
     private final InetAddress localAddress;
     private final int localPort;
     private final List<UDPConnectionData> connectionsDataList;
     private final UDPConnectionData Localdata;
+    private final int delay;
     protected DatagramSocket socket;
 
     public UDPPublisher(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList) {
+        this(localAddress, localPort, connectionsDataList, 0);
+    }
+
+    public UDPPublisher(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList, int delay) {
         this.localAddress = localAddress;
         this.localPort = localPort;
         this.connectionsDataList = connectionsDataList;
@@ -28,37 +33,63 @@ public class UDPPublisher implements Publisher{
         } catch (SocketException e) {
             e.printStackTrace();
         }
-        Localdata = new UDPConnectionData(localAddress,localPort);
+        Localdata = new UDPConnectionData(localAddress, localPort);
+        this.delay = delay;
     }
-
 
     /**
      * Send an event to a ip and port using the UDP protocol.
      *
-     * @param object    The object to send
-     * @param ip        The ip to send the event to
-     * @param port      The port were the receiver is listening
+     * @param object The object to send
+     * @param ip     The ip to send the event to
+     * @param port   The port were the receiver is listening
      */
     public void send(Object object, InetAddress ip, int port) {
-        try {
-            System.out.println("from (port: " +localPort+") UDPPublisher.send(): " + object.getClass());
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            ObjectOutputStream os = new ObjectOutputStream(outputStream);
-            os.writeObject(object);
-            byte[] data = outputStream.toByteArray();
-            DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
-            socket.send(sendPacket);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    System.out.println("from (port: " + localPort + ") UDPPublisher.send(): " + object.getClass());
+                    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                    ObjectOutputStream os = new ObjectOutputStream(outputStream);
+                    os.writeObject(object);
+                    byte[] data = outputStream.toByteArray();
+                    DatagramPacket sendPacket = new DatagramPacket(data, data.length, ip, port);
+                    socket.send(sendPacket);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
     }
 
     /**
-     * @param object     The object that is going to be send to all known connections.
+     * @param object The object that is going to be send to all known connections.
      */
-    public void broadCast(Object object){
-        for (UDPConnectionData data : connectionsDataList){
-            send(object,data.getInetAddress(), data.getPort());
+    public void broadCast(Object object) {
+        if (delay > 0) {
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        Thread.sleep(delay);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                    for (UDPConnectionData data : connectionsDataList) {
+                        send(object, data.getInetAddress(), data.getPort());
+                    }
+                }
+            }).start();
+        } else {
+            for (UDPConnectionData data : connectionsDataList) {
+                send(object, data.getInetAddress(), data.getPort());
+            }
         }
     }
 
@@ -81,7 +112,7 @@ public class UDPPublisher implements Publisher{
     public void addConnections(List<UDPConnectionData> connectionsDataList) {
         // remove already known peers from adding list TODO: maybe not efficient, change?
         System.out.println(localPort + " got size " + connectionsDataList.size());
-        for (UDPConnectionData d: connectionsDataList) {
+        for (UDPConnectionData d : connectionsDataList) {
             if (!this.connectionsDataList.contains(d) && !d.equals(Localdata)) {
                 this.connectionsDataList.add(d);
                 System.out.println("added: " + d.getPort());
@@ -91,7 +122,7 @@ public class UDPPublisher implements Publisher{
 
     public void addConnection(InetAddress ip, int port) {
         //System.out.println("adding someone");
-        UDPConnectionData newPeer = new UDPConnectionData(ip,port);
+        UDPConnectionData newPeer = new UDPConnectionData(ip, port);
         if (!connectionsDataList.contains(newPeer) && !newPeer.equals(Localdata)) {
             System.out.println("they got added");
             connectionsDataList.add(newPeer);

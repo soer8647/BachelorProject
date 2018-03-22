@@ -5,15 +5,17 @@ import Crypto.Interfaces.PublicKey;
 import Interfaces.Block;
 
 import javax.swing.*;
-import java.awt.BorderLayout;
+import java.awt.*;
+import java.awt.event.WindowEvent;
 
 public class GuiApp implements Display{
 
     private final DefaultListModel model;
+    private JFrame guiFrame;
 
     public GuiApp(String title)
     {
-        JFrame guiFrame = new JFrame();
+        guiFrame = new JFrame();
 
         //make sure the program exits when the frame closes
         guiFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -55,5 +57,11 @@ public class GuiApp implements Display{
     @Override
     public void removeLatestFromDisplay() {
         model.removeElementAt(0);
+    }
+
+    @Override
+    public void stop() {
+        guiFrame.dispose();
+        //guiFrame.dispatchEvent(new WindowEvent(guiFrame, WindowEvent.WINDOW_CLOSING));
     }
 }

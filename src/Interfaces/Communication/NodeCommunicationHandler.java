@@ -11,4 +11,6 @@ public interface NodeCommunicationHandler {
     void handleReceivedBlock(ReceivedBlockEvent event);
     void handleNewTransaction(TransactionEvent transactionEvent);
     void handleMinedBlock(MinedBlockEvent minedBlockEvent);
+
+    void stop();
 }

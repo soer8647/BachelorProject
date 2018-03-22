@@ -41,7 +41,7 @@ public class FullNode implements Node {
         //Set the hardness parameter
         int hardness = hardnessManager.getHardness();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
-        BigInteger hardValue = BigInteger.valueOf(2).pow(Configuration.getBitSize()).shiftRight(hardness);
+        BigInteger hardValue = hardnessManager.getHardValue();
 
         //set nonce
         BigInteger nonce = new BigInteger("0");
@@ -62,7 +62,7 @@ public class FullNode implements Node {
 
         Block newBlock = new StandardBlock(
                 nonce,
-                hardness,
+                hardness, //TODO ohh dayum
                 previousBlockHash,
                 10,
                 transactions,

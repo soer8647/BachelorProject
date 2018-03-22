@@ -15,7 +15,10 @@ import java.util.List;
 public class UDPPublisherNode extends UDPPublisher{
 
     public UDPPublisherNode(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList) {
-        super(localAddress,localPort,connectionsDataList);
+        this(localAddress,localPort,connectionsDataList,0);
+    }
+    public UDPPublisherNode(InetAddress localAddress, int localPort, List<UDPConnectionData> connectionsDataList, int delay) {
+        super(localAddress,localPort,connectionsDataList,delay);
         try {
             socket = new DatagramSocket();
         } catch (SocketException e) {

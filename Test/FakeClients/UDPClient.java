@@ -3,6 +3,7 @@ package FakeClients;
 import Configuration.Configuration;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
+import GUI.Display;
 import GUI.GuiApp;
 import Impl.FlexibleHardnessManager;
 import Impl.Communication.StandardNodeCommunicationHandler;
@@ -31,13 +32,20 @@ public class UDPClient{
     private final UDPReceiver receiver;
     private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
+    private final Display display;
 
-    public UDPClient(int myPort, UDPConnectionData seed) {
-        this(myPort, new ArrayList<UDPConnectionData>());
+    public UDPClient(int myPort, UDPConnectionData seed, int delay) {
+        this(myPort, new ArrayList<UDPConnectionData>(), delay);
         publisher.sendJoin(seed.getInetAddress(),seed.getPort());
+    }
+    public UDPClient(int myPort, UDPConnectionData seed) {
+        this(myPort, seed, 0);
     }
 
     public UDPClient(int myPort, List<UDPConnectionData> connectionsData) {
+        this(myPort,connectionsData,0);
+    }
+    public UDPClient(int myPort, List<UDPConnectionData> connectionsData, int delay) {
         InetAddress myIp = null;
         try {
             myIp = InetAddress.getLocalHost();
@@ -51,7 +59,7 @@ public class UDPClient{
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
-        GuiApp display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
+        display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
 
 
         BlockChain blockChain = new StandardBlockChain(genesisBlock);
@@ -60,12 +68,16 @@ public class UDPClient{
         nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
         receiver = new UDPReceiver(queue,myPort);
 
-        publisher = new UDPPublisherNode(myIp,myPort,connectionsData);
+        publisher = new UDPPublisherNode(myIp,myPort,connectionsData,delay);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);
     }
 
     public void stop() {
         //TODO: Stop the client and maybe return/print its last state.
+        nodeRunner.stop();
+        receiver.stop();
+        nodeCommunicationHandler.stop();
+        display.stop();
     }
 
     public static void main(String[] args) {

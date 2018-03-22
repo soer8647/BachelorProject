@@ -34,4 +34,6 @@ public interface NodeRunner {
     void rollback(Deque<Block> chain, int blockNumber);
 
     TransactionHistory getTransactionHistory(Address address, int index);
+
+    void stop();
 }
