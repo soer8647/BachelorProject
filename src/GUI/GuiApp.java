@@ -27,8 +27,6 @@ public class GuiApp implements Display{
 
         //The first JPanel contains a JLabel and JCombobox
         final JPanel comboPanel = new JPanel();
-        JLabel comboLbl = new JLabel("Fruits:");
-        comboPanel.add(comboLbl);
 
         model = new DefaultListModel();
         JList listdata = new JList(model);
