@@ -182,12 +182,10 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
-
-            GlobalCounter.reportConflict();
-
-            System.out.println("someone is ahead of " + publisher.getLocalPort());
             //TODO: Handle other nodes being more than 1 ahead (not done)
             if (orphanage.addChain(block,event.getPort())) {
+                GlobalCounter.reportConflict();
+                System.out.println("someone is ahead of " + publisher.getLocalPort());
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
 //            System.out.println("Other blocks far ahead");

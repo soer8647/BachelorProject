@@ -37,9 +37,9 @@ public class DelayTest {
 
     /**
      *
-     * @param timeTarget amount of 0.1 seconds we want to attempt for 1 block
+     * @param timeTarget amount of 0.1 seconds we want it to take to mine 1 block
      * @param delay      amount of 0.1 seconds delay in communication
-     * @return
+     * @return           The amount of conflicts that occured while the clients ran
      */
     public static int doDelayTest(int timeTarget , int delay) {
         GlobalCounter.resetConflictCount();
