@@ -30,6 +30,7 @@ public class TestDBTransactionManager {
     private KeyPair keyPairReceiver;
     private PublicKeyAddress receiver1;
     private StandardAccount accountSender1;
+    private StandardAccount accountReceiver;
 
     @Before
     public void setUp(){
@@ -37,11 +38,14 @@ public class TestDBTransactionManager {
 
         keyPairSender = rsa.generateNewKeys(new BigInteger("3"));
         sender1 = new PublicKeyAddress(keyPairSender.getPublicKey());
-        accountSender1 = new StandardAccount(new RSA(500),keyPairSender.getPrivateKey(),keyPairSender.getPublicKey(),new SHA256());
+        accountSender1 = new StandardAccount(rsa,keyPairSender.getPrivateKey(),keyPairSender.getPublicKey(),new SHA256());
+
         keyPairReceiver = rsa.generateNewKeys(new BigInteger("3"));
         receiver1 = new PublicKeyAddress(keyPairReceiver.getPublicKey());
+        accountReceiver = new StandardAccount(rsa,keyPairReceiver.getPrivateKey(),keyPairSender.getPublicKey(),new SHA256());
 
         coinBase0 = new StandardCoinBaseTransaction(sender1,10,0);
+
         genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE,10,new ArrayListTransactions(),0, coinBase0);
         blockchain = new BlockChainDatabase("TEST_DBTRANSACTIONMANAGER",genesis);
 
@@ -87,6 +91,18 @@ public class TestDBTransactionManager {
         transactions.add(t1);
         transactions.add(t2);
         assertEquals(false,transactionManager.validateTransactions(transactions));
+    }
+
+    @Test
+    public void shouldGetSomeTransactions() {
+        //not enough funds
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
+        Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0);
+        Transaction t3 = accountSender1.makeTransaction(receiver1,4,coinBase0.transactionHash(),0);
+        transactionManager.addTransaction(t1);
+        transactionManager.addTransaction(t2);
+        transactionManager.addTransaction(t3);
+        assertEquals(3,transactionManager.getSomeTransactions().size());
     }
 
     @After

@@ -22,7 +22,29 @@ public class DBTransactionManager implements TransactionManager{
 
     @Override
     public Transactions getSomeTransactions() {
-        return new ArrayListTransactions();
+        Transactions<ArrayList<Transaction>> result = new ArrayListTransactions();
+        Iterator<Transaction> iter = transactionQueue.iterator();
+        HashMap<Address,Integer> senderMap = new HashMap<>();
+        while (iter.hasNext() && result.size()<Configuration.getTransactionLimit()){
+            Transaction t = iter.next();
+            if (!senderMap.keySet().contains(t.getSenderAddress())){
+                //Put sender and balance - t_value in map
+                int balance = blockChainDatabase.getBalance(t.getSenderAddress());
+                if (balance>=t.getValue()) {
+                    result.add(t);
+                    senderMap.put(t.getSenderAddress(),balance-t.getValue());
+                }
+                //TODO MAYBE REMOVE THEM AT SOME POINT
+            }else {
+                int balance = senderMap.get(t.getSenderAddress());
+                if (balance>=t.getValue()) {
+                    senderMap.replace(t.getSenderAddress(),balance-t.getValue());
+                    result.add(t);
+                }
+            }
+
+        }
+        return result;
     }
 
     @Override
