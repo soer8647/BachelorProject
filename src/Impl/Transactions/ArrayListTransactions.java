@@ -19,7 +19,7 @@ public class ArrayListTransactions implements Transactions {
     }
 
     @Override
-    public Collection getTransactions() {
+    public Collection<Transaction> getTransactions() {
         return transactions;
     }
 

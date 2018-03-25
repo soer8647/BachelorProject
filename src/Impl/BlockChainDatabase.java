@@ -163,8 +163,6 @@ public class BlockChainDatabase implements BlockChain{
      * @param block     The block that your want to append to the block chain.
      */
     public void addBlock(Block block) {
-        //TODO UPDATE UNSPENT TRANSACTIONS
-
         CoinBaseTransaction coinBaseTransaction = block.getCoinBase();
         // Add coinbase to unspent transactions
         addUnspentTransaction(coinBaseTransaction.transactionHash(),coinBaseTransaction.getValue(),true,block.getBlockNumber(),coinBaseTransaction.getMinerAddress());
@@ -296,6 +294,15 @@ public class BlockChainDatabase implements BlockChain{
             e.printStackTrace();
         }
         return new TransactionHistory(transactions,coinBaseTransactions);
+    }
+
+    private UnspentTransaction getUnspentTransactionFromResultSet(ResultSet set) throws SQLException {
+        BigInteger transHash = new BigInteger(set.getString("UNSPENT_TRANS_HASH"));
+        int value_left = set.getInt("VALUE_LEFT");
+        boolean isCoinBase = set.getBoolean("IS_COINBASE");
+        int blocknr = set.getInt("BLOCKNR");
+        Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
+        return new UnspentTransaction(value_left,transHash,isCoinBase,blocknr,receiver);
     }
 
     private ConfirmedTransaction getConfirmedTransactionFromResultSet(ResultSet set, Statement s, boolean close) throws SQLException {
@@ -456,6 +463,23 @@ public class BlockChainDatabase implements BlockChain{
         return null;
     }
 
+    public ArrayList<UnspentTransaction> getUnspentTransactions(Address address){
+        ArrayList<UnspentTransaction> unspentTransactions = new ArrayList<>();
+        try {
+            String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address+"'";
+            Statement s = conn.createStatement();
+            ResultSet rs = s.executeQuery(query);
+            while (rs.next()){
+                unspentTransactions.add(getUnspentTransactionFromResultSet(rs));
+            }
+            rs.close();
+            s.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return unspentTransactions;
+    }
+
     @Override
     public int getBlockNumber() {
         return countDataEntries("BLOCKCHAIN")-1;
@@ -551,9 +575,6 @@ public class BlockChainDatabase implements BlockChain{
          } catch (SQLException e) {
              e.printStackTrace();
          }
-
-
-
     }
 
 
@@ -566,5 +587,27 @@ public class BlockChainDatabase implements BlockChain{
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    /**
+     * This methods looks in all unspent transactions and sums up the amount
+     *
+     * @param address       The address to get balance from
+     * @return              The balance
+     */
+    public int getBalance(Address address) {
+        int balance=0;
+        try {
+            Statement s = conn.createStatement();
+            String query = "SELECT VALUE_LEFT FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address+"'";
+            ResultSet rs = s.executeQuery(query);
+            while (rs.next()){
+                balance += rs.getInt("VALUE_LEFT");
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return balance;
     }
 }

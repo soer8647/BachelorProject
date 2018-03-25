@@ -82,6 +82,4 @@ public class StandardTransaction implements Transaction {
                 "Hash of value proof transaction: " + valueProof+",\n"+
                 "Signature: "+signature+"\n";
     }
-
-
 }
