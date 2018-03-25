@@ -10,4 +10,8 @@ public class GlobalCounter {
     public static int getConflictCount() {
         return conflictCount;
     }
+
+    public static void resetConflictCount() {
+        conflictCount = 0;
+    }
 }

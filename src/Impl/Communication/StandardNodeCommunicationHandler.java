@@ -84,6 +84,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     }
 
     private void handleJoinEvent(JoinEvent event) {
+        //publisher.broadCast(event);
         publisher.addConnection(event.getIp(),event.getPort());
         publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
@@ -182,20 +183,22 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
-
-            GlobalCounter.reportConflict();
-
-            System.out.println("someone is ahead of " + publisher.getLocalPort());
             //TODO: Handle other nodes being more than 1 ahead (not done)
             if (orphanage.addChain(block,event.getPort())) {
+                GlobalCounter.reportConflict();
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
-//            System.out.println("Other blocks far ahead");
+            publisher.broadCast(event);
         } else {
+            //the block is valid
             if (nodeRunner.validateBlock(block)) {
+                //the block was valid
                 nodeRunner.interruptReceivedBlock(block);
+                publisher.broadCast(event);
             } else {
-//                System.out.println("Not valid");
+                // The block was not valid
+                System.out.println("Invalid next block");
+                //TODO not ignore these? (perhaps this is counts as a conflict)
             }
         }
     }
@@ -205,11 +208,11 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         //TODO validate transaction
         // put into Node's queue of potential transactions
         nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction());
+        //publisher.broadCast(transactionEvent); TODO: make sure that this doesn't start endless loop
     }
 
     @Override
     public void handleMinedBlock(MinedBlockEvent block) {
- //       System.out.println("MinedBlock event");
         publisher.publishBlock(block.getBlock());
     }
 
