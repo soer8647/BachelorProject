@@ -49,6 +49,7 @@ public class BlockChainDatabase implements BlockChain{
                 +  " RECEIVER VARCHAR(255) NOT NULL,"
                 +  " VALUE INT NOT NULL,"
                 +  " BLOCKNR INT NOT NULL, "
+                +  " TIMESTAMP INT NOT NULL, "
                 +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
                 +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
                 +  " TRANS_HASH VARCHAR(255) NOT NULL "
@@ -61,6 +62,7 @@ public class BlockChainDatabase implements BlockChain{
                 +  " RECEIVER VARCHAR(255) NOT NULL,"
                 +  " VALUE INT NOT NULL,"
                 +  " BLOCKNR INT NOT NULL, "
+                +  " TIMESTAMP INT NOT NULL, "
                 +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
                 +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
                 +  " PENDING_TRANS_HASH VARCHAR(255) NOT NULL "
@@ -306,12 +308,13 @@ public class BlockChainDatabase implements BlockChain{
         int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
         BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
         BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
+        int timestamp = set.getInt("TIMESTAMP");
         int blockNr = set.getInt("BLOCKNR");
         if (close){
             s.close();
             set.close();
         }
-        return new ConfirmedTransaction(new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof),blockNr);
+        return new ConfirmedTransaction(new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp),blockNr);
     }
 
 
@@ -329,11 +332,12 @@ public class BlockChainDatabase implements BlockChain{
         int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
         BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
         BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
+        int timestamp = set.getInt("TIMESTAMP");
         if (close){
             s.close();
             set.close();
         }
-        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof);
+        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp);
     }
 
     /**
@@ -371,6 +375,7 @@ public class BlockChainDatabase implements BlockChain{
                 + "'"+transaction.getReceiverAddress()+"',"
                 + transaction.getValue()+","
                 + blocknumber+","
+                + transaction.getTimestamp()+","
                 + transaction.getBlockNumberOfValueProof()+",'"
                 + transaction.getValueProof().toString()+"','"
                 + transaction.transactionHash().toString()+"',"
@@ -444,7 +449,8 @@ public class BlockChainDatabase implements BlockChain{
                 int blocknr_value_proof = setT.getInt("BLOCKNR_VALUE_PROOF");
                 BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
-                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof));
+                int timestamp = setT.getInt("TIMESTAMP");
+                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp));
             }
             setT.close();
             s.close();

@@ -31,7 +31,7 @@ public class TestFullNodeWithBlockChainDB {
         bcdb = new BlockChainDatabase("TESTFULLNODEDB", block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct));
         System.out.println("Running setup");
         tx = new TransactionStub();
-        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());
+        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 1);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10, 0);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 2, ct);

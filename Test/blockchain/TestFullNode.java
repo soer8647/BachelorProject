@@ -49,7 +49,7 @@ public class TestFullNode {
     public void setUp(){
         //SETUP FROM DB
         tx = new TransactionStub();
-        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof());
+        stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
@@ -129,7 +129,7 @@ public class TestFullNode {
         Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
         Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
 
-        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProofFake, 0);
+        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProofFake, 0,0);
         Transactions transactions = new ArrayListTransactions();
         transactions.add(transaction);
 
@@ -146,7 +146,7 @@ public class TestFullNode {
         // Sender has 0
 
         //Make new transaction to verify by value
-        Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transactionHash(), 1);
+        Transaction validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,5,transaction.transactionHash(), 1,0);
         Transactions<Collection<Transaction>> transactionsToVerify = new ArrayListTransactions();
         transactionsToVerify.add(validTransaction);
         assertTrue(node.validateTransactions(transactionsToVerify));
@@ -154,7 +154,7 @@ public class TestFullNode {
         // Receiver sends 5. Valid, Not added to blockchain though
 
         //Make transaction to deny by value
-        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,11,transaction.transactionHash(), 1);
+        Transaction invalidTransaction = receiver.makeTransaction(receiverAddress,senderAddress,11,transaction.transactionHash(), 1,0);
         Transactions transactionsToDeny = new ArrayListTransactions();
         transactionsToDeny.add(invalidTransaction);
 
@@ -169,7 +169,7 @@ public class TestFullNode {
         assertTrue(node.verifyTransactionSignature(validTransaction));
 
 
-        validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,15,transaction.transactionHash(), 1);
+        validTransaction = receiver.makeTransaction(receiverAddress,senderAddress,15,transaction.transactionHash(), 1,0);
         transactionsToVerify = new ArrayListTransactions();
         transactionsToVerify.add(validTransaction);
 
@@ -202,12 +202,12 @@ public class TestFullNode {
 
 
         //Make transaction from sender
-        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProof1.transactionHash(), 0);
+        Transaction transaction = sender.makeTransaction(senderAddress,receiverAddress,5,valueProof1.transactionHash(), 0,0);
         Transactions transactions = new ArrayListTransactions();
         transactions.add(transaction);
 
         //Make transaction from receiver to sender
-        Transaction transaction2 = sender.makeTransaction(receiverAddress,senderAddress,5,valueProof2.transactionHash(), 0);
+        Transaction transaction2 = sender.makeTransaction(receiverAddress,senderAddress,5,valueProof2.transactionHash(), 0,0);
         Transactions transactions2 = new ArrayListTransactions();
         transactions.add(transaction2);
 

@@ -18,6 +18,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
     private BigInteger signature;
     private int blockNumberValueProof;
     private int blockNumber;
+    private int timestamp;
 
 
     public ConfirmedTransaction(Transaction transaction,int blockNumber) {
@@ -27,6 +28,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
         valueProof=transaction.getValueProof();
         signature = transaction.getSignature();
         blockNumberValueProof=transaction.getBlockNumberOfValueProof();
+        timestamp = transaction.getTimestamp();
         this.blockNumber = blockNumber;
     }
 
@@ -66,6 +68,11 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
 
     public BigInteger getSignature() {
         return signature;
+    }
+
+    @Override
+    public int getTimestamp() {
+        return this.timestamp;
     }
 
     @Override

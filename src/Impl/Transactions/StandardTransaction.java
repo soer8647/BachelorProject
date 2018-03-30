@@ -16,6 +16,7 @@ public class StandardTransaction implements Transaction {
     private BigInteger valueProof;
     private BigInteger signature;
     private int blockNumberValueProof;
+    private int timestamp; // block number
 
 
     /**
@@ -25,15 +26,17 @@ public class StandardTransaction implements Transaction {
      * @param valueProof    The transaction where the sender has proof of funds for this transaction.
      * @param signature     The signature of the sender on this transaction.
      * @param blockNumberValueProof     The block number where there is proof of funds.
+     * @param timestamp
 
      */
-    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof) {
+    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof, int timestamp) {
         this.sender = sender;
         this.receiver = receiver;
         this.value = value;
         this.valueProof = valueProof;
         this.signature = signature;
         this.blockNumberValueProof = blockNumberValueProof;
+        this.timestamp = timestamp;
     }
 
     /**
@@ -80,8 +83,13 @@ public class StandardTransaction implements Transaction {
                 "Receiver: "+receiver+",\n"+
                 "Value: "+value+",\n"+
                 "Hash of value proof transaction: " + valueProof+",\n"+
+                "Timestamp: " + timestamp+",\n"+
                 "Signature: "+signature+"\n";
+
     }
 
 
+    public int getTimestamp() {
+        return timestamp;
+    }
 }

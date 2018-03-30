@@ -84,7 +84,7 @@ public class AccountAndNodeCommunication {
         nodeAccount = new StandardAccount(cryptoSystem,privateKeyNode,publicKeyNode,new SHA256());
 
         Transaction tx = new TransactionStub();
-        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof());
+        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
         blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);

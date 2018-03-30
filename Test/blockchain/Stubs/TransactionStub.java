@@ -57,4 +57,9 @@ public class TransactionStub implements Transaction{
         return new BigInteger("8080");
     }
 
+    @Override
+    public int getTimestamp() {
+        return 0;
+    }
+
 }
