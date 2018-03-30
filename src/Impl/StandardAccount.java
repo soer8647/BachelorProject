@@ -62,19 +62,18 @@ public class StandardAccount implements Account{
     }
 
     /**
-     * @param sender        The address of the sender of the transaction
      * @param receiver      The address of the receiver of the transaction.
      * @param value         The amount to be transferred.
      * @param valueProof    The transaction where the sender has a proof of funds
      * @return              The transaction object.
      */
     @Override
-    public Transaction makeTransaction(Address sender, Address receiver, int value, BigInteger valueProof,int blockValueProof,int timestamp) {
+    public Transaction makeTransaction(Address receiver, int value, BigInteger valueProof, int blockValueProof,int timestamp) {
 
-        String transaction = sender.toString()+receiver.toString()+value+valueProof.toString();
+        String transaction = address.toString()+receiver.toString()+value+valueProof.toString();
         BigInteger signature = getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
 
-        return new StandardTransaction(sender,receiver,value,valueProof,signature, blockValueProof, timestamp);
+        return new StandardTransaction(address,receiver,value,valueProof,signature, blockValueProof, timestamp);
     }
 
     public HashingAlgorithm getHashingAlgorithm() {

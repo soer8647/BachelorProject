@@ -65,7 +65,7 @@ public class TestStandardAccount {
         Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
 
-        assertNotEquals(account.makeTransaction(sender,receiver,1,valueProof, 0,0),null);
+        assertNotEquals(account.makeTransaction(receiver,1,valueProof, 0,0),null);
     }
 
     @Test
@@ -75,7 +75,7 @@ public class TestStandardAccount {
         Address receiver = new AddressStub();
         RSAPublicKey publicKey = account.getPublicKey();
 
-        Transaction transaction = account.makeTransaction(sender,receiver,1,valueProof, 0,0);
+        Transaction transaction = account.makeTransaction(receiver,1,valueProof, 0,0);
 
         String tx = sender.toString()+receiver.toString()+1+valueProof.toString();
         BigInteger hash = account.getHashingAlgorithm().hash(tx);

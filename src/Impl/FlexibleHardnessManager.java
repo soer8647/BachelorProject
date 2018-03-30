@@ -32,10 +32,10 @@ public class FlexibleHardnessManager implements HardnessManager {
             System.out.println( ((double) (timeElapsed.toMillis()) / 1000 ) + " - > " + (timeTarget.toMillis()/1000) + ", HardValue: " + hardValue );
             if (timeElapsed.compareTo(timeTarget) < 0) {
                 currentHardness++;
-                hardValue = hardValue.divide(BigInteger.TWO);
+                hardValue = hardValue.divide(new BigInteger("2"));
             } else {
                 currentHardness--;
-                hardValue = hardValue.multiply(BigInteger.TWO);
+                hardValue = hardValue.multiply(new BigInteger("2"));
             }
             this.lastTime = thisTime;
             counter = 0;

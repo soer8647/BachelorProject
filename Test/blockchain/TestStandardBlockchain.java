@@ -1,6 +1,7 @@
 package blockchain;
 
 import Impl.StandardBlockChain;
+import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
 import Interfaces.BlockChain;
 import blockchain.Stubs.BlockStub;
@@ -34,11 +35,11 @@ public class TestStandardBlockchain {
     @Test
     public void shouldBeAbleToAddBlockToBlockChain() {
         assertEquals(blockChain.getBlockNumber(), 0);
-        BlockStub newBlockStub = new BlockStub(null);
+        BlockStub newBlockStub = new BlockStub(null, new ArrayListTransactions(), 1);
         newBlockStub.setBlockNumber(1);
         blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 1);
-        newBlockStub = new BlockStub(null);
+        newBlockStub = new BlockStub(null, new ArrayListTransactions(), 1);
         newBlockStub.setBlockNumber(2);
         blockChain.addBlock(newBlockStub);
         assertEquals(blockChain.getBlockNumber(), 2);

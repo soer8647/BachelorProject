@@ -125,6 +125,25 @@ public class TestBlockChainDatabase {
 
 
 
+    @Test
+    public void shouldRemoveAllTransActionThatIsSpent2() {
+        db.addBlock(block1);
+
+        // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,ct0.transactionHash(),tx.getSignature(), 0);
+        ArrayListTransactions transactions = new ArrayListTransactions();
+        transactions.add(t);
+
+        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,ct2);
+        db.addBlock(newBlock);
+        //Sender spends his first 19 and gets ct1 updated to 1
+        assertEquals(ct1.getValue()-9,db.getUnspentTransactionValue(ct1.transactionHash()));
+    }
+
+
+
+
+
     @After
     public void tearDown() throws Exception {
         db.clearTable("BLOCKCHAIN");

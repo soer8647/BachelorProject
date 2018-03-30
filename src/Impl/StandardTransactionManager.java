@@ -6,10 +6,8 @@ import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.*;
 
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.Queue;
+import java.util.*;
+import java.util.stream.Collectors;
 
 public class StandardTransactionManager implements TransactionManager {
     private Queue<Transaction> transactions;
@@ -21,18 +19,31 @@ public class StandardTransactionManager implements TransactionManager {
         transactions = new LinkedList<>();
     }
 
+
+    /**
+     * The method where the transactions are chosen if they are valid and if no other transaction has the same value proof.
+     *
+     * @return Transactions that are valid and ready to be mined in a block. The size is dependent on the configured transaction limit.
+     */
     @Override
     public Transactions getSomeTransactions() {
-        Transactions result = new ArrayListTransactions();
+        Transactions<ArrayList<Transaction>> result = new ArrayListTransactions();
         Iterator<Transaction> iter = transactions.iterator();
         while (result.size() < Configuration.getTransactionLimit()) {
             if (!iter.hasNext()) {
                 break;
             }
             Transaction tran = iter.next();
+            // The transaction might have been spend
             if (validateTransaction(tran)){
-                //TODO validate transaction with the transactions in result. If value proof is reused: throw both transactions away.
-                result.add(tran);
+                // Check if two or more transactions in same batch uses the same value proof
+                ArrayList filtered = result.getTransactions().stream()
+                        .filter(t-> t.getValueProof().toString().equals(tran.getValueProof().toString())).collect(Collectors.toCollection(ArrayList<Transaction>::new));
+                // Only add a transaction if it no other transaction in result has the same value proof.
+                if (filtered.size()==0) {
+                    result.add(tran);
+                }
+
             }
         }
         return result;
@@ -62,32 +73,32 @@ public class StandardTransactionManager implements TransactionManager {
         if(!verifyTransactionSignature(transaction)) {
             return false;
         }
-        //TODO Get unspend transactions as a transactionhistory en stead.
+
         TransactionHistory transactions = blockChain.getTransactionHistory(transaction.getSenderAddress(),transaction.getBlockNumberOfValueProof());
-        int valueToVerify = transaction.getValue();
         int counter = 0;
 
-        Object[] trans = transactions.getConfirmedTransactions().toArray();
-        Object[] coinBases = transactions.getCoinBaseTransactions().toArray();
-        int coinBaseElementNr = coinBases.length-1;
+        ArrayList<VerifiableTransaction> verifiableTransactions = new ArrayList<>();
+        verifiableTransactions.addAll(transactions.getConfirmedTransactions());
+        verifiableTransactions.addAll(transactions.getCoinBaseTransactions());
+        verifiableTransactions.sort(Comparator.comparing(VerifiableTransaction::getBlockNumber).reversed());
 
-        for (int i=trans.length-1;i>=0;i--){
-            CoinBaseTransaction cbt;
-            ConfirmedTransaction tr = (ConfirmedTransaction) trans[i];
-            if (coinBaseElementNr>=0){
-                cbt = ((CoinBaseTransaction)coinBases[coinBaseElementNr]);
-                if(cbt.getBlockNumber()>=tr.getBlockNumber()){
-                    counter+=cbt.getValue();
-                    coinBaseElementNr--;
+        for (VerifiableTransaction vt : verifiableTransactions){
+            if (vt instanceof CoinBaseTransaction){
+                counter+=vt.getValue();
+                if(counter>=transaction.getValue()) return true;
+            }else if (vt instanceof ConfirmedTransaction){
+                ConfirmedTransaction ct = ((ConfirmedTransaction) vt);
+                if(ct.getSenderAddress().toString().equals(transaction.getSenderAddress().toString())){
+                    // The sender spends money
+                    counter-=vt.getValue();
+                }else if (ct.getReceiverAddress().toString().equals(transaction.getSenderAddress().toString())){
+                    // Sender gets money
+                    counter+=vt.getValue();
+                    if(counter>=transaction.getValue()) return true;
                 }
             }
-            if (tr.getReceiverAddress().toString().equals(transaction.getSenderAddress().toString())){
-                counter+=tr.getValue();
-                if (counter>=valueToVerify) return true;
-            }else if(tr.getSenderAddress().toString().equals(transaction.getSenderAddress().toString())){
-                counter -=tr.getValue();
-            }
         }
+
         // If we looked at all the transactions since the proof of funds transaction
         // and it does not sum to at least the transaction value, the transaction is invalid.
         return false;
@@ -111,5 +122,9 @@ public class StandardTransactionManager implements TransactionManager {
     private boolean verifyTransactionSignature(Transaction transaction) {
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         return cs.verify(transaction.getSenderAddress().getPublicKey(),transaction.getSignature(),transaction.transactionHash());
+    }
+
+    public Queue<Transaction> getTransactions() {
+        return transactions;
     }
 }
