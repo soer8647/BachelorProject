@@ -32,20 +32,17 @@ public class UDPClient{
     private final UDPReceiver receiver;
     private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
-    private final Display display;
+    private Display display;
 
-    public UDPClient(int myPort, UDPConnectionData seed, int delay) {
-        this(myPort, new ArrayList<UDPConnectionData>(), delay);
+    public UDPClient(int myPort, UDPConnectionData seed, int delay,boolean doDisplay) {
+        this(myPort, new ArrayList<UDPConnectionData>(), delay,doDisplay);
         publisher.sendJoin(seed.getInetAddress(),seed.getPort());
-    }
-    public UDPClient(int myPort, UDPConnectionData seed) {
-        this(myPort, seed, 0);
     }
 
     public UDPClient(int myPort, List<UDPConnectionData> connectionsData) {
-        this(myPort,connectionsData,0);
+        this(myPort,connectionsData,0,true);
     }
-    public UDPClient(int myPort, List<UDPConnectionData> connectionsData, int delay) {
+    public UDPClient(int myPort, List<UDPConnectionData> connectionsData, int delay,boolean doDisplay) {
         InetAddress myIp = null;
         try {
             myIp = InetAddress.getLocalHost();
@@ -59,13 +56,16 @@ public class UDPClient{
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
-        display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
-
 
         BlockChain blockChain = new StandardBlockChain(genesisBlock);
         TransactionManager transMan = new StandardTransactionManager(blockChain);
         Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
-        nodeRunner = new StandardNodeRunner(node,queue,transMan,display);
+        if (doDisplay) {
+            display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
+            nodeRunner = new StandardNodeRunner(node, queue, transMan, display);
+        } else {
+            nodeRunner = new StandardNodeRunner(node, queue, transMan);
+        }
         receiver = new UDPReceiver(queue,myPort);
 
         publisher = new UDPPublisherNode(myIp,myPort,connectionsData,delay);
@@ -77,7 +77,9 @@ public class UDPClient{
         nodeRunner.stop();
         receiver.stop();
         nodeCommunicationHandler.stop();
-        display.stop();
+        if (display != null) {
+            display.stop();
+        }
     }
 
     public static void main(String[] args) {

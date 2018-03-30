@@ -20,14 +20,14 @@ public class UDPConnectedBlockChains {
         int portB = 6789;
         int portC = 7002;
         int portD = 8003;
-        UDPClient clientA = new UDPClient(portA,new ArrayList<>());
-        UDPClient clientB = new UDPClient(portB, new UDPConnectionData(IPAddress,portA), 100);
-        UDPClient clientC = new UDPClient(portC, new UDPConnectionData(IPAddress,portB), 100);
+        UDPClient clientA = new UDPClient(portA,new ArrayList<>(),100,true);
+        UDPClient clientB = new UDPClient(portB, new UDPConnectionData(IPAddress,portA), 100,true);
+        UDPClient clientC = new UDPClient(portC, new UDPConnectionData(IPAddress,portB), 100,true);
         try {
             Thread.sleep(5000);
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-        UDPClient clientD = new UDPClient(portD, new UDPConnectionData(IPAddress,portB), 100);
+        UDPClient clientD = new UDPClient(portD, new UDPConnectionData(IPAddress,portB), 100,true);
     }
 }

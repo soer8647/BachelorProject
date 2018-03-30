@@ -56,8 +56,8 @@ public class DelayTest {
         int portA = 9876;
         int portB = 6789;
 
-        UDPClient clientA = new UDPClient(portA,new ArrayList<>(),delay*100);
-        UDPClient clientB = new UDPClient(portB, new UDPConnectionData(IPAddress,portA),delay*100);
+        UDPClient clientA = new UDPClient(portA,new ArrayList<>(),delay*100,false);
+        UDPClient clientB = new UDPClient(portB, new UDPConnectionData(IPAddress,portA),delay*100,false);
 
         try {
             Thread.sleep(runTime);
