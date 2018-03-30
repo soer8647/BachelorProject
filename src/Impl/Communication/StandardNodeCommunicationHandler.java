@@ -184,8 +184,8 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
             //TODO: Handle other nodes being more than 1 ahead (not done)
+            GlobalCounter.reportConflict();
             if (orphanage.addChain(block,event.getPort())) {
-                GlobalCounter.reportConflict();
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());
             }
             publisher.broadCast(event);
@@ -199,6 +199,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                 // The block was not valid
                 System.out.println("Invalid next block");
                 //TODO not ignore these? (perhaps this is counts as a conflict)
+                GlobalCounter.reportConflict();
             }
         }
     }
