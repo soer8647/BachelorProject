@@ -54,7 +54,7 @@ public class TestStandardTransactionManager {
     @Test
     public void shouldAcceptValidTransactionWhenAdded() {
         // Give transactionmanager some transactions
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
 
         transactionManager.addTransaction(t1);
 
@@ -64,7 +64,7 @@ public class TestStandardTransactionManager {
     @Test
     public void shouldRejectInvalidTransactionsWhenAdded() {
         // Give transactionmanager some transactions
-        Transaction t1 = accountSender1.makeTransaction(receiver1,11,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,11,coinBase0.transactionHash(),0,0);
 
         transactionManager.addTransaction(t1);
 
@@ -74,7 +74,7 @@ public class TestStandardTransactionManager {
     @Test
     public void shouldOnlyReturnTransactionsWithUniqueValueProof() {
         // Give transactionmanager some transactions
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
 
         transactionManager.addTransaction(t1);
         transactionManager.addTransaction(t1);

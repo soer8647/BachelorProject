@@ -130,7 +130,7 @@ public class TestBlockChainDatabase {
         db.addBlock(block1);
 
         // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
-        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,ct0.transactionHash(),tx.getSignature(), 0);
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,ct0.transactionHash(),tx.getSignature(), 0,0);
         ArrayListTransactions transactions = new ArrayListTransactions();
         transactions.add(t);
 

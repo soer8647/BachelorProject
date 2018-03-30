@@ -59,7 +59,7 @@ public class TestDBTransactionManager {
 
     @Test
     public void shouldAddTransactionToQueue() {
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
         transactionManager.addTransaction(t1);
 
         assertEquals(1,transactionManager.getTransactionQueue().size());
@@ -67,15 +67,15 @@ public class TestDBTransactionManager {
 
     @Test
     public void shouldValidateATransaction() {
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
 
         assertEquals(true,transactionManager.validateTransaction(t1));
     }
 
     @Test
     public void shouldValidateTransactions() {
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
-        Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
+        Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0,0);
         Transactions transactions = new ArrayListTransactions();
         transactions.add(t1);
         transactions.add(t2);
@@ -85,8 +85,8 @@ public class TestDBTransactionManager {
     @Test
     public void shouldNotAcceptInvalidTransactions() {
         //not enough funds
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
-        Transaction t2 = accountSender1.makeTransaction(receiver1,10,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
+        Transaction t2 = accountSender1.makeTransaction(receiver1,10,coinBase0.transactionHash(),0,0);
         Transactions transactions = new ArrayListTransactions();
         transactions.add(t1);
         transactions.add(t2);
@@ -96,9 +96,9 @@ public class TestDBTransactionManager {
     @Test
     public void shouldGetSomeTransactions() {
         //not enough funds
-        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0);
-        Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0);
-        Transaction t3 = accountSender1.makeTransaction(receiver1,4,coinBase0.transactionHash(),0);
+        Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
+        Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0,0);
+        Transaction t3 = accountSender1.makeTransaction(receiver1,4,coinBase0.transactionHash(),0,0);
         transactionManager.addTransaction(t1);
         transactionManager.addTransaction(t2);
         transactionManager.addTransaction(t3);
