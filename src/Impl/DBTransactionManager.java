@@ -26,8 +26,12 @@ public class DBTransactionManager implements TransactionManager{
         Iterator<Transaction> iter = transactionQueue.iterator();
         HashMap<Address,Integer> senderMap = new HashMap<>();
         while (iter.hasNext() && result.size()<Configuration.getTransactionLimit()){
-            //TODO check that the transaction does not exist in block chain
             Transaction t = iter.next();
+            //Check if the transaction exists in the block chain
+            if (blockChainDatabase.doesTransactionExist(t)){
+                iter.remove();
+                continue;
+            }
             if (!senderMap.keySet().contains(t.getSenderAddress())){
                 //Put sender and balance - t_value in map
                 int balance = blockChainDatabase.getBalance(t.getSenderAddress());
@@ -65,8 +69,8 @@ public class DBTransactionManager implements TransactionManager{
      */
     @Override
     public boolean validateTransaction(Transaction transaction) {
-        //TODO check that the transaction does not exist in block chain
-        if(!verifyTransactionSignature(transaction)) {
+
+        if(!verifyTransactionSignature(transaction) || blockChainDatabase.doesTransactionExist(transaction)) {
             return false;
         }
         if (blockChainDatabase.getUnspentTransactionValue(transaction.getValueProof())>transaction.getValue()){
@@ -97,10 +101,10 @@ public class DBTransactionManager implements TransactionManager{
         // Create a map from sender to transactions.
         Map<Address,ArrayList<Transaction>> sendermap = new HashMap<>();
         for (Transaction t:validateTransactions){
-            if(!verifyTransactionSignature(t)) {
+            // Check the signature of the transaction and check if the transaction exists in the block chain.
+            if(!verifyTransactionSignature(t) || blockChainDatabase.doesTransactionExist(t)) {
                 return false;
             }
-            //TODO check that the transaction does not exist in block chain
             if (sendermap.keySet().contains(t.getSenderAddress())){
                 sendermap.get(t.getSenderAddress()).add(t);
             }   else {
