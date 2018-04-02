@@ -14,7 +14,8 @@ public class EmptyTransactionsManager implements TransactionManager {
     }
 
     @Override
-    public void addTransaction(Transaction transaction) {
+    public boolean addTransaction(Transaction transaction) {
+        return true;
     }
 
     @Override

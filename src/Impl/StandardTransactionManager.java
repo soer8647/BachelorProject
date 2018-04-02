@@ -53,11 +53,13 @@ public class StandardTransactionManager implements TransactionManager {
      * @param transaction       The transaction to add.
      */
     @Override
-    public void addTransaction(Transaction transaction) {
+    public boolean addTransaction(Transaction transaction) {
         if (validateTransaction(transaction)){
             this.transactions.add(transaction);
+            return true;
         }else {
             System.out.println(" Invalid transaction received");
+            return false;
         }
     }
 

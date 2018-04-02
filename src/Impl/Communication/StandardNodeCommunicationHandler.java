@@ -205,10 +205,11 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
 
     @Override
     public void handleNewTransaction(TransactionEvent transactionEvent) {
-        //TODO validate transaction
         // put into Node's queue of potential transactions
-        nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction());
-        //publisher.broadCast(transactionEvent); TODO: make sure that this doesn't start endless loop
+        //the TransactionManager should validate the transaction
+        if (nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction())) {
+            publisher.broadCast(transactionEvent);
+        }
     }
 
     @Override

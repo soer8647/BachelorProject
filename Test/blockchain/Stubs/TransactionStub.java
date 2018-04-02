@@ -11,13 +11,12 @@ import java.math.BigInteger;
 
 public class TransactionStub implements Transaction{
 
-    private final KeyPair keypair;
     private PublicKeyAddress pk;
 
 
     public TransactionStub() {
         PublicKeyCryptoSystem rsa = new RSA(500);
-        keypair = rsa.generateNewKeys(new BigInteger("3"));
+        KeyPair keypair = rsa.generateNewKeys(new BigInteger("3"));
         pk = new PublicKeyAddress(keypair.getPublicKey());
     }
 

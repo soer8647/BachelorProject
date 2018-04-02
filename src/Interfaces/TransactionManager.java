@@ -6,7 +6,7 @@ public interface TransactionManager {
 
     Collection<Transaction> getSomeTransactions();
 
-    void addTransaction(Transaction transaction);
+    boolean addTransaction(Transaction transaction);
 
     /**
      * Call this function, when a block (and its transactions has been added to the chain, and should no longer be in the pool of new transactions

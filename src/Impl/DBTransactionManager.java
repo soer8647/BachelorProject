@@ -51,9 +51,12 @@ public class DBTransactionManager implements TransactionManager{
     }
 
     @Override
-    public void addTransaction(Transaction transaction) {
-        if (validateTransaction(transaction))
+    public boolean addTransaction(Transaction transaction) {
+        if (validateTransaction(transaction)) {
             transactionQueue.add(transaction);
+            return true;
+        }
+        return false;
     }
 
     @Override

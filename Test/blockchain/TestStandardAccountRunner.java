@@ -86,6 +86,7 @@ public class TestStandardAccountRunner {
         assertEquals(senderAddress.toString(),account.getAddress().toString());
     }
 
+    /*
     @Test
     public void shouldDelegateTransaction() {
         //Transaction transaction = account.makeTransaction(account.getAddress(), receiverAddress,1,new BigInteger("42"),1);
@@ -100,6 +101,7 @@ public class TestStandardAccountRunner {
         }
         assertEquals(1,accountRunner.getEventQueue().size());
     }
+    */
 
     @Test
     public void shouldGetBalanceFromHistory() {
