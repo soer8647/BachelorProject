@@ -34,7 +34,7 @@ public class TestBlockChainDatabase {
         System.out.println("Running setup");
         tx = new TransactionStub();
 
-        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 6);
+        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 5);
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
@@ -148,7 +148,7 @@ public class TestBlockChainDatabase {
 
     @Test
     public void shouldBeAbleToTellIfATransactionExistsInBlockChain() {
-        db.addTransaction(stx,1);
+        db.addTransaction(stx,6);
         assertEquals(true,db.doesTransactionExist(stx));
     }
 
