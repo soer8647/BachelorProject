@@ -1,19 +1,17 @@
 package GUI;
 //Imports are listed in full to show what's being used
 //could just import javax.swing.* and java.awt.* etc..
-import Crypto.Interfaces.PublicKey;
 import Interfaces.Block;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.WindowEvent;
 
-public class GuiApp implements Display{
+public class JFrameListDisplay implements SimpleListDisplay {
 
     private final DefaultListModel model;
     private JFrame guiFrame;
 
-    public GuiApp(String title)
+    public JFrameListDisplay(String title)
     {
         guiFrame = new JFrame();
 

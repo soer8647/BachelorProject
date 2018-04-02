@@ -1,6 +1,6 @@
 package Impl.Communication;
 
-import GUI.Display;
+import GUI.SimpleListDisplay;
 import Impl.Communication.Events.MinedBlockEvent;
 import Impl.TransactionHistory;
 import Interfaces.*;
@@ -15,14 +15,14 @@ import java.util.concurrent.Semaphore;
 
 public class StandardNodeRunner implements NodeRunner {
     private final TransactionManager transactionManager;
-    private final Display display;
+    private final SimpleListDisplay display;
     private Node node;
     private boolean interrupted = false;
     private Block specialBlock;
     private Semaphore lock = new Semaphore(0);
 
     public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager) {
-        this(node, eventQueue, transactionManager, new Display() {
+        this(node, eventQueue, transactionManager, new SimpleListDisplay() {
             @Override
             public void addToDisplay(Object o) {
             }
@@ -37,7 +37,7 @@ public class StandardNodeRunner implements NodeRunner {
         });
     }
 
-    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager,Display display) {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, SimpleListDisplay display) {
         this.node = node;
         this.transactionManager = transactionManager;
         this.display = display;

@@ -1,6 +1,6 @@
 package GUI;
 
-public interface Display {
+public interface SimpleListDisplay {
 
     void addToDisplay(Object o);
 

@@ -3,8 +3,8 @@ package FakeClients;
 import Configuration.Configuration;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import GUI.Display;
-import GUI.GuiApp;
+import GUI.SimpleListDisplay;
+import GUI.JFrameListDisplay;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;
@@ -30,7 +30,7 @@ public class UDPClient{
     private final UDPReceiver receiver;
     private final UDPPublisherNode publisher;
     private final NodeCommunicationHandler nodeCommunicationHandler;
-    private Display display;
+    private SimpleListDisplay display;
 
     public UDPClient(int myPort, UDPConnectionData seed, int delay,boolean doDisplay) {
         this(myPort, new ArrayList<>(), delay,doDisplay);
@@ -59,7 +59,7 @@ public class UDPClient{
         TransactionManager transMan = new StandardTransactionManager(blockChain);
         Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
         if (doDisplay) {
-            display = new GuiApp(node1Address.getPublicKey() + " - " + myPort);
+            display = new JFrameListDisplay(node1Address.getPublicKey() + " - " + myPort);
             nodeRunner = new StandardNodeRunner(node, queue, transMan, display);
         } else {
             nodeRunner = new StandardNodeRunner(node, queue, transMan);
