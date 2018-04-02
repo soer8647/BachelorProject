@@ -1,13 +1,12 @@
 package Impl;
 
+import Configuration.Configuration;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
-import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
-import Interfaces.HashingAlgorithm;
 import Interfaces.Transaction;
 
 import java.math.BigInteger;
@@ -16,27 +15,21 @@ import java.math.BigInteger;
 *
 * */
 public class StandardAccount implements Account{
-    private PublicKeyCryptoSystem cryptoSystem;
     private RSAPrivateKey privateKey;
     private RSAPublicKey publicKey;
     private PublicKeyAddress address;
-    private HashingAlgorithm hashingAlgorithm;
 
-    public StandardAccount(PublicKeyCryptoSystem cryptoSystem, HashingAlgorithm hashingAlgorithm) {
-        this.cryptoSystem = cryptoSystem;
-        this.hashingAlgorithm = hashingAlgorithm;
-        KeyPair keyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
+    public StandardAccount() {
+        KeyPair keyPair = Configuration.getCryptoSystem().generateNewKeys(BigInteger.valueOf(3));
 
         privateKey = keyPair.getPrivateKey();
         publicKey = keyPair.getPublicKey();
         address = new PublicKeyAddress(publicKey);
     }
 
-    public StandardAccount(PublicKeyCryptoSystem cryptoSystem, RSAPrivateKey privateKey, RSAPublicKey publicKey, HashingAlgorithm hashingAlgorithm) {
-        this.cryptoSystem = cryptoSystem;
+    public StandardAccount(RSAPrivateKey privateKey, RSAPublicKey publicKey) {
         this.privateKey = privateKey;
         this.publicKey = publicKey;
-        this.hashingAlgorithm = hashingAlgorithm;
         address = new PublicKeyAddress(publicKey);
     }
 
@@ -50,11 +43,6 @@ public class StandardAccount implements Account{
         return privateKey;
     }
 
-
-    @Override
-    public PublicKeyCryptoSystem getCryptoSystem() {
-        return cryptoSystem;
-    }
 
     @Override
     public RSAPublicKey getPublicKey() {
@@ -71,12 +59,8 @@ public class StandardAccount implements Account{
     public Transaction makeTransaction(Address receiver, int value, BigInteger valueProof, int blockValueProof,int timestamp) {
 
         String transaction = address.toString()+receiver.toString()+value+valueProof.toString()+timestamp;
-        BigInteger signature = getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
+        BigInteger signature = Configuration.getCryptoSystem().sign(privateKey,Configuration.hash(transaction));
 
         return new StandardTransaction(address,receiver,value,valueProof,signature, blockValueProof, timestamp);
-    }
-
-    public HashingAlgorithm getHashingAlgorithm() {
-        return hashingAlgorithm;
     }
 }

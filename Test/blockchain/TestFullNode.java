@@ -7,7 +7,6 @@ import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.*;
-import Impl.Hashing.SHA256;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
@@ -126,8 +125,8 @@ public class TestFullNode {
         // Make a transaction
         BigInteger valueProofFake = new TransactionStub().transactionHash();
 
-        Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
-        Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
+        Account sender = new StandardAccount(privateKeySender, publicKeySender);
+        Account receiver = new StandardAccount(privateKeyReceiver,publicKeyReceiver);
 
         Transaction transaction = sender.makeTransaction(receiverAddress,5,valueProofFake, 0,0);
         Transactions transactions = new ArrayListTransactions();
@@ -189,8 +188,8 @@ public class TestFullNode {
 
         Address receiverAddress = new PublicKeyAddress(publicKeyReceiver);
 
-        Account sender = new StandardAccount(cryptoSystem, privateKeySender, publicKeySender, new SHA256());
-        Account receiver = new StandardAccount(cryptoSystem, privateKeyReceiver,publicKeyReceiver,new SHA256());
+        Account sender = new StandardAccount(privateKeySender, publicKeySender);
+        Account receiver = new StandardAccount(privateKeyReceiver,publicKeyReceiver);
         System.out.println(node.getBlockChain().getBlockNumber());
 
         CoinBaseTransaction valueProof1 = new StandardCoinBaseTransaction(senderAddress,100,1);

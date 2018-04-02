@@ -180,6 +180,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         if (block.getBlockNumber() < nodeRunner.getBlockNumber()) {
             //we dont care about old
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
+
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
             GlobalCounter.reportConflict();

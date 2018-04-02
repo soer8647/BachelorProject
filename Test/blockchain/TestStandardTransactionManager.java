@@ -4,7 +4,6 @@ import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.*;
-import Impl.Hashing.SHA256;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.Transaction;
@@ -35,7 +34,7 @@ public class TestStandardTransactionManager {
 
         keyPairSender = rsa.generateNewKeys(new BigInteger("3"));
         sender1 = new PublicKeyAddress(keyPairSender.getPublicKey());
-        accountSender1 = new StandardAccount(new RSA(500),keyPairSender.getPrivateKey(),keyPairSender.getPublicKey(),new SHA256());
+        accountSender1 = new StandardAccount(keyPairSender.getPrivateKey(),keyPairSender.getPublicKey());
         keyPairReceiver = rsa.generateNewKeys(new BigInteger("3"));
         receiver1 = new PublicKeyAddress(keyPairReceiver.getPublicKey());
 

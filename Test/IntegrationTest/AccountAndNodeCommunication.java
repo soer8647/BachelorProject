@@ -15,12 +15,14 @@ import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.Communication.UDP.UDPReceiver;
-import Impl.Hashing.SHA256;
 import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
-import Interfaces.Communication.*;
+import Interfaces.Communication.AccountRunner;
+import Interfaces.Communication.Event;
+import Interfaces.Communication.NodeCommunicationHandler;
+import Interfaces.Communication.NodeRunner;
 import blockchain.Stubs.TransactionStub;
 
 import java.math.BigInteger;
@@ -79,9 +81,9 @@ public class AccountAndNodeCommunication {
 
         nodeAddress = new PublicKeyAddress(publicKeyNode);
 
-        account = new StandardAccount(cryptoSystem,privateKeyAccount,publicKeyAccount,new SHA256());
+        account = new StandardAccount(privateKeyAccount,publicKeyAccount);
 
-        nodeAccount = new StandardAccount(cryptoSystem,privateKeyNode,publicKeyNode,new SHA256());
+        nodeAccount = new StandardAccount(privateKeyNode,publicKeyNode);
 
         Transaction tx = new TransactionStub();
         Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);

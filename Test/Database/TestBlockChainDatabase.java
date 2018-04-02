@@ -152,6 +152,12 @@ public class TestBlockChainDatabase {
         assertEquals(true,db.doesTransactionExist(stx));
     }
 
+    @Test
+    public void shouldBeAbleToTellIfATransactionDoesNotExistInBlockChain() {
+        assertEquals(false,db.doesTransactionExist(tx));
+    }
+
+
     @After
     public void tearDown() throws Exception {
         db.clearTable("BLOCKCHAIN");

@@ -1,11 +1,11 @@
 package blockchain;
 
+import Configuration.Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import Impl.Hashing.SHA256;
 import Impl.PublicKeyAddress;
 import Impl.StandardAccount;
 import Interfaces.Account;
@@ -18,7 +18,8 @@ import org.junit.Test;
 
 import java.math.BigInteger;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertNotEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TestStandardAccount {
     PublicKeyCryptoSystem cryptoSystem;
@@ -27,7 +28,7 @@ public class TestStandardAccount {
     @Before
     public void setUp(){
         cryptoSystem = new RSA(1000);
-        account = new StandardAccount(cryptoSystem, new SHA256());
+        account = new StandardAccount();
     }
 
     @Test
@@ -41,11 +42,6 @@ public class TestStandardAccount {
     }
 
     @Test
-    public void shouldUseRsa() {
-        assertEquals(account.getCryptoSystem().getClass(), RSA.class);
-    }
-
-    @Test
     public void shouldHavePublicKey() {
         assertNotEquals(account.getPublicKey(),null);
     }
@@ -56,7 +52,7 @@ public class TestStandardAccount {
         KeyPair rsaKeyPair = cryptoSystem.generateNewKeys(BigInteger.valueOf(3));
         RSAPublicKey publicKey = rsaKeyPair.getPublicKey();
         RSAPrivateKey privateKey = rsaKeyPair.getPrivateKey();
-        assertNotEquals(new StandardAccount(cryptoSystem,privateKey,publicKey, new SHA256()),null);
+        assertNotEquals(new StandardAccount(privateKey,publicKey),null);
     }
 
     @Test
@@ -78,7 +74,7 @@ public class TestStandardAccount {
         Transaction transaction = account.makeTransaction(receiver,1,valueProof, 0,0);
 
         String tx = sender.toString()+receiver.toString()+1+valueProof.toString()+0;
-        BigInteger hash = account.getHashingAlgorithm().hash(tx);
+        BigInteger hash = Configuration.hash(tx);
 
         assertTrue(cryptoSystem.verify(publicKey,transaction.getSignature(),hash));
     }
