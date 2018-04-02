@@ -70,7 +70,7 @@ public class StandardAccount implements Account{
     @Override
     public Transaction makeTransaction(Address receiver, int value, BigInteger valueProof, int blockValueProof,int timestamp) {
 
-        String transaction = address.toString()+receiver.toString()+value+valueProof.toString();
+        String transaction = address.toString()+receiver.toString()+value+valueProof.toString()+timestamp;
         BigInteger signature = getCryptoSystem().sign(privateKey,hashingAlgorithm.hash(transaction));
 
         return new StandardTransaction(address,receiver,value,valueProof,signature, blockValueProof, timestamp);

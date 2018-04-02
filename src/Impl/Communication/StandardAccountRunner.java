@@ -85,7 +85,7 @@ public class StandardAccountRunner implements AccountRunner {
         try {
         Pair<BigInteger,Integer> proof = getValueProof(value);
             for (UDPConnectionData d: udpConnectionsData) {
-                int timestamp = 1; //TODO get actual timestamp
+                int timestamp = eventHandler.getBlockTime();
                 eventQueue.put(new TransactionEvent(account.makeTransaction(address, value, proof.getKey(), proof.getValue(),timestamp), d.getPort(),d.getInetAddress()));
             }
         } catch (InterruptedException |IllegalTransactionException e) {
