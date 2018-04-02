@@ -3,12 +3,18 @@ package Configuration;
 import Crypto.Impl.RSA;
 import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
+import Crypto.Interfaces.PublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Hashing.SHA256;
+import Impl.PublicKeyAddress;
+import Impl.StandardBlock;
+import Impl.Transactions.StandardCoinBaseTransaction;
+import Interfaces.Block;
 import Interfaces.HashingAlgorithm;
 
 import java.math.BigInteger;
 import java.time.Duration;
+import java.util.ArrayList;
 
 public class Configuration {
 
@@ -23,6 +29,10 @@ public class Configuration {
     private static HashingAlgorithm hasher = new SHA256();
     private static int max_package_size = 8192;
     private static Duration hardnessTimeTarget = Duration.ofSeconds(4);
+
+    private static PublicKey secretmanKey = new RSAPublicKey(BigInteger.ONE,BigInteger.valueOf(11));
+    public static Block genesisblock = new StandardBlock(BigInteger.ZERO,0,BigInteger.ZERO,0,new ArrayList<>(),0, new StandardCoinBaseTransaction(new PublicKeyAddress(secretmanKey) , getBlockReward(), 0));
+
 
     /**
      * @return The corresponding Biginteger of a hash

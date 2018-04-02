@@ -60,8 +60,8 @@ public class DBTransactionManager implements TransactionManager{
     }
 
     @Override
-    public void removeTransactions(Collection<Transaction> transactions) {
-        throw new ToBeImplementedException();
+    public void removeTransactions(Collection<Transaction> toBeRemovedTransactions) {
+        this.transactionQueue.removeAll(toBeRemovedTransactions);
     }
 
     /**

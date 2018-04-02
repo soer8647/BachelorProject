@@ -45,7 +45,7 @@ public class BlockChainDatabase implements BlockChain{
                 +  " HARDNESS_PARAM INT NOT NULL,"
                 +  " PREV_BLOCK_HASH VARCHAR(255) NOT NULL,"
                 +  " BLOCK_HASH VARCHAR(255) NOT NULL,"
-                +  " COINBASE_TRANS VARCHAR(255) NOT NULL"
+                +  " COINBASE_TRANS CLOB(64000) NOT NULL"
                 +  " ) ";
 
         String transactions =  "CREATE TABLE %s"

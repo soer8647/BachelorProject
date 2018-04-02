@@ -48,14 +48,13 @@ public class UDPClient{
             e.printStackTrace();
         }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayList<>(),0,new CoinBaseTransactionStub());
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
         Address node1Address = new PublicKeyAddress(node1KeyPair.getPublicKey());
 
 
-        BlockChain blockChain = new StandardBlockChain(genesisBlock);
+        BlockChain blockChain = new StandardBlockChain(Configuration.genesisblock);
         TransactionManager transMan = new StandardTransactionManager(blockChain);
         Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
         if (doDisplay) {
