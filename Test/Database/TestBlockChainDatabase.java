@@ -34,7 +34,7 @@ public class TestBlockChainDatabase {
         System.out.println("Running setup");
         tx = new TransactionStub();
 
-        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 5);
+        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 6);
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
