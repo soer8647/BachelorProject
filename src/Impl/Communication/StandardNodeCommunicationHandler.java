@@ -154,7 +154,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         if (child.getPreviousHash().equals(block.hash())) {
             if (block.getBlockNumber()<=nodeRunner.getBlockNumber() && nodeRunner.validateBlock(block)) {
                 Deque<Block> chain = orphanage.popChain(key);
-                //TODO: perform rollback (if it's the best chain)
                 if (chain.peekLast().getBlockNumber() > nodeRunner.getBlockNumber()) {
                     System.out.println("what we do here is go Back!");
                     nodeRunner.rollback(chain,chain.peekFirst().getBlockNumber());
@@ -183,7 +182,6 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         } else if (block.getBlockNumber() == nodeRunner.getBlockNumber()) {
             //TODO: Change (maybe) if last block was received
         } else if (block.getBlockNumber() > nodeRunner.getBlockNumber()+1) {
-            //TODO: Handle other nodes being more than 1 ahead (not done)
             GlobalCounter.reportConflict();
             if (orphanage.addChain(block,event.getPort())) {
                 publisher.requestBlock(block.getBlockNumber()-1,event.getIp(),event.getPort());

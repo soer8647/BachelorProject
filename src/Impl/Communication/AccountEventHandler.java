@@ -38,8 +38,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
     public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, List<UDPConnectionData> connectionsData) {
         this.transactionHistory = transactionHistory;
         receiver = new UDPReceiver(eventQueue, portNumber);
-        InetAddress address = null;
-        try{address= InetAddress.getLocalHost();
+        try{
+            InetAddress address= InetAddress.getLocalHost();
             publisher = new UDPPublisher(address, portNumber,connectionsData);
         } catch (UnknownHostException e) {
             e.printStackTrace();
@@ -86,8 +86,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
                 }
             } else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent) {
                 publisher.broadCast(event);
-            } else if (event instanceof MinedBlockEvent) {
-                blockTime = ((MinedBlockEvent) event).getBlock().getBlockNumber();
+            } else if (event instanceof ReceivedBlockEvent) {
+                blockTime = ((ReceivedBlockEvent) event).getBlock().getBlockNumber();
             }
             semaphore.release();
         } catch (InterruptedException e) {
