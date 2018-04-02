@@ -70,7 +70,7 @@ public class TestStandardTransaction {
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
 
-            String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+valueProof.toString();
+            String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+valueProof.toString()+standardTransaction.getTimestamp();
             byte[] hash = sha256.digest(s.getBytes());
             BigInteger hashValue = new BigInteger(1,hash);
             assertEquals(hashValue,standardTransaction.transactionHash());

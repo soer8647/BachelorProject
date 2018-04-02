@@ -1,8 +1,6 @@
 package Impl.Communication;
 
-import Impl.Communication.Events.TransactionEvent;
-import Impl.Communication.Events.TransactionHistoryRequestEvent;
-import Impl.Communication.Events.TransactionHistoryResponseEvent;
+import Impl.Communication.Events.*;
 import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisher;
 import Impl.Communication.UDP.UDPReceiver;
@@ -29,21 +27,20 @@ public class AccountEventHandler implements EventHandler,Runnable{
 
     private LinkedBlockingQueue<Event> eventQueue;
     private TransactionHistory transactionHistory;
-    private int port;
     private UDPReceiver receiver;
     private UDPPublisher publisher;
     private Thread t;
     private Semaphore semaphore;
     private Map<LocalDateTime,List<TransactionHistory>> historyMap;
+    private int blockTime = 0;
 
 
     public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, List<UDPConnectionData> connectionsData) {
         this.transactionHistory = transactionHistory;
-        port = portNumber;
-        receiver = new UDPReceiver(eventQueue,port);
+        receiver = new UDPReceiver(eventQueue, portNumber);
         InetAddress address = null;
         try{address= InetAddress.getLocalHost();
-            publisher = new UDPPublisher(address, port,connectionsData);
+            publisher = new UDPPublisher(address, portNumber,connectionsData);
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }
@@ -89,6 +86,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
                 }
             } else if (event instanceof TransactionEvent || event instanceof TransactionHistoryRequestEvent) {
                 publisher.broadCast(event);
+            } else if (event instanceof MinedBlockEvent) {
+                blockTime = ((MinedBlockEvent) event).getBlock().getBlockNumber();
             }
             semaphore.release();
         } catch (InterruptedException e) {
@@ -99,6 +98,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
 
     @Override
     public void run() {
+        JoinEvent event = new JoinEvent(publisher.getLocalPort(),publisher.getLocalAddress());
+        publisher.broadCast(event);
         while (!Thread.currentThread().isInterrupted()){
             try{handleEvent(eventQueue.take());
             } catch (InterruptedException e) {
@@ -110,5 +111,9 @@ public class AccountEventHandler implements EventHandler,Runnable{
     public void start(){
         t = new Thread(this);
         t.start();
+    }
+
+    public int getBlockTime() {
+        return blockTime;
     }
 }

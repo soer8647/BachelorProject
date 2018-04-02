@@ -34,7 +34,7 @@ public class TestBlockChainDatabase {
         System.out.println("Running setup");
         tx = new TransactionStub();
 
-        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
+        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 5);
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
@@ -70,6 +70,12 @@ public class TestBlockChainDatabase {
         db.addBlock(block2);
         String b = block2.toString();
         assertEquals(b,db.getBlock(block2.getBlockNumber()).toString());
+    }
+
+    @Test
+    public void shouldRememberTimestamp() {
+        db.addTransaction(stx,0);
+        assertEquals(5,db.getTransaction(stx.transactionHash(),0).getTimestamp());
     }
 
     @Test

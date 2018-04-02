@@ -44,7 +44,7 @@ public class StandardTransaction implements Transaction {
      */
     @Override
     public BigInteger transactionHash() {
-            return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString());
+            return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString()+timestamp);
     }
 
     @Override

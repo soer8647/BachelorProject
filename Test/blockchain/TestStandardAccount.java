@@ -77,7 +77,7 @@ public class TestStandardAccount {
 
         Transaction transaction = account.makeTransaction(receiver,1,valueProof, 0,0);
 
-        String tx = sender.toString()+receiver.toString()+1+valueProof.toString();
+        String tx = sender.toString()+receiver.toString()+1+valueProof.toString()+0;
         BigInteger hash = account.getHashingAlgorithm().hash(tx);
 
         assertTrue(cryptoSystem.verify(publicKey,transaction.getSignature(),hash));
