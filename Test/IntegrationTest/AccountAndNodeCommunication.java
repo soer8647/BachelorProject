@@ -15,7 +15,6 @@ import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.Communication.UDP.UDPReceiver;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
@@ -88,7 +87,7 @@ public class AccountAndNodeCommunication {
         Transaction tx = new TransactionStub();
         Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
-        Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0,ct);
+        Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),0,ct);
         blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);
         transactionQueue = new LinkedBlockingQueue<>();
         node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new StandardTransactionManager(blockchain));

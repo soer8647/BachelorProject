@@ -1,15 +1,16 @@
 package FakeClients;
 
 import Impl.ToBeImplementedException;
-import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
-import Interfaces.Transactions;
+
+import java.util.ArrayList;
+import java.util.Collection;
 
 public class EmptyTransactionsManager implements TransactionManager {
     @Override
-    public Transactions getSomeTransactions() {
-        return new ArrayListTransactions();
+    public Collection<Transaction> getSomeTransactions() {
+        return new ArrayList<>();
     }
 
     @Override
@@ -22,12 +23,12 @@ public class EmptyTransactionsManager implements TransactionManager {
     }
 
     @Override
-    public boolean validateTransactions(Transactions transactions) {
+    public boolean validateTransactions(Collection<Transaction> transactions) {
         throw new ToBeImplementedException();
     }
 
     @Override
-    public void removeTransactions(Transactions transactions) {
+    public void removeTransactions(Collection<Transaction> transactions) {
 
     }
 }

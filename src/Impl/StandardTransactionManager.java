@@ -2,7 +2,6 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.*;
 
@@ -11,7 +10,6 @@ import java.util.stream.Collectors;
 
 public class StandardTransactionManager implements TransactionManager {
     private Queue<Transaction> transactions;
-    private Node node;
     private BlockChain blockChain;
 
     public StandardTransactionManager(BlockChain blockChain) {
@@ -26,8 +24,8 @@ public class StandardTransactionManager implements TransactionManager {
      * @return Transactions that are valid and ready to be mined in a block. The size is dependent on the configured transaction limit.
      */
     @Override
-    public Transactions getSomeTransactions() {
-        Transactions<ArrayList<Transaction>> result = new ArrayListTransactions();
+    public Collection<Transaction> getSomeTransactions() {
+        Collection<Transaction> result = new ArrayList<>();
         Iterator<Transaction> iter = transactions.iterator();
         while (result.size() < Configuration.getTransactionLimit()) {
             if (!iter.hasNext()) {
@@ -37,8 +35,8 @@ public class StandardTransactionManager implements TransactionManager {
             // The transaction might have been spend
             if (validateTransaction(tran)){
                 // Check if two or more transactions in same batch uses the same value proof
-                ArrayList filtered = result.getTransactions().stream()
-                        .filter(t-> t.getValueProof().toString().equals(tran.getValueProof().toString())).collect(Collectors.toCollection(ArrayList<Transaction>::new));
+                ArrayList filtered = result.stream()
+                        .filter(t-> t.getValueProof().toString().equals(tran.getValueProof().toString())).collect(Collectors.toCollection(ArrayList::new));
                 // Only add a transaction if it no other transaction in result has the same value proof.
                 if (filtered.size()==0) {
                     result.add(tran);
@@ -64,8 +62,8 @@ public class StandardTransactionManager implements TransactionManager {
     }
 
     @Override
-    public void removeTransactions(Transactions<Collection<Transaction>> toBeRemovedTransactions) {
-        this.transactions.removeAll(toBeRemovedTransactions.getTransactions());
+    public void removeTransactions(Collection<Transaction> toBeRemovedTransactions) {
+        this.transactions.removeAll(toBeRemovedTransactions);
     }
 
     @Override
@@ -105,9 +103,9 @@ public class StandardTransactionManager implements TransactionManager {
     }
 
     @Override
-    public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
+    public boolean validateTransactions(Collection<Transaction> transactions) {
         //For each transaction
-        for (Transaction t: transactions.getTransactions()) {
+        for (Transaction t: transactions) {
             if(!validateTransaction(t)) {
                 return false;
             }

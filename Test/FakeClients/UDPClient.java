@@ -5,14 +5,12 @@ import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import GUI.Display;
 import GUI.GuiApp;
-import Impl.FlexibleHardnessManager;
 import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPConnectionData;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.Communication.UDP.UDPReceiver;
 import Impl.*;
-import Impl.Transactions.ArrayListTransactions;
 import Interfaces.*;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
@@ -35,7 +33,7 @@ public class UDPClient{
     private Display display;
 
     public UDPClient(int myPort, UDPConnectionData seed, int delay,boolean doDisplay) {
-        this(myPort, new ArrayList<UDPConnectionData>(), delay,doDisplay);
+        this(myPort, new ArrayList<>(), delay,doDisplay);
         publisher.sendJoin(seed.getInetAddress(),seed.getPort());
     }
 
@@ -50,7 +48,7 @@ public class UDPClient{
             e.printStackTrace();
         }
         BlockingQueue<Event> queue = new LinkedBlockingQueue<>();
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),0,new CoinBaseTransactionStub());
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayList<>(),0,new CoinBaseTransactionStub());
 
         PublicKeyCryptoSystem cs = Configuration.getCryptoSystem();
         KeyPair node1KeyPair = cs.generateNewKeys(BigInteger.valueOf(3));
@@ -91,7 +89,7 @@ public class UDPClient{
         }
 //        startUDP(9876,6789,IPAddress);
 
-        List<UDPConnectionData> connectionsData = new ArrayList<UDPConnectionData>();
+        List<UDPConnectionData> connectionsData = new ArrayList<>();
         connectionsData.add(new UDPConnectionData(IPAddress,9876));
         UDPClient client = new UDPClient(6789, connectionsData );
     }

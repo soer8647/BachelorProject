@@ -2,7 +2,6 @@ package blockchain;
 
 import Impl.BlockChainDatabase;
 import Impl.StandardBlock;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Block;
@@ -13,6 +12,7 @@ import org.junit.AfterClass;
 import org.junit.Before;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 public class TestFullNodeWithBlockChainDB {
 
@@ -28,13 +28,13 @@ public class TestFullNodeWithBlockChainDB {
 
     @Before
     public void setUp() {
-        bcdb = new BlockChainDatabase("TESTFULLNODEDB", block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct));
+        bcdb = new BlockChainDatabase("TESTFULLNODEDB", block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 0, ct));
         System.out.println("Running setup");
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 1);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 10, 0);
-        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
-        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 2, ct);
+        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 1, ct);
+        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 2, ct);
     }
 
     @AfterClass

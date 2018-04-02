@@ -16,7 +16,7 @@ public interface Block extends Serializable{
     /**
      * @return The transactions inside this block.
      */
-    Transactions<Collection<Transaction>> getTransactions();
+    Collection<Transaction> getTransactions();
 
     /**
      * @return The number of the block

@@ -7,7 +7,6 @@ import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.*;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.*;
@@ -21,6 +20,7 @@ import org.junit.Test;
 
 import java.io.File;
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 
 import static org.junit.Assert.*;
@@ -50,8 +50,8 @@ public class TestFullNode {
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
-        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 0, ct);
-        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayListTransactions(), 1, ct);
+        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 0, ct);
+        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 1, ct);
         //SETUP ACCOUNTS AND TRANSACTIONS
         cryptoSystem = new RSA(Configuration.getKeyBitLength());
 
@@ -93,7 +93,7 @@ public class TestFullNode {
         int hashCode = falcon.hashCode();
         //Make int to a BigInteger
         BigInteger integer = new BigInteger(Integer.toString(hashCode));
-        node.mine(Configuration.hash(integer.toString()),new ArrayListTransactions());
+        node.mine(Configuration.hash(integer.toString()),new ArrayList<>());
         //The genesisblock should have blocknumber 0.
         assertEquals(blocks+1,node.getBlockChain().getBlockNumber());
     }
@@ -110,7 +110,7 @@ public class TestFullNode {
         int blocks = blockChain.getBlockNumber();
         for (int i=1;i<6;i++){
             BigInteger previousHash = node.getBlockChain().getBlock(i-1).hash();
-            node.mine(Configuration.hash(previousHash.toString()),new ArrayListTransactions());
+            node.mine(Configuration.hash(previousHash.toString()),new ArrayList<>());
             assertEquals(blocks+i,node.getBlockChain().getBlockNumber());
         }
     }
@@ -129,13 +129,13 @@ public class TestFullNode {
         Account receiver = new StandardAccount(privateKeyReceiver,publicKeyReceiver);
 
         Transaction transaction = sender.makeTransaction(receiverAddress,5,valueProofFake, 0,0);
-        Transactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
 
 
         //make block with the transaction
         Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1, ct);
-        Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayListTransactions(),0, ct);
+        Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayList<>(),0, ct);
 
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(block);
@@ -146,7 +146,7 @@ public class TestFullNode {
 
         //Make new transaction to verify by value
         Transaction validTransaction = receiver.makeTransaction(senderAddress,5,transaction.transactionHash(), 1,0);
-        Transactions<Collection<Transaction>> transactionsToVerify = new ArrayListTransactions();
+        Collection<Transaction> transactionsToVerify = new ArrayList<>();
         transactionsToVerify.add(validTransaction);
         assertTrue(node.validateTransactions(transactionsToVerify));
 
@@ -154,7 +154,7 @@ public class TestFullNode {
 
         //Make transaction to deny by value
         Transaction invalidTransaction = receiver.makeTransaction(senderAddress,11,transaction.transactionHash(), 1,0);
-        Transactions transactionsToDeny = new ArrayListTransactions();
+        Collection<Transaction> transactionsToDeny = new ArrayList<>();
         transactionsToDeny.add(invalidTransaction);
 
         // Receiver sends 11. invalid, has 5.
@@ -169,11 +169,11 @@ public class TestFullNode {
 
 
         validTransaction = receiver.makeTransaction(senderAddress,15,transaction.transactionHash(), 1,0);
-        transactionsToVerify = new ArrayListTransactions();
+        transactionsToVerify = new ArrayList<>();
         transactionsToVerify.add(validTransaction);
 
         CoinBaseTransaction cb = new StandardCoinBaseTransaction(receiverAddress,10,2);
-        blockChain.addBlock(new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayListTransactions(),2,cb));
+        blockChain.addBlock(new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayList<>(),2,cb));
 
         // Receiver sends 11. Valid has 15.
 
@@ -193,21 +193,21 @@ public class TestFullNode {
         System.out.println(node.getBlockChain().getBlockNumber());
 
         CoinBaseTransaction valueProof1 = new StandardCoinBaseTransaction(senderAddress,100,1);
-        node.addBlock(new BlockStub(valueProof1, new ArrayListTransactions(), 1));
+        node.addBlock(new BlockStub(valueProof1, new ArrayList<>(), 1));
 
 
         CoinBaseTransaction valueProof2 = new StandardCoinBaseTransaction(senderAddress,100,2);
-        node.addBlock(new BlockStub(valueProof2, new ArrayListTransactions(), 2));
+        node.addBlock(new BlockStub(valueProof2, new ArrayList<>(), 2));
 
 
         //Make transaction from sender
         Transaction transaction = sender.makeTransaction(receiverAddress,5,valueProof1.transactionHash(), 0,0);
-        Transactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(transaction);
 
         //Make transaction from receiver to sender
         Transaction transaction2 = sender.makeTransaction(senderAddress,5,valueProof2.transactionHash(), 0,0);
-        Transactions transactions2 = new ArrayListTransactions();
+        Collection<Transaction> transactions2 = new ArrayList<>();
         transactions.add(transaction2);
 
         node.mine(new BigInteger("42"),transactions);

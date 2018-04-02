@@ -8,6 +8,7 @@ import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeRunner;
 
 import java.util.ArrayDeque;
+import java.util.Collection;
 import java.util.Deque;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
@@ -47,7 +48,7 @@ public class StandardNodeRunner implements NodeRunner {
             @Override
             public void run() {
                 while(!interrupted) {
-                    Transactions trans = transactionManager.getSomeTransactions();
+                    Collection<Transaction> trans = transactionManager.getSomeTransactions();
 
                  //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     lock.release();
@@ -152,7 +153,7 @@ public class StandardNodeRunner implements NodeRunner {
         //reset the potentiel transactionspool ( in the TransactionManager)
         while (removedBlocks.peekFirst() != null) {
         Block block = removedBlocks.removeFirst();
-            for (Transaction t: block.getTransactions().getTransactions()) {
+            for (Transaction t: block.getTransactions()) {
                 if (node.validateTransaction(t)) {
                     transactionManager.addTransaction(t);
                 }

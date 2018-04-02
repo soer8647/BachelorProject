@@ -17,7 +17,7 @@ public interface Node {
      * @param transactions          The transactions to validate and mine in this block
      * @return                      The new block, that has been mined
      */
-    Block mine(BigInteger previousBlockHash, Transactions transactions);
+    Block mine(BigInteger previousBlockHash, Collection<Transaction> transactions);
 
     /**
      * When mining a block or validating a block one should be able to validate that the transactions are valid.
@@ -25,7 +25,7 @@ public interface Node {
      * @param transactions          The transactions to verify.
      * @return                      True is all transactions are valid, false otherwise.
      */
-    boolean validateTransactions(Transactions<Collection<Transaction>> transactions);
+    boolean validateTransactions(Collection<Transaction> transactions);
 
 
     /**

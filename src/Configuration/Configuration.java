@@ -1,6 +1,8 @@
 package Configuration;
 
 import Crypto.Impl.RSA;
+import Crypto.Impl.RSAPrivateKey;
+import Crypto.Impl.RSAPublicKey;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Hashing.SHA256;
 import Interfaces.HashingAlgorithm;
@@ -16,7 +18,7 @@ public class Configuration {
     private static int blockReward = 10;
     private static int hardnessParameter = 14;
     private static int keyBitLength = 500;
-    private static PublicKeyCryptoSystem cryptoSystem = new RSA(keyBitLength);
+    private static PublicKeyCryptoSystem<RSAPublicKey,RSAPrivateKey> cryptoSystem = new RSA(keyBitLength);
     private static int transactionLimit=10;
     private static HashingAlgorithm hasher = new SHA256();
     private static int max_package_size = 8192;

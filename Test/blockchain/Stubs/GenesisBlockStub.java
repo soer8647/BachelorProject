@@ -2,14 +2,15 @@ package blockchain.Stubs;
 
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
-import Interfaces.Transactions;
+import Interfaces.Transaction;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 /*This is a stub to help test*/
 public class GenesisBlockStub implements Block {
     @Override
-    public Transactions getTransactions() {
+    public Collection<Transaction> getTransactions() {
         return null;
     }
 

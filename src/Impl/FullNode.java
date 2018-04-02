@@ -4,7 +4,6 @@ import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.*;
-import Interfaces.HardnessManager;
 
 import java.math.BigInteger;
 import java.util.Collection;
@@ -37,7 +36,7 @@ public class FullNode implements Node {
      * @return                  The new block that was mined
      */
     @Override
-    public Block mine(BigInteger previousBlockHash, Transactions transactions) {
+    public Block mine(BigInteger previousBlockHash, Collection<Transaction> transactions) {
         //Set the hardness parameter
         int hardness = hardnessManager.getHardness();
         //Set the hardness value, by getting the bitsize of the hashing algorithm and shifting right by the hardness parameter.
@@ -52,9 +51,13 @@ public class FullNode implements Node {
                 this.interrupted = false;
                 return null;
             }
+            StringBuilder sb = new StringBuilder();
+            for (Transaction t: transactions){
+                sb.append(t.transactionHash());
+            }
             hash = new BigInteger(String.valueOf(Configuration.hash(
                     previousBlockHash.toString()
-                            + transactions.hashTransactions().toString()
+                            + sb.toString()
                             + nonce.toString()
                             +coinBase.toString())));
             nonce = nonce.add(new BigInteger("1"));
@@ -79,7 +82,7 @@ public class FullNode implements Node {
      * @return              True if all the transactions are valid.
      */
     @Override
-    public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
+    public boolean validateTransactions(Collection<Transaction> transactions) {
         return transactionManager.validateTransactions(transactions);
     }
 

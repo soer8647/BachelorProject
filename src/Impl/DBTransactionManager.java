@@ -2,12 +2,10 @@ package Impl;
 
 import Configuration.Configuration;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.UnspentTransaction;
 import Interfaces.Address;
 import Interfaces.Transaction;
 import Interfaces.TransactionManager;
-import Interfaces.Transactions;
 
 import java.util.*;
 
@@ -21,8 +19,8 @@ public class DBTransactionManager implements TransactionManager{
     }
 
     @Override
-    public Transactions getSomeTransactions() {
-        Transactions<ArrayList<Transaction>> result = new ArrayListTransactions();
+    public Collection<Transaction> getSomeTransactions() {
+        Collection<Transaction> result = new ArrayList<>();
         Iterator<Transaction> iter = transactionQueue.iterator();
         HashMap<Address,Integer> senderMap = new HashMap<>();
         while (iter.hasNext() && result.size()<Configuration.getTransactionLimit()){
@@ -59,7 +57,7 @@ public class DBTransactionManager implements TransactionManager{
     }
 
     @Override
-    public void removeTransactions(Transactions<Collection<Transaction>> transactions) {
+    public void removeTransactions(Collection<Transaction> transactions) {
         throw new ToBeImplementedException();
     }
 
@@ -96,11 +94,10 @@ public class DBTransactionManager implements TransactionManager{
      * @return                  True if the transactions are valid, false otherwise.
      */
     @Override
-    public boolean validateTransactions(Transactions<Collection<Transaction>> transactions) {
-        Collection<Transaction> validateTransactions = transactions.getTransactions();
+    public boolean validateTransactions(Collection<Transaction> transactions) {
         // Create a map from sender to transactions.
         Map<Address,ArrayList<Transaction>> sendermap = new HashMap<>();
-        for (Transaction t:validateTransactions){
+        for (Transaction t: transactions){
             // Check the signature of the transaction and check if the transaction exists in the block chain.
             if(!verifyTransactionSignature(t) || blockChainDatabase.doesTransactionExist(t)) {
                 return false;

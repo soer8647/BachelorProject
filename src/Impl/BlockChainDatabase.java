@@ -3,13 +3,17 @@ package Impl;
 import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
-import Impl.Transactions.*;
+import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.StandardCoinBaseTransaction;
+import Impl.Transactions.StandardTransaction;
+import Impl.Transactions.UnspentTransaction;
 import Interfaces.*;
 import org.apache.derby.jdbc.EmbeddedDriver;
 
 import java.math.BigInteger;
 import java.sql.*;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 
@@ -171,7 +175,7 @@ public class BlockChainDatabase implements BlockChain{
 
 
         // Update the values of the unspent transactions
-        for (Transaction transaction: block.getTransactions().getTransactions()){
+        for (Transaction transaction: block.getTransactions()){
             // Get the value proof rest value
             updateUnspentTransactions(transaction.getValueProof(),transaction.getValue(),transaction.getSenderAddress());
             addUnspentTransaction(transaction.transactionHash(),transaction.getValue(),false,block.getBlockNumber(),transaction.getReceiverAddress());
@@ -188,7 +192,7 @@ public class BlockChainDatabase implements BlockChain{
             // Add to block chain
             query(query);
             // Add to transactions
-            for (Transaction t:block.getTransactions().getTransactions()){
+            for (Transaction t:block.getTransactions()){
                 addTransaction(t,block.getBlockNumber());
             }
 
@@ -447,7 +451,7 @@ public class BlockChainDatabase implements BlockChain{
 
             String queryT = "SELECT * FROM TRANSACTIONS WHERE BLOCKNR="+blockNumber;
 
-            Transactions transactions = new ArrayListTransactions();
+            Collection<Transaction> transactions = new ArrayList<>();
             ResultSet setT = s.executeQuery(queryT);
             while(setT.next()){
                 Address sender = new PublicKeyAddress(new RSAPublicKey(setT.getString("SENDER")));
@@ -547,7 +551,7 @@ public class BlockChainDatabase implements BlockChain{
              String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address.toString()+"'";
 
              ResultSet r = s.executeQuery(query);
-             ArrayList<UnspentTransaction> unspentTransactions = new ArrayList();
+             ArrayList<UnspentTransaction> unspentTransactions = new ArrayList<>();
              while(r.next()){
                  BigInteger hash = new BigInteger(r.getString("UNSPENT_TRANS_HASH"));
                  int valueLeft = r.getInt("VALUE_LEFT");

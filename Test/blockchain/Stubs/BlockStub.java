@@ -2,16 +2,17 @@ package blockchain.Stubs;
 
 import Interfaces.Block;
 import Interfaces.CoinBaseTransaction;
-import Interfaces.Transactions;
+import Interfaces.Transaction;
 
 import java.math.BigInteger;
+import java.util.Collection;
 
 public class BlockStub implements Block {
     private int blockNumber;
     private CoinBaseTransaction coinbase;
-    private Transactions transactions;
+    private Collection<Transaction> transactions;
 
-    public BlockStub(CoinBaseTransaction coinbase, Transactions transactions, int blockNumber) {
+    public BlockStub(CoinBaseTransaction coinbase, Collection<Transaction> transactions, int blockNumber) {
         this.coinbase = coinbase;
         this.transactions = transactions;
         this.blockNumber = blockNumber;
@@ -20,7 +21,7 @@ public class BlockStub implements Block {
 
 
     @Override
-    public Transactions getTransactions() {
+    public Collection<Transaction> getTransactions() {
         return transactions;
     }
 

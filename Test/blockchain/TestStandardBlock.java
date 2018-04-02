@@ -2,13 +2,14 @@ package blockchain;
 
 import Configuration.Configuration;
 import Impl.StandardBlock;
-import Impl.Transactions.ArrayListTransactions;
 import Interfaces.Block;
+import Interfaces.Transaction;
 import blockchain.Stubs.CoinBaseTransactionStub;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotEquals;
@@ -23,7 +24,7 @@ public class TestStandardBlock {
                 20,
                 new BigInteger("42"),
                 8,
-                new ArrayListTransactions(),
+                new ArrayList<>(),
                 1,
                 new CoinBaseTransactionStub());
     }
@@ -71,9 +72,13 @@ public class TestStandardBlock {
 
     @Test
     public void shouldBeAbleToHashBlock(){
+        StringBuilder sb = new StringBuilder();
+        for (Transaction t: block.getTransactions()){
+            sb.append(t.transactionHash());
+        }
         BigInteger hash = new BigInteger(String.valueOf(Configuration.hash(
                 new BigInteger("42").toString()+
-                        new ArrayListTransactions().hashTransactions().toString()+
+                        sb.toString()+
                         new BigInteger("42").toString()+
                         new CoinBaseTransactionStub().toString())));
         assertEquals(hash,block.hash());

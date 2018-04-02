@@ -2,7 +2,6 @@ package Database;
 
 import Impl.BlockChainDatabase;
 import Impl.StandardBlock;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Block;
@@ -15,6 +14,8 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
@@ -38,9 +39,9 @@ public class TestBlockChainDatabase {
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
-        block1 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),1,ct1);
-        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),2,ct2);
-        db = new BlockChainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayListTransactions(),0, ct0));
+        block1 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),1,ct1);
+        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),2,ct2);
+        db = new BlockChainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),0, ct0));
     }
 
 
@@ -92,7 +93,7 @@ public class TestBlockChainDatabase {
         db.addBlock(block1);
         // Must be a valid transaction
         StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),5,c.transactionHash(),tx.getSignature(), block1.getBlockNumber(), 0);
-        ArrayListTransactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
         Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1));
         db.addBlock(newBlock);
@@ -104,7 +105,7 @@ public class TestBlockChainDatabase {
 
         // Must be a valid transaction
         StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),10,ct0.transactionHash(),tx.getSignature(), 0, 0);
-        ArrayListTransactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
         CoinBaseTransaction c2 = new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1);
         Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,c2);
@@ -120,7 +121,7 @@ public class TestBlockChainDatabase {
 
         // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
         StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),15,ct0.transactionHash(),tx.getSignature(), 0, 0);
-        ArrayListTransactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 
         Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,ct2);
@@ -137,7 +138,7 @@ public class TestBlockChainDatabase {
 
         // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
         StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,ct0.transactionHash(),tx.getSignature(), 0,0);
-        ArrayListTransactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 
         Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,ct2);

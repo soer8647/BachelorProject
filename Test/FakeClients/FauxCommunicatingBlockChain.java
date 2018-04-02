@@ -7,9 +7,7 @@ import Impl.Communication.StandardNodeCommunicationHandler;
 import Impl.Communication.StandardNodeRunner;
 import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.*;
-import Impl.Transactions.ArrayListTransactions;
 import Interfaces.*;
-import Impl.ConstantHardnessManager;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
@@ -18,6 +16,7 @@ import blockchain.Stubs.FauxPublisher;
 import blockchain.Stubs.FauxReceiver;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.LinkedBlockingQueue;
 
@@ -26,7 +25,7 @@ public class FauxCommunicatingBlockChain {
         BlockingQueue<Event> queue_A = new LinkedBlockingQueue<>();
         BlockingQueue<Event> queue_B = new LinkedBlockingQueue<>();
 
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayListTransactions(),1,new CoinBaseTransactionStub());
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayList<>(),1,new CoinBaseTransactionStub());
 
         TransactionManager transMan = new EmptyTransactionsManager();
 

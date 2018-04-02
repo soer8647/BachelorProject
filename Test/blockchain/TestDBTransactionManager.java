@@ -4,21 +4,21 @@ import Crypto.Impl.RSA;
 import Crypto.Interfaces.KeyPair;
 import Crypto.Interfaces.PublicKeyCryptoSystem;
 import Impl.*;
-import Impl.Transactions.ArrayListTransactions;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Interfaces.Transaction;
-import Interfaces.Transactions;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 
 import static junit.framework.TestCase.assertEquals;
 
 public class TestDBTransactionManager {
 
-    PublicKeyCryptoSystem rsa;
+    private PublicKeyCryptoSystem rsa;
     private KeyPair keyPairSender;
     private PublicKeyAddress sender1;
     private StandardCoinBaseTransaction coinBase0;
@@ -45,7 +45,7 @@ public class TestDBTransactionManager {
 
         coinBase0 = new StandardCoinBaseTransaction(sender1,10,0);
 
-        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE,10,new ArrayListTransactions(),0, coinBase0);
+        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE,10, new ArrayList<>(),0, coinBase0);
         blockchain = new BlockChainDatabase("TEST_DBTRANSACTIONMANAGER",genesis);
 
         transactionManager = new DBTransactionManager(blockchain);
@@ -75,7 +75,7 @@ public class TestDBTransactionManager {
     public void shouldValidateTransactions() {
         Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
         Transaction t2 = accountSender1.makeTransaction(receiver1,2,coinBase0.transactionHash(),0,0);
-        Transactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t1);
         transactions.add(t2);
         assertEquals(true,transactionManager.validateTransactions(transactions));
@@ -86,7 +86,7 @@ public class TestDBTransactionManager {
         //not enough funds
         Transaction t1 = accountSender1.makeTransaction(receiver1,1,coinBase0.transactionHash(),0,0);
         Transaction t2 = accountSender1.makeTransaction(receiver1,10,coinBase0.transactionHash(),0,0);
-        Transactions transactions = new ArrayListTransactions();
+        Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t1);
         transactions.add(t2);
         assertEquals(false,transactionManager.validateTransactions(transactions));

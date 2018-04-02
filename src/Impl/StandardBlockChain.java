@@ -68,7 +68,7 @@ public class StandardBlockChain implements BlockChain{
         ArrayList<CoinBaseTransaction> coinBaseTransactions = new ArrayList<>();
         for (Block b : blocks){
             if(b.getBlockNumber()>=blockNumber) {
-                for (Transaction t : b.getTransactions().getTransactions()) {
+                for (Transaction t : b.getTransactions()) {
                     if (t.getSenderAddress().toString().equals(address.toString()) || t.getReceiverAddress().toString().equals(address.toString())) {
                         transactions.add(new ConfirmedTransaction(t,b.getBlockNumber()));
                     }
