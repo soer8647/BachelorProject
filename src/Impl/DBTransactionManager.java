@@ -26,6 +26,7 @@ public class DBTransactionManager implements TransactionManager{
         Iterator<Transaction> iter = transactionQueue.iterator();
         HashMap<Address,Integer> senderMap = new HashMap<>();
         while (iter.hasNext() && result.size()<Configuration.getTransactionLimit()){
+            //TODO check that the transaction does not exist in block chain
             Transaction t = iter.next();
             if (!senderMap.keySet().contains(t.getSenderAddress())){
                 //Put sender and balance - t_value in map
@@ -64,6 +65,7 @@ public class DBTransactionManager implements TransactionManager{
      */
     @Override
     public boolean validateTransaction(Transaction transaction) {
+        //TODO check that the transaction does not exist in block chain
         if(!verifyTransactionSignature(transaction)) {
             return false;
         }
@@ -98,6 +100,7 @@ public class DBTransactionManager implements TransactionManager{
             if(!verifyTransactionSignature(t)) {
                 return false;
             }
+            //TODO check that the transaction does not exist in block chain
             if (sendermap.keySet().contains(t.getSenderAddress())){
                 sendermap.get(t.getSenderAddress()).add(t);
             }   else {

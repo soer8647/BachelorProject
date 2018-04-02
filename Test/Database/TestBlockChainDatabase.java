@@ -140,9 +140,11 @@ public class TestBlockChainDatabase {
         assertEquals(ct1.getValue()-9,db.getUnspentTransactionValue(ct1.transactionHash()));
     }
 
-
-
-
+    @Test
+    public void shouldBeAbleToTellIfATransactionExistsInBlockChain() {
+        db.addTransaction(stx,1);
+        assertEquals(true,db.doesTransactionExist(stx));
+    }
 
     @After
     public void tearDown() throws Exception {

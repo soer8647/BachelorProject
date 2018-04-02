@@ -616,4 +616,28 @@ public class BlockChainDatabase implements BlockChain{
         }
         return balance;
     }
+
+
+    /**
+     * The method checks weather a transaction exists in the blockchain with a blocknumber higher than the transaction timestamp and with the same hash.
+     *
+     * @param transaction       The transaction
+     * @return                  True if the transaction is in the block chain and false otherwise.
+     */
+    public boolean doesTransactionExist(Transaction transaction){
+        try {
+            Statement s = conn.createStatement();
+            String query = "SELECT * FROM TRANSACTIONS"+
+                    " WHERE BLOCKNR > "+transaction.getTimestamp()+
+                    " AND TRANS_HASH = "+"'"+transaction.transactionHash().toString()+"'";
+            ResultSet r = s.executeQuery(query);
+            boolean exists = r.next();
+            s.close();
+            r.close();
+            return exists;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
 }
