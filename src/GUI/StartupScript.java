@@ -40,7 +40,7 @@ public class StartupScript {
              System.out.println("Enter d of key:");
             BigInteger d = sc.nextBigInteger();
             RSAPrivateKey sk = new RSAPrivateKey(n,d);
-            RSAPublicKey pk = new RSAPublicKey(n,d);
+            RSAPublicKey pk = new RSAPublicKey(e,n);
             acc = new StandardAccount(sk,pk);
         }
         System.out.println("Enter seed port:");
@@ -52,7 +52,10 @@ public class StartupScript {
         } catch (UnknownHostException exp) {
             exp.printStackTrace();
         }
-
+        System.out.println("Your Keys:");
+        System.out.println("N: " + acc.getPublicKey().getN());
+        System.out.println("D: " + acc.getPrivateKey().getD());
+        System.out.println("E: " + acc.getPublicKey().getE());
 
         int myPort = 8000;
         List list = new ArrayList<UDPConnectionData>();

@@ -58,19 +58,19 @@ public class AccountEventHandler implements EventHandler,Runnable{
         try {
             semaphore.acquire();
             if (event instanceof TransactionHistoryResponseEvent) {
-                TransactionHistoryResponseEvent the = (TransactionHistoryResponseEvent) event;
-                TransactionHistory th = the.getTransactions();
+                TransactionHistoryResponseEvent transHistoryResponseEvent = (TransactionHistoryResponseEvent) event;
+                TransactionHistory th = transHistoryResponseEvent.getTransactions();
 
-                if (transactionHistory.size() == the.getIndex() && the.getParts() == 1) {
+                if (transactionHistory.size() == transHistoryResponseEvent.getIndex() && transHistoryResponseEvent.getParts() == 1) {
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
                     transactionHistory.getCoinBaseTransactions().addAll(th.getCoinBaseTransactions());
 
-                } else if(transactionHistory.size() == the.getIndex()){
+                } else if(transactionHistory.size() == transHistoryResponseEvent.getIndex()){
                     // Get the histories with the same timestamp
-                    List<TransactionHistory> histories = historyMap.get(the.getTime());
+                    List<TransactionHistory> histories = historyMap.get(transHistoryResponseEvent.getTime());
                     histories.add(transactionHistory);
                     //If we have all the transactions -> merge and update
-                    if (the.getParts() == histories.size()) {
+                    if (transHistoryResponseEvent.getParts() == histories.size()) {
                         ArrayList<ConfirmedTransaction> confirmedTransactions = new ArrayList<>();
                         ArrayList<CoinBaseTransaction> coinBaseTransactionArrayList = new ArrayList<>();
                         for (TransactionHistory t : histories) {
