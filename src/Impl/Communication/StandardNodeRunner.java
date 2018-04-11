@@ -2,6 +2,7 @@ package Impl.Communication;
 
 import GUI.SimpleListDisplay;
 import Impl.Communication.Events.MinedBlockEvent;
+import Impl.FullNode;
 import Impl.TransactionHistory;
 import Interfaces.*;
 import Interfaces.Communication.Event;
@@ -20,6 +21,14 @@ public class StandardNodeRunner implements NodeRunner {
     private boolean interrupted = false;
     private Block specialBlock;
     private Semaphore lock = new Semaphore(0);
+
+    public StandardNodeRunner(BlockChain blockChain, Address address, HardnessManager hardnessManager, TransactionManager transactionManager, BlockingQueue<Event> eventQueue, SimpleListDisplay display) {
+        this(new FullNode(blockChain,address,hardnessManager,transactionManager),eventQueue,transactionManager,display);
+    }
+
+    public StandardNodeRunner(BlockChain blockChain, Address address, HardnessManager hardnessManager, TransactionManager transactionManager, BlockingQueue<Event> eventQueue) {
+        this(new FullNode(blockChain,address,hardnessManager,transactionManager),eventQueue,transactionManager);
+    }
 
     public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager) {
         this(node, eventQueue, transactionManager, new SimpleListDisplay() {
