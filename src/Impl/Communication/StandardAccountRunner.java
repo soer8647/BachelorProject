@@ -119,6 +119,7 @@ public class StandardAccountRunner implements AccountRunner {
         //Sort the list on block number
         transactions.sort(Comparator.comparing(VerifiableTransaction::getBlockNumber));
         for (VerifiableTransaction vt : transactions){
+            System.out.println(vt.getBlockNumber());
             if(vt instanceof CoinBaseTransaction){
                 counter+=vt.getValue();
                 if (counter>=bal) return new Pair<>(new BigInteger("0"),vt.getBlockNumber());

@@ -143,11 +143,15 @@ public class AccountRunnerGUI{
                     +" ,Receiver "+confirmedTransaction.getReceiverAddress().toString().substring(0,5)
                     +"value "+confirmedTransaction.getValue()));
         }
-
+        try {
+            accountRunner.getTransactionHistory().getSemaphore().acquire();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
                 historyContainer.add(new JLabel("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber()));
-            System.out.println("Adding coinbase");
         }
+        accountRunner.getTransactionHistory().getSemaphore().release();
         frame.getContentPane().validate();
         frame.pack();
         frame.getContentPane().repaint();

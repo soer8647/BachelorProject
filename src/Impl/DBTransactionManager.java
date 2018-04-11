@@ -75,18 +75,16 @@ public class DBTransactionManager implements TransactionManager{
         if(!verifyTransactionSignature(transaction) || blockChainDatabase.doesTransactionExist(transaction)) {
             return false;
         }
-        if (blockChainDatabase.getUnspentTransactionValue(transaction.getValueProof())>transaction.getValue()){
-            return true;
-        }else {
-            //Look in every unspent transaction since
-            ArrayList<UnspentTransaction> unspent = blockChainDatabase.getUnspentTransactions(transaction.getSenderAddress());
 
-            int counter = 0;
-            for(UnspentTransaction ut : unspent){
-                counter+=ut.getValueLeft();
-                if(counter>=transaction.getValue()) return true;
-            }
+        //Look in every unspent transaction since
+        ArrayList<UnspentTransaction> unspent = blockChainDatabase.getUnspentTransactions(transaction.getSenderAddress());
+
+        int counter = 0;
+        for(UnspentTransaction ut : unspent){
+            counter+=ut.getValueLeft();
+            if(counter>=transaction.getValue()) return true;
         }
+
         return false;
     }
 

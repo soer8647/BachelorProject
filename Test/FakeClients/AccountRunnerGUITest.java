@@ -53,14 +53,14 @@ public class AccountRunnerGUITest {
             }},8000);
 
             AccountRunnerGUI gui = new AccountRunnerGUI(runner);
-            BlockChain blockChain = new BlockChainDatabase("ACCOUNTRUNNERTEST",block);
+            BlockChainDatabase blockChain = new BlockChainDatabase("ACCOUNTRUNNERTEST",block);
 
             //Connect accountrunner to noderunner
             Configuration.setHardnessParameter(19);
-            Node testNode = new FullNode(blockChain,main.getAddress(),new ConstantHardnessManager(),new StandardTransactionManager(blockChain));
+            Node testNode = new FullNode(blockChain,main.getAddress(),new ConstantHardnessManager(),new DBTransactionManager(blockChain));
 
             BlockingQueue<Event> blockingQueue = new LinkedBlockingQueue<Event>();
-            NodeRunner nodeRunner = new StandardNodeRunner(testNode,blockingQueue, new StandardTransactionManager(blockChain),new JFrameListDisplay("Test"));
+            NodeRunner nodeRunner = new StandardNodeRunner(testNode,blockingQueue, new DBTransactionManager(blockChain),new JFrameListDisplay("Test"));
 
             UDPReceiver receiver = new UDPReceiver(blockingQueue,1337);
 

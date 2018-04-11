@@ -92,4 +92,13 @@ public class StandardTransaction implements Transaction {
     public int getTimestamp() {
         return timestamp;
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (obj == null) return false;
+        if (obj==this) return true;
+        if (obj.getClass() != this.getClass()) return false;
+        StandardTransaction t = (StandardTransaction) obj;
+        return t.transactionHash().equals(this.transactionHash());
+    }
 }
