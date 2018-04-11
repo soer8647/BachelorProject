@@ -61,11 +61,11 @@ public class AccountEventHandler implements EventHandler,Runnable{
                 TransactionHistoryResponseEvent transHistoryResponseEvent = (TransactionHistoryResponseEvent) event;
                 TransactionHistory th = transHistoryResponseEvent.getTransactions();
 
-                if (transactionHistory.size() == transHistoryResponseEvent.getIndex() && transHistoryResponseEvent.getParts() == 1) {
+                if (transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex() && transHistoryResponseEvent.getParts() == 1) {
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
                     transactionHistory.getCoinBaseTransactions().addAll(th.getCoinBaseTransactions());
 
-                } else if(transactionHistory.size() == transHistoryResponseEvent.getIndex()){
+                } else if(transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex()){
                     // Get the histories with the same timestamp
                     List<TransactionHistory> histories = historyMap.get(transHistoryResponseEvent.getTime());
                     histories.add(transactionHistory);

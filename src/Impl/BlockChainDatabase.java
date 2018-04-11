@@ -37,7 +37,7 @@ public class BlockChainDatabase implements BlockChain{
         //TODO set derby.system.home to another path. This is where the databases are.
         connectionURL = "jdbc:derby:" +"databases/"+databaseName + ";create=true";
 
-        //Store the blockchain in one table and store all transactions in another table
+        //Store the blocks in one table and store all transactions in another table
         String blockchain = "CREATE TABLE %s"
                 +  "(BLOCKNR INT NOT NULL"
                 +  " CONSTRAINT BLOCKNR PRIMARY KEY, "
@@ -74,45 +74,37 @@ public class BlockChainDatabase implements BlockChain{
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
                 +  " ) " ;
 
-        //TODO MAKE FOREIGN KEY CONSTRAINT ON UNSPEND_TRANSACTIONS
         String unspent = "CREATE TABLE %s"
                         +"(UNSPENT_TRANS_HASH VARCHAR(255) NOT NULL CONSTRAINT UNSPENT_TRANS_HASH PRIMARY KEY,"
                         +"VALUE_LEFT INT NOT NULL,"
                         +"IS_COINBASE BOOLEAN NOT NULL,"
                         +"BLOCKNR INT NOT NULL,"
                         +"RECEIVER VARCHAR(255) NOT NULL)";
-        //  JDBC code sections
+
         //  Beginning of Primary DB access section
-        //   ## BOOT DATABASE SECTION ##
+        //  BOOT DATABASE SECTION
         try {
             DriverManager.registerDriver(new EmbeddedDriver());
             conn = DriverManager.getConnection(connectionURL);
             // Connect to database
             System.out.println("Connected to database " + databaseName);
 
-            //   ## INITIAL SQL SECTION ##
             createTableIfNotExists("UNSPENT_TRANSACTIONS", unspent);
 
             createTableIfNotExists("BLOCKCHAIN",blockchain);
-            // If the table is empty add genesisblock
+
+            // If the table is empty add genesis block
             if(getBlockNumber()==-1){
                 System.out.println("No block found,Adding block "+genesisblock.getBlockNumber()+" to blockchain");
                 addBlock(genesisblock);}
 
-
             //Check if table TRANSACTIONS exist
-            //   ## INITIAL SQL SECTION ##
             createTableIfNotExists("TRANSACTIONS", transactions);
 
             createTableIfNotExists("PENDING_TRANSACTIONS", pending_transactions);
 
-
-
-            //  Beginning of the primary catch block: prints stack trace
         }  catch (Throwable e)  {
-            /*       Catch all exceptions and pass them to
-             *       the Throwable.printStackTrace method  */
-            System.out.println(" . . . exception thrown:");
+            System.out.println("Exception thrown:");
             e.printStackTrace(System.out);
         }
     }
@@ -121,12 +113,9 @@ public class BlockChainDatabase implements BlockChain{
      *  Closes the connection and shuts down the database.
      */
     public void shutDown() {
-
         try {
             conn.close();
             System.out.println("Closed connection");
-
-            //DATABASE SHUTDOWN SECTION
             //Shutdown throws the XJ015 exception to confirm success.
             if (driver.equals("org.apache.derby.jdbc.EmbeddedDriver")) {
                 boolean gotSQLExc = false;
@@ -379,6 +368,7 @@ public class BlockChainDatabase implements BlockChain{
      * @param transaction       The transaction to put on the blockchain.
      * @param blocknumber       The blocknumber of the mined block where this transaction was in.
      */
+
     public void addTransaction(Transaction transaction,int blocknumber) {
         String query = "INSERT INTO TRANSACTIONS "
                 + "VALUES ("

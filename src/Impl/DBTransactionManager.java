@@ -11,7 +11,7 @@ import java.util.*;
 
 public class DBTransactionManager implements TransactionManager{
     private BlockChainDatabase blockChainDatabase;
-    private Queue<Transaction> transactionQueue;
+        private Queue<Transaction> transactionQueue;
 
     public DBTransactionManager(BlockChainDatabase blockChainDatabase) {
         this.blockChainDatabase = blockChainDatabase;

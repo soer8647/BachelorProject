@@ -143,7 +143,7 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public void updateTransactionHistory() {
         try {
-            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.size(),account.getAddress()));
+            eventQueue.put(new TransactionHistoryRequestEvent(InetAddress.getLocalHost(),  listeningPort,transactionHistory.getBlocknumber()+1,account.getAddress()));
         } catch (InterruptedException | UnknownHostException e) {
             e.printStackTrace();
         }
