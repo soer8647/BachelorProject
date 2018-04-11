@@ -6,20 +6,28 @@ import Interfaces.CoinBaseTransaction;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.Semaphore;
 
 public  class TransactionHistory implements Serializable
 {
     private List<ConfirmedTransaction> confirmedTransactions;
     private List<CoinBaseTransaction> coinBaseTransactions;
+    private Semaphore semaphore;
 
     public TransactionHistory(List<ConfirmedTransaction> confirmedTransactions, List<CoinBaseTransaction> coinBaseTransactions) {
         this.confirmedTransactions = confirmedTransactions;
         this.coinBaseTransactions = coinBaseTransactions;
+        semaphore = new Semaphore(1);
     }
 
     public TransactionHistory(){
         confirmedTransactions = new ArrayList<>();
         coinBaseTransactions= new ArrayList<>();
+        semaphore= new Semaphore(1);
+    }
+
+    public Semaphore getSemaphore() {
+        return semaphore;
     }
 
     public List<ConfirmedTransaction> getConfirmedTransactions() {

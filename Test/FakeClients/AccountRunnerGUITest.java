@@ -39,6 +39,11 @@ public class AccountRunnerGUITest {
         Account main = new StandardAccount();
         CoinBaseTransaction c = new StandardCoinBaseTransaction(main.getAddress(),10,1);
         TransactionHistory t = new TransactionHistory(new ArrayList<ConfirmedTransaction>(),new ArrayList<CoinBaseTransaction>(){{add(c);}});
+
+        Account second = new StandardAccount();
+        System.out.println(second.getAddress());
+
+
         try {
             UDPConnectionData nodeData = new UDPConnectionData(InetAddress.getLocalHost(),1337);
 

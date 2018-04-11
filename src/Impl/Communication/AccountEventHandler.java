@@ -62,8 +62,10 @@ public class AccountEventHandler implements EventHandler,Runnable{
                 TransactionHistory th = transHistoryResponseEvent.getTransactions();
 
                 if (transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex() && transHistoryResponseEvent.getParts() == 1) {
+                    transactionHistory.getSemaphore().acquire();
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
                     transactionHistory.getCoinBaseTransactions().addAll(th.getCoinBaseTransactions());
+                    transactionHistory.getSemaphore().release();
 
                 } else if(transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex()){
                     // Get the histories with the same timestamp
@@ -77,8 +79,10 @@ public class AccountEventHandler implements EventHandler,Runnable{
                             confirmedTransactions.addAll(t.getConfirmedTransactions());
                             coinBaseTransactionArrayList.addAll(t.getCoinBaseTransactions());
                         }
+                        transactionHistory.getSemaphore().acquire();
                         transactionHistory.getConfirmedTransactions().addAll(confirmedTransactions);
                         transactionHistory.getCoinBaseTransactions().addAll(coinBaseTransactionArrayList);
+                        transactionHistory.getSemaphore().release();
                     }
 
                 }else{

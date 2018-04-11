@@ -63,15 +63,23 @@ public class StandardAccountRunner implements AccountRunner {
 
     @Override
     public int getBalance() {
-        int amount = 0;
-        for (Transaction t:getTransactionHistory().getConfirmedTransactions()){
-            if (t.getReceiverAddress().toString().equals(account.getAddress().toString())) amount+=t.getValue();
-            else if(t.getSenderAddress().toString().equals(account.getAddress().toString())) amount-=t.getValue();
+        try {
+            transactionHistory.getSemaphore().acquire();
+            int amount = 0;
+            for (Transaction t : getTransactionHistory().getConfirmedTransactions()) {
+                if (t.getReceiverAddress().toString().equals(account.getAddress().toString())) amount += t.getValue();
+                else if (t.getSenderAddress().toString().equals(account.getAddress().toString()))
+                    amount -= t.getValue();
+            }
+            for (CoinBaseTransaction c : getTransactionHistory().getCoinBaseTransactions()) {
+                amount += c.getValue();
+            }
+            transactionHistory.getSemaphore().release();
+            return amount;
+        }catch (InterruptedException e){
+            e.printStackTrace();
         }
-        for (CoinBaseTransaction c:getTransactionHistory().getCoinBaseTransactions()){
-            amount+=c.getValue();
-        }
-        return amount;
+        return 0;
     }
 
     /**

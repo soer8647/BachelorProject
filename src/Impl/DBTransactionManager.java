@@ -26,10 +26,11 @@ public class DBTransactionManager implements TransactionManager{
         while (iter.hasNext() && result.size()<Configuration.getTransactionLimit()){
             Transaction t = iter.next();
             //Check if the transaction exists in the block chain
-            if (blockChainDatabase.doesTransactionExist(t)){
+            if (blockChainDatabase.doesTransactionExist(t) || result.contains(t)){
                 iter.remove();
                 continue;
             }
+
             if (!senderMap.keySet().contains(t.getSenderAddress())){
                 //Put sender and balance - t_value in map
                 int balance = blockChainDatabase.getBalance(t.getSenderAddress());
