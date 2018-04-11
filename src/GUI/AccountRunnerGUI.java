@@ -65,24 +65,25 @@ public class AccountRunnerGUI{
 
 
         //Value and receiver container
-        Container transInfo = new Container();
-        transInfo.setLayout(new BoxLayout(transInfo,BoxLayout.X_AXIS));
+        Container valueInfo = new Container();
+        valueInfo.setLayout(new BoxLayout(valueInfo,BoxLayout.X_AXIS));
         valueField = new JTextArea("0");
         receiverField = new JTextArea();
-        transInfo.add(new JLabel("Value"));
-        transInfo.add(valueField);
-        transInfo.add(new JLabel("Receiver"));
+        valueInfo.add(new JLabel("Value"));
+        valueInfo.add(valueField);
+
         comboAddresses = new JComboBox<Address>();
-
-
         comboAddresses.setRenderer(new ListCellRenderer<Address>() {
             @Override
             public Component getListCellRendererComponent(JList<? extends Address> list, Address value, int index, boolean isSelected, boolean cellHasFocus) {
                 return new JLabel(value.getPublicKey().toString().substring(14,25));
             }
         });
-        transInfo.add(comboAddresses);
-        //transInfo.add(receiverField);
+
+        Container receiverInfo = new Container();
+        receiverInfo.setLayout(new BoxLayout(receiverInfo,BoxLayout.X_AXIS));
+        receiverInfo.add(new JLabel("Receiver"));
+        receiverInfo.add(comboAddresses);
 
         //Add receive
         JTextArea newReceiver = new JTextArea("Add a new Receiver");
@@ -91,7 +92,7 @@ public class AccountRunnerGUI{
         JButton newReceiverButton = new JButton("Add receiver");
         newReceiverButton.addActionListener(e -> comboAddresses.addItem(new PublicKeyAddress(new RSAPublicKey(newReceiver.getText()))));
 
-        makeTrans.add(transInfo);
+        makeTrans.add(valueInfo);
 
         // Make trans button
         makeButton = new JButton("Make transaction!");
@@ -144,13 +145,18 @@ public class AccountRunnerGUI{
         main.add(newReceiverButton,constraints);
 
         constraints.gridx = 1;
-        constraints.gridy = 3;
+        constraints.gridy = 4;
         main.add(makeButton,constraints);
 
 
         constraints.gridx = 0;
         constraints.gridy = 3;
         main.add(makeTrans,constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 4;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        main.add(receiverInfo,constraints);
 
 
         constraints.gridx = 0;
@@ -179,10 +185,10 @@ public class AccountRunnerGUI{
             while (!Thread.interrupted()) {
                 accountRunner.updateTransactionHistory();
                 System.out.println("Updating");
-                updateHistory();
+                SwingUtilities.invokeLater(this::updateHistory);
                 moneyArea.setText(String.valueOf(accountRunner.getBalance()));
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(5000);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }

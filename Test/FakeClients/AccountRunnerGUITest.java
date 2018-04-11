@@ -38,7 +38,7 @@ public class AccountRunnerGUITest {
 
         Account main = new StandardAccount();
         CoinBaseTransaction c = new StandardCoinBaseTransaction(main.getAddress(),10,1);
-        TransactionHistory t = new TransactionHistory(new ArrayList<ConfirmedTransaction>(),new ArrayList<CoinBaseTransaction>(){{add(c);}});
+        TransactionHistory t = new TransactionHistory(new ArrayList<ConfirmedTransaction>(),new ArrayList<CoinBaseTransaction>());
 
         Account second = new StandardAccount();
 
