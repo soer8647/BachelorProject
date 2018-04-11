@@ -13,6 +13,8 @@ import java.awt.*;
 import java.util.ArrayList;
 
 public class AccountRunnerGUI{
+    private final JList<String> historyText;
+    private final DefaultListModel<String> model;
     private ArrayList<PublicKeyAddress> addresses;
     private final JButton makeButton;
     private final Container historyContainer;
@@ -101,15 +103,26 @@ public class AccountRunnerGUI{
         historyContainer.setLayout(new BoxLayout(historyContainer,BoxLayout.Y_AXIS));
 
         historyContainer.add(new JLabel("Transaction History:"));
+        model = new DefaultListModel<>();
+        historyText = new JList<>(model);
+        historyText.setLayoutOrientation(JList.VERTICAL);
+        historyText.setVisibleRowCount(10);
+        JScrollPane bar = new JScrollPane(historyText);
+
+        //Set number of rows before scroll
+
+
+        historyContainer.add(bar);
 
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
-            historyContainer.add(new JLabel("Sender "+confirmedTransaction.getSenderAddress().toString().substring(0,5)
+
+            model.addElement("Sender "+confirmedTransaction.getSenderAddress().toString().substring(0,5)
                     +" ,Receiver "+confirmedTransaction.getReceiverAddress().toString().substring(0,5)
-            +"value "+confirmedTransaction.getValue()));
+            +"value "+confirmedTransaction.getValue());
         }
 
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
-            historyContainer.add(new JLabel("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber()));
+            model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
         }
         main.add(historyContainer);
 
@@ -143,25 +156,21 @@ public class AccountRunnerGUI{
     }
 
     private void updateHistory(){
-        historyContainer.removeAll();
-        System.out.println(accountRunner.getTransactionHistory().size());
-        for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
-            historyContainer.add(new JLabel("Sender "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(13,25)
-                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(13,25)
-                    +"value "+confirmedTransaction.getValue()));
-        }
+        model.removeAllElements();
         try {
             accountRunner.getTransactionHistory().getSemaphore().acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
+            model.addElement("Sender "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(13,25)
+                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(13,25)
+                    +"value "+confirmedTransaction.getValue());
+        }
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
-                historyContainer.add(new JLabel("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber()));
+                model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
         }
         accountRunner.getTransactionHistory().getSemaphore().release();
-        frame.getContentPane().validate();
-        frame.pack();
-        frame.getContentPane().repaint();
     }
 
     public void addAddress(Address address){
