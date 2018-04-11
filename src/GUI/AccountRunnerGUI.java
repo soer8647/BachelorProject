@@ -4,6 +4,7 @@ import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.PublicKeyAddress;
 import Impl.Transactions.ConfirmedTransaction;
+import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 
@@ -15,7 +16,7 @@ public class AccountRunnerGUI{
     private ArrayList<PublicKeyAddress> addresses;
     private final JButton makeButton;
     private final Container historyContainer;
-    private JComboBox<PublicKeyAddress> comboAddresses;
+    private JComboBox<Address> comboAddresses;
 
     private JTextArea receiverField;
     private JTextArea valueField;
@@ -67,7 +68,13 @@ public class AccountRunnerGUI{
         transInfo.add(new JLabel("Value"));
         transInfo.add(valueField);
         transInfo.add(new JLabel("Receiver"));
-        comboAddresses = new JComboBox<PublicKeyAddress>();
+        comboAddresses = new JComboBox<Address>();
+        comboAddresses.setRenderer(new ListCellRenderer<Address>() {
+            @Override
+            public Component getListCellRendererComponent(JList<? extends Address> list, Address value, int index, boolean isSelected, boolean cellHasFocus) {
+                return new JLabel(value.getPublicKey().toString().substring(14,25));
+            }
+        });
         transInfo.add(comboAddresses);
         //transInfo.add(receiverField);
 
@@ -135,12 +142,12 @@ public class AccountRunnerGUI{
         t.start();
     }
 
-    public void updateHistory(){
+    private void updateHistory(){
         historyContainer.removeAll();
         System.out.println(accountRunner.getTransactionHistory().size());
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
-            historyContainer.add(new JLabel("Sender "+confirmedTransaction.getSenderAddress().toString().substring(0,5)
-                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().toString().substring(0,5)
+            historyContainer.add(new JLabel("Sender "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(13,25)
+                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(13,25)
                     +"value "+confirmedTransaction.getValue()));
         }
         try {
@@ -155,6 +162,9 @@ public class AccountRunnerGUI{
         frame.getContentPane().validate();
         frame.pack();
         frame.getContentPane().repaint();
+    }
 
+    public void addAddress(Address address){
+        comboAddresses.addItem(address);
     }
 }

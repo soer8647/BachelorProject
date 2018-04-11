@@ -41,7 +41,6 @@ public class AccountRunnerGUITest {
         TransactionHistory t = new TransactionHistory(new ArrayList<ConfirmedTransaction>(),new ArrayList<CoinBaseTransaction>(){{add(c);}});
 
         Account second = new StandardAccount();
-        System.out.println(second.getAddress());
 
 
         try {
@@ -53,6 +52,7 @@ public class AccountRunnerGUITest {
             }},8000);
 
             AccountRunnerGUI gui = new AccountRunnerGUI(runner);
+            gui.addAddress(second.getAddress());
             BlockChainDatabase blockChain = new BlockChainDatabase("ACCOUNTRUNNERTEST",block);
 
             //Connect accountrunner to noderunner
