@@ -32,9 +32,14 @@ public class AccountRunnerGUI{
         this.accountRunner = accountRunner;
         frame = new JFrame("ACCOUNT");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+        frame.setPreferredSize(new Dimension(400,300));
+
         // Put content
         Container main = frame.getContentPane();
-        main.setLayout(new BoxLayout(main,BoxLayout.Y_AXIS));
+
+        main.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
 
         addresses = new ArrayList<>();
 
@@ -51,16 +56,13 @@ public class AccountRunnerGUI{
         moneyArea = new JLabel(String.valueOf(accountRunner.getBalance()));
         moneyCont.add(moneyArea);
 
-        //Add to main
-        main.add(moneyCont);
-
         // Make transactions container
         Container makeTrans = new Container();
-        makeTrans.setLayout(new BoxLayout(makeTrans,BoxLayout.Y_AXIS));
+        makeTrans.setLayout(new BoxLayout(makeTrans,BoxLayout.X_AXIS));
 
         // Make transaction text label
-        JLabel text = new JLabel("Make transaction:");
-        makeTrans.add(text);
+        JLabel makeTransText = new JLabel("Make transaction:");
+
 
         //Value and receiver container
         Container transInfo = new Container();
@@ -71,6 +73,8 @@ public class AccountRunnerGUI{
         transInfo.add(valueField);
         transInfo.add(new JLabel("Receiver"));
         comboAddresses = new JComboBox<Address>();
+
+
         comboAddresses.setRenderer(new ListCellRenderer<Address>() {
             @Override
             public Component getListCellRendererComponent(JList<? extends Address> list, Address value, int index, boolean isSelected, boolean cellHasFocus) {
@@ -80,38 +84,32 @@ public class AccountRunnerGUI{
         transInfo.add(comboAddresses);
         //transInfo.add(receiverField);
 
-        //Add receiver
-        Container newReceiverCont = new Container();
-        newReceiverCont.setLayout(new BoxLayout(newReceiverCont,BoxLayout.X_AXIS));
+        //Add receive
         JTextArea newReceiver = new JTextArea("Add a new Receiver");
+
+
         JButton newReceiverButton = new JButton("Add receiver");
         newReceiverButton.addActionListener(e -> comboAddresses.addItem(new PublicKeyAddress(new RSAPublicKey(newReceiver.getText()))));
-        newReceiverCont.add(newReceiver);
-        newReceiverCont.add(newReceiverButton);
-        main.add(newReceiverCont);
-
 
         makeTrans.add(transInfo);
 
         // Make trans button
         makeButton = new JButton("Make transaction!");
 
-        makeTrans.add(makeButton);
-        main.add(makeTrans);
-
-        historyContainer = new Container();
+        historyContainer = new JPanel();
         historyContainer.setLayout(new BoxLayout(historyContainer,BoxLayout.Y_AXIS));
 
-        historyContainer.add(new JLabel("Transaction History:"));
+
+        JLabel transHistoryLabel = new JLabel("Transaction History:");
+        transHistoryLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        transHistoryLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+        // The model that holds the data
         model = new DefaultListModel<>();
         historyText = new JList<>(model);
         historyText.setLayoutOrientation(JList.VERTICAL);
+        //Set number of rows before scroll
         historyText.setVisibleRowCount(10);
         JScrollPane bar = new JScrollPane(historyText);
-
-        //Set number of rows before scroll
-
-
         historyContainer.add(bar);
 
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
@@ -124,7 +122,45 @@ public class AccountRunnerGUI{
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
             model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
         }
-        main.add(historyContainer);
+
+        //Add to main
+        constraints.gridx = 1;
+        constraints.gridy = 6;
+        constraints.anchor = GridBagConstraints.LAST_LINE_START;
+        main.add(moneyCont,constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 1;
+        constraints.fill = GridBagConstraints.BOTH;
+        main.add(newReceiver,constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 2;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        main.add(makeTransText,constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 1;
+        main.add(newReceiverButton,constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 3;
+        main.add(makeButton,constraints);
+
+
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        main.add(makeTrans,constraints);
+
+
+        constraints.gridx = 0;
+        constraints.gridy = 5;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        main.add(transHistoryLabel,constraints);
+
+        constraints.gridx = 0;
+        constraints.gridy = 6;
+        main.add(historyContainer,constraints);
 
         // ActionListener for button
         makeButton.addActionListener(e->{
@@ -156,12 +192,12 @@ public class AccountRunnerGUI{
     }
 
     private void updateHistory(){
-        model.removeAllElements();
         try {
             accountRunner.getTransactionHistory().getSemaphore().acquire();
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        model.removeAllElements();
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
             model.addElement("Sender "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(13,25)
                     +" ,Receiver "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(13,25)
