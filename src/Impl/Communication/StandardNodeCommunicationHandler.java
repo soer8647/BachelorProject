@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
+import java.util.stream.Collectors;
 
 public class StandardNodeCommunicationHandler implements NodeCommunicationHandler {
     private final Thread thread;
@@ -89,13 +90,22 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
         publisher.sendJoinResponse(event.getIp(),event.getPort());
     }
 
+    /**
+     * Handle the request of a history for a given address. The handler gets the history from the node and returns the history of confirmed transactions.
+     *
+     * @param event     The TransactionHistoryRequestEvent from an account.
+     */
     private void handleTransactionHistoryRequest(TransactionHistoryRequestEvent event) {
         //Get the history
         TransactionHistory history = nodeRunner.getTransactionHistory(event.getAddress(),event.getIndex());
         List<ConfirmedTransaction> confirmedTransactions = history.getConfirmedTransactions();
         List<CoinBaseTransaction> coinBaseTransactions = history.getCoinBaseTransactions();
+        //Sort the transaction that are confirmed.
+        confirmedTransactions = confirmedTransactions.stream().filter(c->c.getBlockNumber()<=(nodeRunner.getBlockNumber()-Configuration.getConfirmedTransactionDepth())).collect(Collectors.toList());
+        coinBaseTransactions = coinBaseTransactions.stream().filter(c->c.getBlockNumber()<=(nodeRunner.getBlockNumber()-Configuration.getConfirmedTransactionDepth())).collect(Collectors.toList());
+
         //Check if it is valid size
-        TransactionHistoryResponseEvent the = new TransactionHistoryResponseEvent(event.getIp(),event.getPort(),history,event.getIndex(),1,1, LocalDateTime.now());
+        TransactionHistoryResponseEvent the = new TransactionHistoryResponseEvent(event.getIp(),event.getPort(),new TransactionHistory(confirmedTransactions,coinBaseTransactions),event.getIndex(),1,1, LocalDateTime.now());
         try {
             ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream(outputStream);
@@ -125,7 +135,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
                     publisher.sendTransactionHistoryResponse(new TransactionHistory(confirmed_part,coinBase_part),time,event.getIndex(),i+1,parts,event.getIp(),event.getPort());
                 }
             }else{
-                publisher.sendTransactionHistoryResponse(history, time, event.getIndex(),1,1,event.getIp(),event.getPort());
+                publisher.sendTransactionHistoryResponse(new TransactionHistory(confirmedTransactions,coinBaseTransactions), time, event.getIndex(),1,1,event.getIp(),event.getPort());
             }
         } catch (IOException e) {
             e.printStackTrace();

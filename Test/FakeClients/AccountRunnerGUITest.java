@@ -31,6 +31,7 @@ public class AccountRunnerGUITest {
 
 
     public static void main(String[] args) {
+        Configuration.setHardnessParameter(18);
         Transaction tx = new TransactionStub();
         StandardTransaction stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
         CoinBaseTransaction  ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
@@ -41,7 +42,6 @@ public class AccountRunnerGUITest {
         TransactionHistory t = new TransactionHistory(new ArrayList<ConfirmedTransaction>(),new ArrayList<CoinBaseTransaction>());
 
         Account second = new StandardAccount();
-
 
         try {
             UDPConnectionData nodeData = new UDPConnectionData(InetAddress.getLocalHost(),1337);
@@ -56,7 +56,6 @@ public class AccountRunnerGUITest {
             BlockChainDatabase blockChain = new BlockChainDatabase("ACCOUNTRUNNERTEST",block);
 
             //Connect accountrunner to noderunner
-            Configuration.setHardnessParameter(19);
             Node testNode = new FullNode(blockChain,main.getAddress(),new ConstantHardnessManager(),new DBTransactionManager(blockChain));
 
             BlockingQueue<Event> blockingQueue = new LinkedBlockingQueue<Event>();

@@ -29,6 +29,10 @@ public class Configuration {
     private static HashingAlgorithm hasher = new SHA256();
     private static int max_package_size = 8192;
     private static Duration hardnessTimeTarget = Duration.ofSeconds(4);
+    /**
+     * The number of blocks a transaction needs to be buried under to be valid.
+     */
+    private static int confirmedTransactionDepth = 6;
 
     private static PublicKey secretmanKey = new RSAPublicKey(BigInteger.ONE,BigInteger.valueOf(11));
     public static Block genesisblock = new StandardBlock(BigInteger.ZERO,0,BigInteger.ZERO,0,new ArrayList<>(),0, new StandardCoinBaseTransaction(new PublicKeyAddress(secretmanKey) , getBlockReward(), 0));
@@ -84,5 +88,9 @@ public class Configuration {
 
     public static void setHardnessTimeTarget(int seconds) {
         hardnessTimeTarget = Duration.ofSeconds(seconds);
+    }
+
+    public static int getConfirmedTransactionDepth() {
+        return confirmedTransactionDepth;
     }
 }

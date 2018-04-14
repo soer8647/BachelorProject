@@ -3,24 +3,26 @@ package GUI;
 import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.PublicKeyAddress;
+import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 
 import javax.swing.*;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
 import java.awt.*;
-import java.util.ArrayList;
 
 public class AccountRunnerGUI{
     private final JList<String> historyText;
     private final DefaultListModel<String> model;
-    private ArrayList<PublicKeyAddress> addresses;
+    private final JScrollPane bar;
     private final JButton makeButton;
     private final Container historyContainer;
+    private final JLabel errorField;
     private JComboBox<Address> comboAddresses;
 
-    private JTextArea receiverField;
     private JTextArea valueField;
     private AccountRunner accountRunner;
     private JFrame frame;
@@ -33,15 +35,13 @@ public class AccountRunnerGUI{
         frame = new JFrame("ACCOUNT");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.setPreferredSize(new Dimension(400,300));
+        frame.setPreferredSize(new Dimension(435,300));
 
         // Put content
         Container main = frame.getContentPane();
 
         main.setLayout(new GridBagLayout());
         GridBagConstraints constraints = new GridBagConstraints();
-
-        addresses = new ArrayList<>();
 
         //Money label and money field
         Container moneyCont = new Container();
@@ -68,7 +68,22 @@ public class AccountRunnerGUI{
         Container valueInfo = new Container();
         valueInfo.setLayout(new BoxLayout(valueInfo,BoxLayout.X_AXIS));
         valueField = new JTextArea("0");
-        receiverField = new JTextArea();
+        valueField.getDocument().addDocumentListener(new DocumentListener() {
+            @Override
+            public void insertUpdate(DocumentEvent e) {
+                checkTextAreaAndEnableTransButton();
+            }
+
+            @Override
+            public void removeUpdate(DocumentEvent e) {
+                checkTextAreaAndEnableTransButton();
+            }
+
+            @Override
+            public void changedUpdate(DocumentEvent e) {
+                checkTextAreaAndEnableTransButton();
+            }
+        });
         valueInfo.add(new JLabel("Value"));
         valueInfo.add(valueField);
 
@@ -110,20 +125,14 @@ public class AccountRunnerGUI{
         historyText.setLayoutOrientation(JList.VERTICAL);
         //Set number of rows before scroll
         historyText.setVisibleRowCount(10);
-        JScrollPane bar = new JScrollPane(historyText);
+        bar = new JScrollPane(historyText);
+        bar.setPreferredSize(new Dimension(220,173));
         historyContainer.add(bar);
 
-        for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
+        errorField = new JLabel();
+        errorField.setVisible(false);
 
-            model.addElement("Sender "+confirmedTransaction.getSenderAddress().toString().substring(0,5)
-                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().toString().substring(0,5)
-            +"value "+confirmedTransaction.getValue());
-        }
-
-        for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
-            model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
-        }
-
+        updateHistory();
         //Add to main
         constraints.gridx = 1;
         constraints.gridy = 6;
@@ -164,6 +173,11 @@ public class AccountRunnerGUI{
         constraints.fill = GridBagConstraints.HORIZONTAL;
         main.add(transHistoryLabel,constraints);
 
+        constraints.gridx = 1;
+        constraints.gridy = 3   ;
+        constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+        main.add(errorField,constraints);
+
         constraints.gridx = 0;
         constraints.gridy = 6;
         main.add(historyContainer,constraints);
@@ -173,6 +187,8 @@ public class AccountRunnerGUI{
             try {
                 accountRunner.makeTransaction((PublicKeyAddress)comboAddresses.getSelectedItem(),Integer.valueOf(valueField.getText()));
             } catch (NotEnoughMoneyException e1) {
+                errorField.setText("Not enough money to make transaction");
+                errorField.setVisible(true);
                 e1.printStackTrace();
             }
         });
@@ -199,23 +215,52 @@ public class AccountRunnerGUI{
 
     private void updateHistory(){
         try {
-            accountRunner.getTransactionHistory().getSemaphore().acquire();
+            inputTransactionHistoryElements(accountRunner.getTransactionHistory());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+    }
+
+    private void inputTransactionHistoryElements(TransactionHistory transactionHistory) throws InterruptedException {
+
+        transactionHistory.getSemaphore().acquire();
         model.removeAllElements();
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
-            model.addElement("Sender "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(13,25)
-                    +" ,Receiver "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(13,25)
-                    +"value "+confirmedTransaction.getValue());
+            model.addElement("S: "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(16,22)
+                    +", R: "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(16,22)
+                    +", V: "+confirmedTransaction.getValue());
         }
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
-                model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
+            model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
         }
-        accountRunner.getTransactionHistory().getSemaphore().release();
+        transactionHistory.getSemaphore().release();
     }
 
     public void addAddress(Address address){
         comboAddresses.addItem(address);
     }
+
+
+    private void checkTextAreaAndEnableTransButton(){
+        String value = valueField.getText();
+        errorField.setVisible(false);
+        try{
+            int transactionValue = Integer.valueOf(value);
+            // Maybe not this TODO
+            if (transactionValue>accountRunner.getBalance()){
+                makeButton.setEnabled(false);
+                errorField.setVisible(true);
+                errorField.setText("<html>Not enough funds.</html>");
+                errorField.setForeground(Color.RED);
+            }else {
+                makeButton.setEnabled(true);
+            }
+        }catch (NumberFormatException e){
+            makeButton.setEnabled(false);
+            errorField.setText("<html>Value must be integer.</html>");
+            errorField.setForeground(Color.RED);
+            errorField.setVisible(true);
+        }
+    }
+
 }
