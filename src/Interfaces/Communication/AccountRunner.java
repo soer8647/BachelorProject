@@ -48,4 +48,6 @@ public interface AccountRunner {
      * Send a request to the network to update the history of an account.
      */
     void updateTransactionHistory();
+
+    void updatePendingTransactions();
 }
