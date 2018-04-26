@@ -93,6 +93,7 @@ public class AccountAndNodeCommunication {
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),0,ct);
         blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);
         transactionQueue = new LinkedBlockingQueue<>();
+        node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new DBTransactionManager(blockchain));
         Configuration.setHardnessParameter(18);
 
     }
@@ -101,7 +102,7 @@ public class AccountAndNodeCommunication {
         //Not so much an integration test, but manual testing is done here.
         new AccountAndNodeCommunication();
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
-        nodeRunner = new StandardNodeRunner(blockchain,nodeAddress,new ConstantHardnessManager(),new DBTransactionManager(blockchain),transactionQueue);
+        nodeRunner = new StandardNodeRunner(node,eventQueue);
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
 
         try {

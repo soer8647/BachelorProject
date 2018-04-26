@@ -59,7 +59,7 @@ public class AccountRunnerGUITest {
             Node testNode = new FullNode(blockChain,main.getAddress(),new ConstantHardnessManager(),new DBTransactionManager(blockChain));
 
             BlockingQueue<Event> blockingQueue = new LinkedBlockingQueue<Event>();
-            NodeRunner nodeRunner = new StandardNodeRunner(testNode,blockingQueue, new DBTransactionManager(blockChain),new JFrameListDisplay("Test"));
+            NodeRunner nodeRunner = new StandardNodeRunner(testNode,blockingQueue,new JFrameListDisplay("Test"));
 
             UDPReceiver receiver = new UDPReceiver(blockingQueue,1337);
 

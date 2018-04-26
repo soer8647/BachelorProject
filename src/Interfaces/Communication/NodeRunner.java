@@ -25,8 +25,6 @@ public interface NodeRunner {
      */
     int getBlockNumber();
 
-    TransactionManager getTransactionManager();
-
     boolean validateTransaction(Transaction transaction);
 
     Block getBlock(int number);
@@ -36,4 +34,6 @@ public interface NodeRunner {
     TransactionHistory getTransactionHistory(Address address, int index);
 
     void stop();
+
+    boolean addTransaction(Transaction transaction);
 }

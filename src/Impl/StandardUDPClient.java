@@ -44,7 +44,7 @@ public class StandardUDPClient {
         TransactionManager transMan = new DBTransactionManager(db);
         Node node = new FullNode(db,acc.getAddress(),new FlexibleHardnessManager(), transMan);
         display = new JFrameListDisplay(acc.getAddress().getPublicKey() + " - " + myPort);
-        nodeRunner = new StandardNodeRunner(node, queue, transMan, display);
+        nodeRunner = new StandardNodeRunner(node, queue, display);
 
         publisher = new UDPPublisherNode(myIp,myPort,connectionsData);
         nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,publisher,queue);

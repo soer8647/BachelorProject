@@ -151,4 +151,19 @@ public class FullNode implements Node {
     public TransactionHistory getTransactionHistory(Address a, int index){
         return blockChain.getTransactionHistory(a,index);
     }
+
+    @Override
+    public Collection<Transaction> getSomeTransactions() {
+        return transactionManager.getSomeTransactions();
+    }
+
+    @Override
+    public boolean addTransaction(Transaction t) {
+        return transactionManager.addTransaction(t);
+    }
+
+    @Override
+    public void removeTransactions(Collection<Transaction> transactions) {
+        transactionManager.removeTransactions(transactions);
+    }
 }

@@ -217,7 +217,7 @@ public class StandardNodeCommunicationHandler implements NodeCommunicationHandle
     public void handleNewTransaction(TransactionEvent transactionEvent) {
         // put into Node's queue of potential transactions
         //the TransactionManager should validate the transaction
-        if (nodeRunner.getTransactionManager().addTransaction(transactionEvent.getTransaction())) {
+        if (nodeRunner.addTransaction(transactionEvent.getTransaction())) {
             publisher.broadCast(transactionEvent);
         }
     }

@@ -29,39 +29,8 @@ public class NodeRunnerStub implements NodeRunner {
         return this.blockNumber;
     }
 
-    @Override
     public TransactionManager getTransactionManager() {
-        return new TransactionManager() {
-
-            @Override
-            public Collection<Transaction> getSomeTransactions() {
-                return null;
-            }
-
-            @Override
-            public boolean addTransaction(Transaction transaction) {
-                if (gotATransaction) {
-                    return false;
-                }
-                gotATransaction = true;
-                return true;
-            }
-
-            @Override
-            public void removeTransactions(Collection<Transaction> transactions) {
-
-            }
-
-            @Override
-            public boolean validateTransaction(Transaction transaction) {
-                return false;
-            }
-
-            @Override
-            public boolean validateTransactions(Collection<Transaction> transactions) {
-                return false;
-            }
-        };
+        return null;
     }
 
     @Override
@@ -87,6 +56,15 @@ public class NodeRunnerStub implements NodeRunner {
     @Override
     public void stop() {
 
+    }
+
+    @Override
+    public boolean addTransaction(Transaction transaction) {
+        if (gotATransaction) {
+            return false;
+        }
+        gotATransaction = true;
+        return true;
     }
 
     public boolean gotTransaction() {

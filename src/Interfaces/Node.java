@@ -72,4 +72,10 @@ public interface Node {
     void addBlock(Block block);
 
     TransactionHistory getTransactionHistory(Address address, int index);
+
+    Collection<Transaction> getSomeTransactions();
+
+    boolean addTransaction(Transaction t);
+
+    void removeTransactions(Collection<Transaction> transactions);
 }
