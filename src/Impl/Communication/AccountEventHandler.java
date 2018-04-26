@@ -6,10 +6,12 @@ import Impl.Communication.UDP.UDPPublisher;
 import Impl.Communication.UDP.UDPReceiver;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.PendingTransaction;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.EventHandler;
 
+import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.time.LocalDateTime;
@@ -33,11 +35,13 @@ public class AccountEventHandler implements EventHandler,Runnable{
     private Semaphore semaphore;
     private Map<LocalDateTime,List<TransactionHistory>> historyMap;
     private int blockTime = 0;
+    private Map<BigInteger,PendingTransaction> pendingTransactionHashMap;
 
 
-    public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, List<UDPConnectionData> connectionsData) {
+    public AccountEventHandler(TransactionHistory transactionHistory, LinkedBlockingQueue<Event> eventQueue, int portNumber, List<UDPConnectionData> connectionsData, Map<BigInteger, PendingTransaction> pendingTransactionMap) {
         this.transactionHistory = transactionHistory;
         receiver = new UDPReceiver(eventQueue, portNumber);
+        this.pendingTransactionHashMap=pendingTransactionMap;
         try{
             InetAddress address= InetAddress.getLocalHost();
             publisher = new UDPPublisher(address, portNumber,connectionsData);
@@ -60,13 +64,17 @@ public class AccountEventHandler implements EventHandler,Runnable{
             if (event instanceof TransactionHistoryResponseEvent) {
                 TransactionHistoryResponseEvent transHistoryResponseEvent = (TransactionHistoryResponseEvent) event;
                 TransactionHistory th = transHistoryResponseEvent.getTransactions();
-
+                // If the transaction history response only has one part
                 if (transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex() && transHistoryResponseEvent.getParts() == 1) {
                     transactionHistory.getSemaphore().acquire();
+                    // TODO confirm or discard pending transactions
+                    // Remove all transactions from pending.
+                    th.getConfirmedTransactions().forEach(t->pendingTransactionHashMap.remove(t.transactionHash()));
+                    // TODO mark as confirmed
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
                     transactionHistory.getCoinBaseTransactions().addAll(th.getCoinBaseTransactions());
                     transactionHistory.getSemaphore().release();
-
+                // Merge the parts in the map
                 } else if(transactionHistory.getBlocknumber()+1 == transHistoryResponseEvent.getIndex()){
                     // Get the histories with the same timestamp
                     List<TransactionHistory> histories = historyMap.get(transHistoryResponseEvent.getTime());

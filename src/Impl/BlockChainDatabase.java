@@ -1,6 +1,5 @@
 package Impl;
 
-import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Transactions.ConfirmedTransaction;
@@ -54,8 +53,6 @@ public class BlockChainDatabase implements BlockChain{
                 +  " VALUE INT NOT NULL,"
                 +  " BLOCKNR INT NOT NULL, "
                 +  " TIMESTAMP INT NOT NULL, "
-                +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
-                +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
                 +  " TRANS_HASH VARCHAR(255) NOT NULL "
                 +  " CONSTRAINT TRANS_HASH PRIMARY KEY,"
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
@@ -67,8 +64,6 @@ public class BlockChainDatabase implements BlockChain{
                 +  " VALUE INT NOT NULL,"
                 +  " BLOCKNR INT NOT NULL, "
                 +  " TIMESTAMP INT NOT NULL, "
-                +  " BLOCKNR_VALUE_PROOF INT NOT NULL,"
-                +  " HASH_TRANS_VALUE_PROOF VARCHAR(255) NOT NULL,"
                 +  " PENDING_TRANS_HASH VARCHAR(255) NOT NULL "
                 +  " CONSTRAINT PENDING_TRANS_HASH PRIMARY KEY,"
                 +  " SIGNATURE VARCHAR(255) NOT NULL"
@@ -166,7 +161,7 @@ public class BlockChainDatabase implements BlockChain{
         // Update the values of the unspent transactions
         for (Transaction transaction: block.getTransactions()){
             // Get the value proof rest value
-            updateUnspentTransactions(transaction.getValueProof(),transaction.getValue(),transaction.getSenderAddress());
+            updateUnspentTransactions(transaction.getValue(),transaction.getSenderAddress());
             addUnspentTransaction(transaction.transactionHash(),transaction.getValue(),false,block.getBlockNumber(),transaction.getReceiverAddress());
         }
         try{
@@ -206,9 +201,9 @@ public class BlockChainDatabase implements BlockChain{
         }
     }
 
-    private void removeUnspentTransaction(BigInteger valueProof) {
+    private void removeUnspentTransaction(BigInteger hash) {
         try {
-            String query = "DELETE FROM UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH='"+valueProof+"'";
+            String query = "DELETE FROM UNSPENT_TRANSACTIONS WHERE UNSPENT_TRANS_HASH='"+hash+"'";
             query(query);
         } catch (SQLException e) {
             e.printStackTrace();
@@ -305,8 +300,6 @@ public class BlockChainDatabase implements BlockChain{
         Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
         Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
         int value = set.getInt("VALUE");
-        int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
-        BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
         BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
         int timestamp = set.getInt("TIMESTAMP");
         int blockNr = set.getInt("BLOCKNR");
@@ -314,7 +307,7 @@ public class BlockChainDatabase implements BlockChain{
             s.close();
             set.close();
         }
-        return new ConfirmedTransaction(new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp),blockNr);
+        return new ConfirmedTransaction(new StandardTransaction(sender,receiver,value, signature, timestamp),blockNr);
     }
 
 
@@ -329,15 +322,13 @@ public class BlockChainDatabase implements BlockChain{
         Address sender = new PublicKeyAddress(new RSAPublicKey(set.getString("SENDER")));
         Address receiver = new PublicKeyAddress(new RSAPublicKey(set.getString("RECEIVER")));
         int value = set.getInt("VALUE");
-        int blocknr_value_proof = set.getInt("BLOCKNR_VALUE_PROOF");
-        BigInteger hash_trans_value_proof = new BigInteger(set.getString("HASH_TRANS_VALUE_PROOF"));
         BigInteger signature = new BigInteger(set.getString("SIGNATURE"));
         int timestamp = set.getInt("TIMESTAMP");
         if (close){
             s.close();
             set.close();
         }
-        return new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp);
+        return new StandardTransaction(sender,receiver,value, signature, timestamp);
     }
 
     /**
@@ -376,9 +367,7 @@ public class BlockChainDatabase implements BlockChain{
                 + "'"+transaction.getReceiverAddress()+"',"
                 + transaction.getValue()+","
                 + blocknumber+","
-                + transaction.getTimestamp()+","
-                + transaction.getBlockNumberOfValueProof()+",'"
-                + transaction.getValueProof().toString()+"','"
+                + transaction.getTimestamp()+",'"
                 + transaction.transactionHash().toString()+"',"
                 +"'"+transaction.getSignature().toString()+"')";
 
@@ -451,11 +440,11 @@ public class BlockChainDatabase implements BlockChain{
                 BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
                 int timestamp = setT.getInt("TIMESTAMP");
-                transactions.add( new StandardTransaction(sender,receiver,value,hash_trans_value_proof,signature,blocknr_value_proof, timestamp));
+                transactions.add( new StandardTransaction(sender,receiver,value, signature, timestamp));
             }
             setT.close();
             s.close();
-            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.getTransactionLimit(),transactions,blockNumber,coinBase);
+            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash, transactions,blockNumber,coinBase);
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -535,7 +524,7 @@ public class BlockChainDatabase implements BlockChain{
         return getBlock(0);
     }
 
-     public void updateUnspentTransactions(BigInteger beginTransactionHash,int beginValue, Address address){
+     public void updateUnspentTransactions(int beginValue, Address address){
          try {
              Statement s = conn.createStatement();
              String query = "SELECT * FROM UNSPENT_TRANSACTIONS WHERE RECEIVER='"+address.toString()+"'";
@@ -554,22 +543,17 @@ public class BlockChainDatabase implements BlockChain{
              unspentTransactions.sort(Comparator.comparing(UnspentTransaction::getBlockNumber));
 
              int valueToUpdate=beginValue;
-             boolean after=false;
+
              for (UnspentTransaction u: unspentTransactions){
-                 if (u.getUnspentTransactionHash().toString().equals(beginTransactionHash.toString())){
-                     after=true;
-                 }
-                 if (after) {
-                     int val = u.getValueLeft() - valueToUpdate;
-                     if (val > 0){
-                         updateUnspentTransactionValue(u.getUnspentTransactionHash(),val);
-                     }else if (val ==0){
-                         removeUnspentTransaction(u.getUnspentTransactionHash());
-                         break;
-                     }else {
-                         removeUnspentTransaction(u.getUnspentTransactionHash());
-                         valueToUpdate = -val;
-                     }
+                 int val = u.getValueLeft() - valueToUpdate;
+                 if (val > 0){
+                     updateUnspentTransactionValue(u.getUnspentTransactionHash(),val);
+                 }else if (val ==0){
+                     removeUnspentTransaction(u.getUnspentTransactionHash());
+                     break;
+                 }else {
+                     removeUnspentTransaction(u.getUnspentTransactionHash());
+                     valueToUpdate = -val;
                  }
              }
          } catch (SQLException e) {

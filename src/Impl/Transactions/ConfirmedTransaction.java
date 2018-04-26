@@ -14,9 +14,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
     private Address sender;
     private Address receiver;
     private int value;
-    private BigInteger valueProof;
     private BigInteger signature;
-    private int blockNumberValueProof;
     private int blockNumber;
     private int timestamp;
 
@@ -25,9 +23,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
         sender= transaction.getSenderAddress();
         receiver=transaction.getReceiverAddress();
         value=transaction.getValue();
-        valueProof=transaction.getValueProof();
         signature = transaction.getSignature();
-        blockNumberValueProof=transaction.getBlockNumberOfValueProof();
         timestamp = transaction.getTimestamp();
         this.blockNumber = blockNumber;
     }
@@ -37,7 +33,7 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
      */
     @Override
     public BigInteger transactionHash() {
-        return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString()+timestamp);
+        return Configuration.hash(sender.toString()+receiver.toString()+value+timestamp);
     }
 
     @Override
@@ -54,18 +50,6 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
         return value;
     }
 
-    /**
-     *  @return         The hash of the transaction where there is proof of funds
-     */
-    public BigInteger getValueProof() {
-        return valueProof;
-    }
-
-    @Override
-    public int getBlockNumberOfValueProof() {
-        return blockNumberValueProof;
-    }
-
     public BigInteger getSignature() {
         return signature;
     }
@@ -80,7 +64,6 @@ public class ConfirmedTransaction implements Transaction, VerifiableTransaction 
         return "Sender: "+sender+",\n"+
                 "Receiver: "+receiver+",\n"+
                 "Value: "+value+",\n"+
-                "Hash of value proof transaction: " + valueProof+",\n"+
                 "Signature: "+signature+"\n";
     }
 

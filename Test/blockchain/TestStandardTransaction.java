@@ -4,7 +4,6 @@ import Crypto.Impl.RSAPublicKey;
 import Impl.PublicKeyAddress;
 import Impl.Transactions.StandardTransaction;
 import Interfaces.Address;
-import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -19,15 +18,15 @@ public class TestStandardTransaction {
 
     private StandardTransaction standardTransaction;
     private BigInteger signature;
-    private BigInteger valueProof;
+
     @Before
     public void setUp(){
-        valueProof = new TransactionStub().transactionHash();
+
         signature = new BigInteger("42");
 
         Address receiver = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
         Address  sender = new PublicKeyAddress(new RSAPublicKey(new BigInteger("3"),new BigInteger("1234")));
-        standardTransaction = new StandardTransaction(receiver,sender, 1, valueProof, signature, 0, 0);
+        standardTransaction = new StandardTransaction(receiver,sender, 1, signature, 0);
     }
 
     @Test
@@ -50,10 +49,6 @@ public class TestStandardTransaction {
         assertThat(standardTransaction.getValue(),is(1));
     }
 
-    @Test
-    public void hasProofOfAmount(){
-        assertNotEquals(standardTransaction.getValueProof(),null);
-    }
 
     @Test
     public void hasSignature(){
@@ -70,7 +65,7 @@ public class TestStandardTransaction {
         try {
             MessageDigest sha256 = MessageDigest.getInstance("SHA-256");
 
-            String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+valueProof.toString()+standardTransaction.getTimestamp();
+            String s =standardTransaction.getSenderAddress().toString()+standardTransaction.getReceiverAddress().toString()+standardTransaction.getValue()+standardTransaction.getTimestamp();
             byte[] hash = sha256.digest(s.getBytes());
             BigInteger hashValue = new BigInteger(1,hash);
             assertEquals(hashValue,standardTransaction.transactionHash());
@@ -81,12 +76,11 @@ public class TestStandardTransaction {
 
     @Test
     public void shouldOverrideToString(){
-        BigInteger hash = valueProof;
+
 
         String should = "Sender: "+standardTransaction.getSenderAddress().toString()+",\n"+
                         "Receiver: "+standardTransaction.getReceiverAddress().toString()+
-                                ",\nValue: 1,\nHash of value proof transaction: " +hash+",\nTimestamp: 0,\nSignature: "+ signature+"\n";
-
+                                ",\nValue: 1,\nTimestamp: 0,\nSignature: "+ signature+"\n";
 
         assertEquals(should,standardTransaction.toString());
     }

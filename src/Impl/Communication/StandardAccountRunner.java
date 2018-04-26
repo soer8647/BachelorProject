@@ -7,6 +7,7 @@ import Impl.Communication.UDP.UDPConnectionData;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
 import Impl.Transactions.IllegalTransactionException;
+import Impl.Transactions.PendingTransaction;
 import Interfaces.*;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
@@ -15,12 +16,11 @@ import Interfaces.Communication.EventHandler;
 import java.math.BigInteger;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.LinkedBlockingQueue;
+import java.util.stream.Collectors;
 
 public class StandardAccountRunner implements AccountRunner {
 
@@ -30,14 +30,18 @@ public class StandardAccountRunner implements AccountRunner {
     private AccountEventHandler eventHandler;
     private Collection<UDPConnectionData> udpConnectionsData;
     private int listeningPort;
+    private Map<BigInteger,PendingTransaction> pendingTransactionMap;
+    private List<Transaction> discardedTransactions;
 
     public StandardAccountRunner(Account account, LinkedBlockingQueue<Event> eventQueue, List<UDPConnectionData> connectionsData, int listeningPort) {
         this.listeningPort=listeningPort;
         this.account = account;
         this.eventQueue = eventQueue;
         this.udpConnectionsData = connectionsData;
+        discardedTransactions = new ArrayList<>();
+        pendingTransactionMap = new HashMap<>();
         transactionHistory = new TransactionHistory(new CopyOnWriteArrayList<>(),new CopyOnWriteArrayList<>());
-        eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,connectionsData);
+        eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort,connectionsData,pendingTransactionMap);
         eventHandler.start();
     }
 
@@ -46,8 +50,10 @@ public class StandardAccountRunner implements AccountRunner {
         this.account = account;
         this.transactionHistory = transactionHistory;
         this.eventQueue = new LinkedBlockingQueue<>();
-        this.eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort, udpConnectionsData);
+        this.eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort, udpConnectionsData,pendingTransactionMap);
         this.udpConnectionsData = udpConnectionsData;
+        discardedTransactions = new ArrayList<>();
+        pendingTransactionMap = new HashMap<>();
         eventHandler.start();
     }
 
@@ -83,7 +89,7 @@ public class StandardAccountRunner implements AccountRunner {
     }
 
     /**
-     * The AccountRunner broadcasts the transaction to all the known nodes
+     * The AccountRunner broadcasts the transaction to all the known nodes, and puts the transaction in the pending map.
      *
      * @param address The address of the receiver
      * @param value   The value to send
@@ -91,10 +97,12 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public void makeTransaction(Address address, int value) throws NotEnoughMoneyException {
         try {
-        Pair<BigInteger,Integer> proof = getValueProof(value);
+            int timestamp = eventHandler.getBlockTime();
+            Pair<BigInteger,Integer> proof = getValueProof(value);
+            Transaction transaction = account.makeTransaction(address, value, timestamp);
+            pendingTransactionMap.put(transaction.transactionHash(),new PendingTransaction(transaction,LocalDateTime.now()));
             for (UDPConnectionData d: udpConnectionsData) {
-                int timestamp = eventHandler.getBlockTime();
-                eventQueue.put(new TransactionEvent(account.makeTransaction(address, value, proof.getKey(), proof.getValue(),timestamp), d.getPort(),d.getInetAddress()));
+                eventQueue.put(new TransactionEvent(transaction, d.getPort(),d.getInetAddress()));
             }
         } catch (InterruptedException |IllegalTransactionException e) {
             e.printStackTrace();
@@ -157,6 +165,18 @@ public class StandardAccountRunner implements AccountRunner {
             e.printStackTrace();
         }
 
+    }
+
+    @Override
+    public void updatePendingTransactions() {
+        List<BigInteger> discarded =pendingTransactionMap.keySet().stream().filter(t->pendingTransactionMap.get(t).getTime().isBefore(LocalDateTime.now().minusMinutes(1))).collect(Collectors.toList());
+        // Collect all discarded transactions
+        discardedTransactions = discardedTransactions.stream().map(t->pendingTransactionMap.get(t).getTransaction()).collect(Collectors.toList());
+
+        pendingTransactionMap.keySet().forEach(t->{if(discarded.contains(t)){
+            pendingTransactionMap.remove(t);
+        }});
+        
     }
 
 

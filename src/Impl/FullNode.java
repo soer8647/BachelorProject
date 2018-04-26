@@ -67,7 +67,6 @@ public class FullNode implements Node {
                 nonce,
                 hardness, //TODO ohh dayum
                 previousBlockHash,
-                10,
                 transactions,
                 blockChain.getBlockNumber()+1,
                 coinBase);

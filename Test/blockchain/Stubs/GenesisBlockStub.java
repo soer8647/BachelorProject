@@ -35,11 +35,6 @@ public class GenesisBlockStub implements Block {
     }
 
     @Override
-    public int getTransactionLimit() {
-        return 0;
-    }
-
-    @Override
     public BigInteger hash() {
         return BigInteger.ZERO;
     }

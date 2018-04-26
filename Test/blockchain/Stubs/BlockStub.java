@@ -46,11 +46,6 @@ public class BlockStub implements Block {
     }
 
     @Override
-    public int getTransactionLimit() {
-        return 0;
-    }
-
-    @Override
     public BigInteger hash() {
         return new BigInteger("1337");
     }

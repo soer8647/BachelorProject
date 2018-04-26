@@ -42,16 +42,6 @@ public class TransactionStub implements Transaction{
     }
 
     @Override
-    public BigInteger getValueProof() {
-        return new BigInteger("8008");
-    }
-
-    @Override
-    public int getBlockNumberOfValueProof() {
-        return 0;
-    }
-
-    @Override
     public BigInteger getSignature() {
         return new BigInteger("8080");
     }

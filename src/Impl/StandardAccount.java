@@ -52,15 +52,14 @@ public class StandardAccount implements Account{
     /**
      * @param receiver      The address of the receiver of the transaction.
      * @param value         The amount to be transferred.
-     * @param valueProof    The transaction where the sender has a proof of funds
      * @return              The transaction object.
      */
     @Override
-    public Transaction makeTransaction(Address receiver, int value, BigInteger valueProof, int blockValueProof,int timestamp) {
+    public Transaction makeTransaction(Address receiver, int value, int timestamp) {
 
-        String transaction = address.toString()+receiver.toString()+value+valueProof.toString()+timestamp;
+        String transaction = address.toString()+receiver.toString()+value+timestamp;
         BigInteger signature = Configuration.getCryptoSystem().sign(privateKey,Configuration.hash(transaction));
 
-        return new StandardTransaction(address,receiver,value,valueProof,signature, blockValueProof, timestamp);
+        return new StandardTransaction(address,receiver,value, signature, timestamp);
     }
 }

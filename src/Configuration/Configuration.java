@@ -35,7 +35,7 @@ public class Configuration {
     private static int confirmedTransactionDepth = 6;
 
     private static PublicKey secretmanKey = new RSAPublicKey(BigInteger.ONE,BigInteger.valueOf(11));
-    public static Block genesisblock = new StandardBlock(BigInteger.ZERO,0,BigInteger.ZERO,0,new ArrayList<>(),0, new StandardCoinBaseTransaction(new PublicKeyAddress(secretmanKey) , getBlockReward(), 0));
+    public static Block genesisblock = new StandardBlock(BigInteger.ZERO,0,BigInteger.ZERO, new ArrayList<>(),0, new StandardCoinBaseTransaction(new PublicKeyAddress(secretmanKey) , getBlockReward(), 0));
 
 
     /**

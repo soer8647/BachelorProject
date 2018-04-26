@@ -16,11 +16,15 @@ import java.awt.*;
 
 public class AccountRunnerGUI{
     private final JList<String> historyText;
-    private final DefaultListModel<String> model;
-    private final JScrollPane bar;
+    private final DefaultListModel<String> historyModel;
+    private final JList<String> pendingText;
+    private final DefaultListModel<String> pendingTransactions;
+    private final JScrollPane historyBar;
     private final JButton makeButton;
     private final Container historyContainer;
     private final JLabel errorField;
+    private final JScrollPane pendingBar;
+    private final JPanel pendingContainer;
     private JComboBox<Address> comboAddresses;
 
     private JTextArea valueField;
@@ -35,7 +39,7 @@ public class AccountRunnerGUI{
         frame = new JFrame("ACCOUNT");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);
-        frame.setPreferredSize(new Dimension(435,300));
+        frame.setPreferredSize(new Dimension(530,300));
 
         // Put content
         Container main = frame.getContentPane();
@@ -112,47 +116,68 @@ public class AccountRunnerGUI{
         // Make trans button
         makeButton = new JButton("Make transaction!");
 
+        // Pending transactions
+        pendingContainer = new JPanel();
+        pendingContainer.setLayout(new BoxLayout(pendingContainer,BoxLayout.Y_AXIS));
+        JLabel pendingTextLabel = new JLabel("Pending transactions:");
+        pendingTextLabel.setHorizontalAlignment(SwingConstants.LEFT);
+        pendingTextLabel.setHorizontalTextPosition(SwingConstants.LEFT);
+
+        pendingTransactions = new DefaultListModel<>();
+        pendingText = new JList<>(pendingTransactions);
+        pendingText.setLayoutOrientation(JList.VERTICAL);
+        pendingText.setVisibleRowCount(10);
+        pendingBar = new JScrollPane(pendingText);
+        pendingBar.setPreferredSize(new Dimension(220,173));
+        pendingContainer.add(pendingBar);
+
         historyContainer = new JPanel();
         historyContainer.setLayout(new BoxLayout(historyContainer,BoxLayout.Y_AXIS));
-
 
         JLabel transHistoryLabel = new JLabel("Transaction History:");
         transHistoryLabel.setHorizontalAlignment(SwingConstants.LEFT);
         transHistoryLabel.setHorizontalTextPosition(SwingConstants.LEFT);
-        // The model that holds the data
-        model = new DefaultListModel<>();
-        historyText = new JList<>(model);
+        // The historyModel that holds the data
+        historyModel = new DefaultListModel<>();
+        historyText = new JList<>(historyModel);
         historyText.setLayoutOrientation(JList.VERTICAL);
         //Set number of rows before scroll
         historyText.setVisibleRowCount(10);
-        bar = new JScrollPane(historyText);
-        bar.setPreferredSize(new Dimension(220,173));
-        historyContainer.add(bar);
+        historyBar = new JScrollPane(historyText);
+        historyBar.setPreferredSize(new Dimension(220,173));
+        historyContainer.add(historyBar);
 
         errorField = new JLabel();
         errorField.setVisible(false);
 
         updateHistory();
         //Add to main
-        constraints.gridx = 1;
+
+        //Add money text area
+        constraints.gridx = 2;
         constraints.gridy = 6;
         constraints.anchor = GridBagConstraints.LAST_LINE_START;
         main.add(moneyCont,constraints);
 
+        //Add receiver text area
         constraints.gridx = 0;
         constraints.gridy = 1;
         constraints.fill = GridBagConstraints.BOTH;
         main.add(newReceiver,constraints);
 
+        //Add transaction text
         constraints.gridx = 0;
         constraints.gridy = 2;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         main.add(makeTransText,constraints);
 
+
+        //add "add receiver button"
         constraints.gridx = 1;
         constraints.gridy = 1;
         main.add(newReceiverButton,constraints);
 
+        //add "make transaction" button
         constraints.gridx = 1;
         constraints.gridy = 4;
         main.add(makeButton,constraints);
@@ -168,15 +193,27 @@ public class AccountRunnerGUI{
         main.add(receiverInfo,constraints);
 
 
+
+
         constraints.gridx = 0;
         constraints.gridy = 5;
         constraints.fill = GridBagConstraints.HORIZONTAL;
         main.add(transHistoryLabel,constraints);
 
         constraints.gridx = 1;
+        constraints.gridy = 5;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        main.add(pendingTextLabel,constraints);
+
+
+        constraints.gridx = 1;
         constraints.gridy = 3   ;
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         main.add(errorField,constraints);
+
+        constraints.gridx = 1;
+        constraints.gridy = 6;
+        main.add(pendingContainer,constraints);
 
         constraints.gridx = 0;
         constraints.gridy = 6;
@@ -200,6 +237,7 @@ public class AccountRunnerGUI{
         Thread t = new Thread(()->{
             while (!Thread.interrupted()) {
                 accountRunner.updateTransactionHistory();
+                accountRunner.updatePendingTransactions();
                 System.out.println("Updating");
                 SwingUtilities.invokeLater(this::updateHistory);
                 moneyArea.setText(String.valueOf(accountRunner.getBalance()));
@@ -224,14 +262,14 @@ public class AccountRunnerGUI{
     private void inputTransactionHistoryElements(TransactionHistory transactionHistory) throws InterruptedException {
 
         transactionHistory.getSemaphore().acquire();
-        model.removeAllElements();
+        historyModel.removeAllElements();
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){
-            model.addElement("S: "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(16,22)
+            historyModel.addElement("S: "+confirmedTransaction.getSenderAddress().getPublicKey().toString().substring(16,22)
                     +", R: "+confirmedTransaction.getReceiverAddress().getPublicKey().toString().substring(16,22)
                     +", V: "+confirmedTransaction.getValue());
         }
         for (CoinBaseTransaction coinBaseTransaction: accountRunner.getTransactionHistory().getCoinBaseTransactions()){
-            model.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
+            historyModel.addElement("Coin: "+coinBaseTransaction.getValue() + " ,blocknumber: "+coinBaseTransaction.getBlockNumber());
         }
         transactionHistory.getSemaphore().release();
     }

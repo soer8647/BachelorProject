@@ -41,11 +41,6 @@ public interface Block extends Serializable{
     BigInteger getPreviousHash();
 
     /**
-     * @return The limit of how many transactions can be stored inside of a single block.
-     */
-    int getTransactionLimit();
-
-    /**
      * @return      The hash of the nonce, transactions and previous block hash.
      */
     BigInteger hash();

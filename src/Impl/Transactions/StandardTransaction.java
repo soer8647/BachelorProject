@@ -13,9 +13,7 @@ public class StandardTransaction implements Transaction {
     private Address sender;
     private Address receiver;
     private int value;
-    private BigInteger valueProof;
     private BigInteger signature;
-    private int blockNumberValueProof;
     private int timestamp; // block number
 
 
@@ -23,19 +21,15 @@ public class StandardTransaction implements Transaction {
      * @param sender        The "address" or id of the sender of the transaction.
      * @param receiver      The "address" or id of the receiver of the transaction.
      * @param value         The value of the transaction.
-     * @param valueProof    The transaction where the sender has proof of funds for this transaction.
      * @param signature     The signature of the sender on this transaction.
-     * @param blockNumberValueProof     The block number where there is proof of funds.
      * @param timestamp
 
      */
-    public StandardTransaction(Address sender, Address receiver, int value, BigInteger valueProof, BigInteger signature, int blockNumberValueProof, int timestamp) {
+    public StandardTransaction(Address sender, Address receiver, int value, BigInteger signature, int timestamp) {
         this.sender = sender;
         this.receiver = receiver;
         this.value = value;
-        this.valueProof = valueProof;
         this.signature = signature;
-        this.blockNumberValueProof = blockNumberValueProof;
         this.timestamp = timestamp;
     }
 
@@ -44,7 +38,7 @@ public class StandardTransaction implements Transaction {
      */
     @Override
     public BigInteger transactionHash() {
-            return Configuration.hash(sender.toString()+receiver.toString()+value+valueProof.toString()+timestamp);
+            return Configuration.hash(sender.toString()+receiver.toString()+value+timestamp);
     }
 
     @Override
@@ -61,18 +55,6 @@ public class StandardTransaction implements Transaction {
         return value;
     }
 
-    /**
-     *  @return         The hash of the transaction where there is proof of funds
-     */
-    public BigInteger getValueProof() {
-        return valueProof;
-    }
-
-    @Override
-    public int getBlockNumberOfValueProof() {
-        return blockNumberValueProof;
-    }
-
     public BigInteger getSignature() {
         return signature;
     }
@@ -82,7 +64,6 @@ public class StandardTransaction implements Transaction {
         return "Sender: "+sender+",\n"+
                 "Receiver: "+receiver+",\n"+
                 "Value: "+value+",\n"+
-                "Hash of value proof transaction: " + valueProof+",\n"+
                 "Timestamp: " + timestamp+",\n"+
                 "Signature: "+signature+"\n";
 
