@@ -25,7 +25,7 @@ public class FauxCommunicatingBlockChain {
         BlockingQueue<Event> queue_A = new LinkedBlockingQueue<>();
         BlockingQueue<Event> queue_B = new LinkedBlockingQueue<>();
 
-        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayList<>(),1,new CoinBaseTransactionStub());
+        Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), new ArrayList<>(),1,new CoinBaseTransactionStub());
 
         TransactionManager transMan = new EmptyTransactionsManager();
 

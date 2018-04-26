@@ -45,7 +45,7 @@ public class TestDBTransactionManager {
 
         coinBase0 = new StandardCoinBaseTransaction(sender1,10,0);
 
-        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE,10, new ArrayList<>(),0, coinBase0);
+        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE, new ArrayList<>(),0, coinBase0);
         blockchain = new BlockChainDatabase("TEST_DBTRANSACTIONMANAGER",genesis);
 
         transactionManager = new DBTransactionManager(blockchain);

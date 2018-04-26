@@ -35,7 +35,7 @@ public class AccountRunnerGUITest {
         Transaction tx = new TransactionStub();
         StandardTransaction stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
         CoinBaseTransaction  ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
-        Block block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 0, ct);
+        Block block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 0, ct);
 
         Account main = new StandardAccount();
         CoinBaseTransaction c = new StandardCoinBaseTransaction(main.getAddress(),10,1);

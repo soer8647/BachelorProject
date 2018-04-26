@@ -50,8 +50,8 @@ public class TestFullNode {
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
-        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 0, ct);
-        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), 10, new ArrayList<>(), 1, ct);
+        block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 0, ct);
+        block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 1, ct);
         //SETUP ACCOUNTS AND TRANSACTIONS
         cryptoSystem = new RSA(Configuration.getKeyBitLength());
 
@@ -134,8 +134,8 @@ public class TestFullNode {
 
 
         //make block with the transaction
-        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,transactions,1, ct);
-        Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayList<>(),0, ct);
+        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), transactions,1, ct);
+        Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), new ArrayList<>(),0, ct);
 
         BlockChain blockChain = new StandardBlockChain(genesis);
         blockChain.addBlock(block);
@@ -173,7 +173,7 @@ public class TestFullNode {
         transactionsToVerify.add(validTransaction);
 
         CoinBaseTransaction cb = new StandardCoinBaseTransaction(receiverAddress,10,2);
-        blockChain.addBlock(new StandardBlock(new BigInteger("42"),10,new BigInteger("42"),10,new ArrayList<>(),2,cb));
+        blockChain.addBlock(new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), new ArrayList<>(),2,cb));
 
         // Receiver sends 11. Valid has 15.
 

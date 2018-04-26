@@ -14,22 +14,18 @@ public class StandardBlock implements Block {
     private BigInteger nonce;
     private int hardnessParameter;
     private BigInteger previousHash;
-    private int transactionLimit;
     private Collection<Transaction> transactions;
     private int blockNumber;
     private CoinBaseTransaction coinBaseTransaction;
-
     public StandardBlock(BigInteger nonce,
                          int hardnessParameter,
                          BigInteger previousHash,
-                         int transactionLimit,
                          Collection<Transaction> transactions,
                          int blockNumber,
                          CoinBaseTransaction coinbase) {
         this.nonce = nonce;
         this.hardnessParameter = hardnessParameter;
         this.previousHash = previousHash;
-        this.transactionLimit = transactionLimit;
         this.transactions = transactions;
         this.blockNumber=blockNumber;
         this.coinBaseTransaction = coinbase;
@@ -58,11 +54,6 @@ public class StandardBlock implements Block {
     @Override
     public BigInteger getPreviousHash() {
         return previousHash;
-    }
-
-    @Override
-    public int getTransactionLimit() {
-        return transactionLimit;
     }
 
     @Override

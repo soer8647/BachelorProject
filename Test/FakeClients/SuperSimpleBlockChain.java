@@ -14,7 +14,7 @@ public class SuperSimpleBlockChain {
 
         public static void main(String[] args) {
             //variables
-            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), 8, new ArrayList<>(),1, new CoinBaseTransactionStub());
+            Block genesisBlock =  new StandardBlock(new BigInteger("42"),20, new BigInteger("42"), new ArrayList<>(),1, new CoinBaseTransactionStub());
             BlockChain  myBlockChain = new StandardBlockChain(genesisBlock);
             Node node = new FullNode(myBlockChain, new AddressStub(),new ConstantHardnessManager(), new StandardTransactionManager(myBlockChain));
             BigInteger hash = genesisBlock.hash();

@@ -23,7 +23,6 @@ public class TestStandardBlock {
                 new BigInteger("42"),
                 20,
                 new BigInteger("42"),
-                8,
                 new ArrayList<>(),
                 1,
                 new CoinBaseTransactionStub());
@@ -45,14 +44,6 @@ public class TestStandardBlock {
     @Test
     public void shouldHavePreviousHash(){
         assertNotEquals(block.getPreviousHash(),null);
-    }
-    @Test
-    public void shouldHaveTransactionLimit(){
-        assertNotEquals(block.getTransactionLimit(),null);
-    }
-    @Test
-    public void shouldHaveTransactionLimitOf8(){
-        assertEquals(block.getTransactionLimit(),8);
     }
 
     @Test

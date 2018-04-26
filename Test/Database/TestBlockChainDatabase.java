@@ -39,9 +39,9 @@ public class TestBlockChainDatabase {
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
-        block1 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),1,ct1);
-        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),2,ct2);
-        db = new BlockChainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"),10,new ArrayList<>(),0, ct0));
+        block1 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),1,ct1);
+        block2 = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),2,ct2);
+        db = new BlockChainDatabase("TEST", new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),0, ct0));
     }
 
 
@@ -95,7 +95,7 @@ public class TestBlockChainDatabase {
         StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),5,c.transactionHash(),tx.getSignature(), block1.getBlockNumber(), 0);
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
-        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1));
+        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"), transactions, block1.getBlockNumber()+1,new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1));
         db.addBlock(newBlock);
         assertEquals(ct0.getValue()-5,db.getUnspentTransactionValue(c.transactionHash()));
     }
@@ -108,7 +108,7 @@ public class TestBlockChainDatabase {
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
         CoinBaseTransaction c2 = new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1);
-        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,c2);
+        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"), transactions, block1.getBlockNumber()+1,c2);
         db.addBlock(newBlock);
         // The transactions should be c2 and t. ct0 was removed.
         assertEquals(2,db.countDataEntries("UNSPENT_TRANSACTIONS"));
@@ -124,7 +124,7 @@ public class TestBlockChainDatabase {
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 
-        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,ct2);
+        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"), transactions, block1.getBlockNumber()+1,ct2);
         db.addBlock(newBlock);
         //Sender spends his first 15 and gets ct1 updated to 5
         assertEquals(ct1.getValue()-5,db.getUnspentTransactionValue(ct1.transactionHash()));
@@ -141,7 +141,7 @@ public class TestBlockChainDatabase {
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 
-        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"),10,transactions, block1.getBlockNumber()+1,ct2);
+        Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"), transactions, block1.getBlockNumber()+1,ct2);
         db.addBlock(newBlock);
         //Sender spends his first 19 and gets ct1 updated to 1
         assertEquals(ct1.getValue()-9,db.getUnspentTransactionValue(ct1.transactionHash()));

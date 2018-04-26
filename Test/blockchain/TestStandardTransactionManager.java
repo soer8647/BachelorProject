@@ -39,7 +39,7 @@ public class TestStandardTransactionManager {
         receiver1 = new PublicKeyAddress(keyPairReceiver.getPublicKey());
 
         coinBase0 = new StandardCoinBaseTransaction(sender1,10,0);
-        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE,10, new ArrayList<>(),0, coinBase0);
+        genesis = new StandardBlock(BigInteger.ONE,10,BigInteger.ONE, new ArrayList<>(),0, coinBase0);
         blockchain = new BlockChainDatabase("TEST_TRANSACTIONMANAGER",genesis);
 
         transactionManager = new StandardTransactionManager(blockchain);

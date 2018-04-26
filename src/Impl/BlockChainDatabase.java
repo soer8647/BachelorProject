@@ -1,6 +1,5 @@
 package Impl;
 
-import Configuration.Configuration;
 import Crypto.Impl.RSAPublicKey;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.Transactions.ConfirmedTransaction;
@@ -455,7 +454,7 @@ public class BlockChainDatabase implements BlockChain{
             }
             setT.close();
             s.close();
-            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash,Configuration.getTransactionLimit(),transactions,blockNumber,coinBase);
+            return   new StandardBlock(new BigInteger(String.valueOf(nonce)),hardness_param,prev_hash, transactions,blockNumber,coinBase);
 
         } catch (SQLException e) {
             e.printStackTrace();
