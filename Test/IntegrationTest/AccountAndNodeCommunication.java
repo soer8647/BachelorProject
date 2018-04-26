@@ -99,7 +99,7 @@ public class AccountAndNodeCommunication {
         //Not so much an integration test, but manual testing is done here.
         new AccountAndNodeCommunication();
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
-        nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager(blockchain));
+        nodeRunner = new StandardNodeRunner(node,eventQueue);
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
 
 

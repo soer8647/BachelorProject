@@ -15,23 +15,14 @@ import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.Semaphore;
 
 public class StandardNodeRunner implements NodeRunner {
-    private final TransactionManager transactionManager;
     private final SimpleListDisplay display;
     private Node node;
     private boolean interrupted = false;
     private Block specialBlock;
     private Semaphore lock = new Semaphore(0);
 
-    public StandardNodeRunner(BlockChain blockChain, Address address, HardnessManager hardnessManager, TransactionManager transactionManager, BlockingQueue<Event> eventQueue, SimpleListDisplay display) {
-        this(new FullNode(blockChain,address,hardnessManager,transactionManager),eventQueue,transactionManager,display);
-    }
-
-    public StandardNodeRunner(BlockChain blockChain, Address address, HardnessManager hardnessManager, TransactionManager transactionManager, BlockingQueue<Event> eventQueue) {
-        this(new FullNode(blockChain,address,hardnessManager,transactionManager),eventQueue,transactionManager);
-    }
-
-    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager) {
-        this(node, eventQueue, transactionManager, new SimpleListDisplay() {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue) {
+        this(node, eventQueue, new SimpleListDisplay() {
             @Override
             public void addToDisplay(Object o) {
             }
@@ -46,9 +37,8 @@ public class StandardNodeRunner implements NodeRunner {
         });
     }
 
-    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, TransactionManager transactionManager, SimpleListDisplay display) {
+    public StandardNodeRunner(Node node, BlockingQueue<Event> eventQueue, SimpleListDisplay display) {
         this.node = node;
-        this.transactionManager = transactionManager;
         this.display = display;
         Thread thread = new Thread(new Runnable() {
             int prevBlocknr = node.getBlockChain().getBlockNumber();
@@ -57,7 +47,7 @@ public class StandardNodeRunner implements NodeRunner {
             @Override
             public void run() {
                 while(!interrupted) {
-                    Collection<Transaction> trans = transactionManager.getSomeTransactions();
+                    Collection<Transaction> trans = node.getSomeTransactions();
 
                  //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     lock.release();
@@ -85,7 +75,7 @@ public class StandardNodeRunner implements NodeRunner {
                         }
                     }
                     display.addToDisplay(newBlock);
-                    transactionManager.removeTransactions(newBlock.getTransactions());
+                    node.removeTransactions(newBlock.getTransactions());
                 }
             }
         });
@@ -103,6 +93,11 @@ public class StandardNodeRunner implements NodeRunner {
     }
 
     @Override
+    public boolean addTransaction(Transaction transaction) {
+        return node.addTransaction(transaction);
+    }
+
+    @Override
     public boolean validateBlock(Block block) {
         return node.validateBlock(block);
     }
@@ -116,11 +111,6 @@ public class StandardNodeRunner implements NodeRunner {
     @Override
     public int getBlockNumber() {
         return node.getBlockChain().getBlockNumber();
-    }
-
-    @Override
-    public TransactionManager getTransactionManager() {
-        return this.transactionManager;
     }
 
     @Override
@@ -164,7 +154,7 @@ public class StandardNodeRunner implements NodeRunner {
         Block block = removedBlocks.removeFirst();
             for (Transaction t: block.getTransactions()) {
                 if (node.validateTransaction(t)) {
-                    transactionManager.addTransaction(t);
+                    node.addTransaction(t);
                 }
             }
         }

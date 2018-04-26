@@ -39,8 +39,8 @@ public class FauxCommunicatingBlockChain {
         BlockChain blockChain2 = new StandardBlockChain(genesisBlock);
         Node node1 = new FullNode(blockChain1,node1Address,new ConstantHardnessManager(), new StandardTransactionManager(blockChain1));
         Node node2 = new FullNode(blockChain2,node2Address,new ConstantHardnessManager(),new StandardTransactionManager(blockChain2) );
-        NodeRunner nodeRunner_A = new StandardNodeRunner(node1,queue_A,transMan);
-        NodeRunner nodeRunner_B = new StandardNodeRunner(node2,queue_B,transMan);
+        NodeRunner nodeRunner_A = new StandardNodeRunner(node1,queue_A);
+        NodeRunner nodeRunner_B = new StandardNodeRunner(node2,queue_B);
         FauxReceiver receiver_A = new FauxReceiver(queue_A);
         FauxReceiver receiver_B = new FauxReceiver(queue_B);
         UDPPublisherNode publisher_A = new FauxPublisher(receiver_B);

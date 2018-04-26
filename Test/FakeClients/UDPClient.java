@@ -59,9 +59,9 @@ public class UDPClient{
         Node node = new FullNode(blockChain,node1Address,new FlexibleHardnessManager(), new StandardTransactionManager(blockChain));
         if (doDisplay) {
             display = new JFrameListDisplay(node1Address.getPublicKey() + " - " + myPort);
-            nodeRunner = new StandardNodeRunner(node, queue, transMan, display);
+            nodeRunner = new StandardNodeRunner(node, queue, display);
         } else {
-            nodeRunner = new StandardNodeRunner(node, queue, transMan);
+            nodeRunner = new StandardNodeRunner(node, queue);
         }
         receiver = new UDPReceiver(queue,myPort);
 
