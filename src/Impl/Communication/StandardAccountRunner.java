@@ -99,7 +99,7 @@ public class StandardAccountRunner implements AccountRunner {
         try {
             int timestamp = eventHandler.getBlockTime();
             Pair<BigInteger,Integer> proof = getValueProof(value);
-            Transaction transaction = account.makeTransaction(address, value, proof.getKey(), proof.getValue(),timestamp);
+            Transaction transaction = account.makeTransaction(address, value, timestamp);
             pendingTransactionMap.put(transaction.transactionHash(),new PendingTransaction(transaction,LocalDateTime.now()));
             for (UDPConnectionData d: udpConnectionsData) {
                 eventQueue.put(new TransactionEvent(transaction, d.getPort(),d.getInetAddress()));

@@ -17,11 +17,14 @@ import Impl.Communication.UDP.UDPPublisherNode;
 import Impl.Communication.UDP.UDPReceiver;
 import Impl.Transactions.StandardCoinBaseTransaction;
 import Impl.Transactions.StandardTransaction;
-import Interfaces.*;
+import Interfaces.Account;
+import Interfaces.Block;
+import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
 import Interfaces.Communication.Event;
 import Interfaces.Communication.NodeCommunicationHandler;
 import Interfaces.Communication.NodeRunner;
+import Interfaces.Transaction;
 import blockchain.Stubs.TransactionStub;
 
 import java.math.BigInteger;
@@ -37,7 +40,7 @@ import static org.junit.Assert.assertEquals;
 public class AccountAndNodeCommunication {
 
     private static boolean running = true;
-    private static BlockChain blockchain;
+    private static BlockChainDatabase blockchain;
     private PublicKeyCryptoSystem<RSAPublicKey, RSAPrivateKey> cryptoSystem;
 
     private KeyPair keyPair1;
@@ -85,12 +88,11 @@ public class AccountAndNodeCommunication {
         nodeAccount = new StandardAccount(privateKeyNode,publicKeyNode);
 
         Transaction tx = new TransactionStub();
-        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 0);
+        Transaction stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getSignature(), 0);
         CoinBaseTransaction ct = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),0,ct);
         blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);
         transactionQueue = new LinkedBlockingQueue<>();
-        node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new StandardTransactionManager(blockchain));
         Configuration.setHardnessParameter(18);
 
     }
@@ -99,11 +101,8 @@ public class AccountAndNodeCommunication {
         //Not so much an integration test, but manual testing is done here.
         new AccountAndNodeCommunication();
         BlockingQueue<Event> eventQueue = new LinkedBlockingQueue<>();
-        nodeRunner = new StandardNodeRunner(node,eventQueue,new StandardTransactionManager(blockchain));
+        nodeRunner = new StandardNodeRunner(blockchain,nodeAddress,new ConstantHardnessManager(),new DBTransactionManager(blockchain),transactionQueue);
         UDPReceiver receiver = new UDPReceiver(eventQueue,8008);
-
-
-
 
         try {
             NodeCommunicationHandler nodeCommunicationHandler = new StandardNodeCommunicationHandler(nodeRunner,new UDPPublisherNode(InetAddress.getLocalHost(),8008, new ArrayList<>()),eventQueue);

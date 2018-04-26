@@ -4,8 +4,6 @@ import Crypto.Impl.RSAPrivateKey;
 import Crypto.Impl.RSAPublicKey;
 import Impl.PublicKeyAddress;
 
-import java.math.BigInteger;
-
 public interface Account {
 
     /**
@@ -17,5 +15,5 @@ public interface Account {
 
     RSAPublicKey getPublicKey();
 
-    Transaction makeTransaction(Address receiver, int value, BigInteger valueProof, int blockValueProof, int timestamp);
+    Transaction makeTransaction(Address receiver, int value, int timestamp);
 }

@@ -108,9 +108,9 @@ public class TestStandardAccountRunner {
         //Setup fake history for account
 
         // Account receives 42 money
-        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("100"),new BigInteger("42"),1, 0),2);
+        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,42,new BigInteger("42"), 0),2);
         // Account sends 10 money
-        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("100"),new BigInteger("42"),1, 0),2);
+        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,10,new BigInteger("42"), 0),2);
         TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);}},new CopyOnWriteArrayList<>());
         accountRunner = new StandardAccountRunner(account,transactions,new ArrayList<>(),8001);
         assertEquals(32,accountRunner.getBalance());
@@ -120,17 +120,17 @@ public class TestStandardAccountRunner {
     public void shouldGetValueProof() {
 
         //Account gets 4 money
-        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("100"),new BigInteger("42"),1, 1),2);
+        ConfirmedTransaction t1 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,4,new BigInteger("42"), 1),2);
         // Account sends 3 money
-        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("42"),new BigInteger("43"),2, 2),3);
+        ConfirmedTransaction t2 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,3,new BigInteger("43"), 2),3);
         //Account gets 2 money
-        ConfirmedTransaction t3 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("44"),3, 3),4);
+        ConfirmedTransaction t3 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("44"),3),4);
         // Account sends 1 money
-        ConfirmedTransaction t4 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("45"),4, 4),5);
+        ConfirmedTransaction t4 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("45"),4),5);
         //Account gets 2 money
-        ConfirmedTransaction t5 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("42"),new BigInteger("46"),5, 5),6);
+        ConfirmedTransaction t5 = new ConfirmedTransaction(new StandardTransaction(receiverAddress,senderAddress,2,new BigInteger("46"),5),6);
         // Account sends 1 money
-        ConfirmedTransaction t6 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("42"),new BigInteger("47"),6, 6),7);
+        ConfirmedTransaction t6 = new ConfirmedTransaction(new StandardTransaction(senderAddress,receiverAddress,1,new BigInteger("47"),6),7);
         //Balance of 3
         TransactionHistory transactions = new TransactionHistory(new CopyOnWriteArrayList<ConfirmedTransaction>(){{add(t1);add(t2);add(t3);add(t4);add(t5);add(t6);}},new CopyOnWriteArrayList<>());
         try {

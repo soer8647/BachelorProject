@@ -39,16 +39,6 @@ public class PendingTransaction implements Transaction {
     }
 
     @Override
-    public BigInteger getValueProof() {
-        return transaction.getValueProof();
-    }
-
-    @Override
-    public int getBlockNumberOfValueProof() {
-        return transaction.getBlockNumberOfValueProof();
-    }
-
-    @Override
     public BigInteger getSignature() {
         return transaction.getSignature();
     }

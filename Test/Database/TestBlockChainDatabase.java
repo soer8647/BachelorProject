@@ -35,7 +35,7 @@ public class TestBlockChainDatabase {
         System.out.println("Running setup");
         tx = new TransactionStub();
 
-        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getValueProof(),tx.getSignature(),tx.getBlockNumberOfValueProof(), 5);
+        stx = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),tx.getValue(),tx.getSignature(), 5);
         ct0 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 0);
         ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 1);
         ct2 = new StandardCoinBaseTransaction(stx.getSenderAddress(),10, 2);
@@ -92,7 +92,7 @@ public class TestBlockChainDatabase {
         CoinBaseTransaction c = block1.getCoinBase();
         db.addBlock(block1);
         // Must be a valid transaction
-        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),5,c.transactionHash(),tx.getSignature(), block1.getBlockNumber(), 0);
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),5,tx.getSignature(), 0);
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
         Block newBlock = new StandardBlock(new BigInteger("1"),1,new BigInteger("42"), transactions, block1.getBlockNumber()+1,new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1));
@@ -104,7 +104,7 @@ public class TestBlockChainDatabase {
     public void shouldRemoveATransActionThatIsSpent() {
 
         // Must be a valid transaction
-        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),10,ct0.transactionHash(),tx.getSignature(), 0, 0);
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),10,tx.getSignature(), 0);
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
         CoinBaseTransaction c2 = new StandardCoinBaseTransaction(tx.getReceiverAddress(),10, block1.getBlockNumber()+1);
@@ -120,7 +120,7 @@ public class TestBlockChainDatabase {
         db.addBlock(block1);
 
         // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
-        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),15,ct0.transactionHash(),tx.getSignature(), 0, 0);
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),15,tx.getSignature(), 0);
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 
@@ -137,7 +137,7 @@ public class TestBlockChainDatabase {
         db.addBlock(block1);
 
         // Must be a valid transaction: Sender has 10 from ct0 and 10 from ct1.
-        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,ct0.transactionHash(),tx.getSignature(), 0,0);
+        StandardTransaction t = new StandardTransaction(tx.getSenderAddress(),tx.getReceiverAddress(),19,tx.getSignature(), 0);
         Collection<Transaction> transactions = new ArrayList<>();
         transactions.add(t);
 

@@ -12,7 +12,6 @@ import Interfaces.Account;
 import Interfaces.Address;
 import Interfaces.Transaction;
 import blockchain.Stubs.AddressStub;
-import blockchain.Stubs.TransactionStub;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -57,23 +56,20 @@ public class TestStandardAccount {
 
     @Test
     public void shouldBeAbleToMakeTransaction() {
-        BigInteger valueProof = new TransactionStub().transactionHash();
-        Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
 
-        assertNotEquals(account.makeTransaction(receiver,1,valueProof, 0,0),null);
+        assertNotEquals(account.makeTransaction(receiver,1, 0),null);
     }
 
     @Test
     public void shouldBeVerifiableSignatureOnTransaction() {
-        BigInteger valueProof = new TransactionStub().transactionHash();
         Address sender = new PublicKeyAddress(account.getPublicKey());
         Address receiver = new AddressStub();
         RSAPublicKey publicKey = account.getPublicKey();
 
-        Transaction transaction = account.makeTransaction(receiver,1,valueProof, 0,0);
+        Transaction transaction = account.makeTransaction(receiver,1, 0);
 
-        String tx = sender.toString()+receiver.toString()+1+valueProof.toString()+0;
+        String tx = sender.toString()+receiver.toString()+1+0;
         BigInteger hash = Configuration.hash(tx);
 
         assertTrue(cryptoSystem.verify(publicKey,transaction.getSignature(),hash));

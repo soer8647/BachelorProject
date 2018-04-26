@@ -33,13 +33,6 @@ public interface Transaction extends Serializable {
      */
     int getValue();
 
-    /**
-     * @return       The transaction hash where the sender has a proof of funds to make this transaction.
-     */
-    BigInteger getValueProof();
-
-    int getBlockNumberOfValueProof();
-
     BigInteger getSignature();
 
     int getTimestamp();

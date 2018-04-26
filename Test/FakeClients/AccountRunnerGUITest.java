@@ -33,7 +33,7 @@ public class AccountRunnerGUITest {
     public static void main(String[] args) {
         Configuration.setHardnessParameter(18);
         Transaction tx = new TransactionStub();
-        StandardTransaction stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getValueProof(), tx.getSignature(), tx.getBlockNumberOfValueProof(), 0);
+        StandardTransaction stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(),  tx.getSignature(), 0);
         CoinBaseTransaction  ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
         Block block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 0, ct);
 
