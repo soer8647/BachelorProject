@@ -58,8 +58,6 @@ public class StandardNodeRunner implements NodeRunner {
             public void run() {
                 while(!interrupted) {
                     Collection<Transaction> trans = transactionManager.getSomeTransactions();
-
-                 //   System.out.println(getBlockNumber() + ",,, " + newBlock);
                     lock.release();
                     newBlock = node.mine(newBlock.hash(), trans);
                     try {

@@ -43,6 +43,7 @@ public class TestFullNode {
     private KeyPair keyPair2;
     private RSAPublicKey publicKeyReceiver;
     private RSAPrivateKey privateKeyReceiver;
+    private StandardCoinBaseTransaction ct1;
 
     @Before
     public void setUp(){
@@ -50,6 +51,7 @@ public class TestFullNode {
         tx = new TransactionStub();
         stx = new StandardTransaction(tx.getSenderAddress(), tx.getReceiverAddress(), tx.getValue(), tx.getSignature(), 0);
         ct = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 0);
+        ct1 = new StandardCoinBaseTransaction(stx.getSenderAddress(), 0, 1);
         block = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 0, ct);
         block2 = new StandardBlock(new BigInteger("4"), 4, new BigInteger("42"), new ArrayList<>(), 1, ct);
         //SETUP ACCOUNTS AND TRANSACTIONS
@@ -132,7 +134,7 @@ public class TestFullNode {
 
 
         //make block with the transaction
-        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), transactions,1, ct);
+        Block block = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), transactions,1, ct1);
         Block genesis = new StandardBlock(new BigInteger("42"),10,new BigInteger("42"), new ArrayList<>(),0, ct);
 
         BlockChainDatabase blockChain = new BlockChainDatabase("FULLNODETESTV",genesis);
