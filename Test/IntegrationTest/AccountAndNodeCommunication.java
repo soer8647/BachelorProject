@@ -93,7 +93,7 @@ public class AccountAndNodeCommunication {
         Block genesis = new StandardBlock(new BigInteger("4"),4,new BigInteger("42"), new ArrayList<>(),0,ct);
         blockchain =new BlockChainDatabase("ACCOUNTCONNTEST",genesis);
         transactionQueue = new LinkedBlockingQueue<>();
-        node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new StandardTransactionManager(blockchain));
+        node = new FullNode(blockchain,nodeAddress,new ConstantHardnessManager(), new DBTransactionManager(blockchain));
         Configuration.setHardnessParameter(18);
 
     }
