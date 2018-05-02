@@ -370,7 +370,6 @@ public class BlockChainDatabase implements BlockChain{
                 + transaction.getTimestamp()+",'"
                 + transaction.transactionHash().toString()+"',"
                 +"'"+transaction.getSignature().toString()+"')";
-
         try {
             query(query);
         } catch (SQLException e) {
@@ -436,8 +435,6 @@ public class BlockChainDatabase implements BlockChain{
                 Address sender = new PublicKeyAddress(new RSAPublicKey(setT.getString("SENDER")));
                 Address receiver = new PublicKeyAddress(new RSAPublicKey(setT.getString("RECEIVER")));
                 int value = setT.getInt("VALUE");
-                int blocknr_value_proof = setT.getInt("BLOCKNR_VALUE_PROOF");
-                BigInteger hash_trans_value_proof = new BigInteger(setT.getString("HASH_TRANS_VALUE_PROOF"));
                 BigInteger signature = new BigInteger(setT.getString("SIGNATURE"));
                 int timestamp = setT.getInt("TIMESTAMP");
                 transactions.add( new StandardTransaction(sender,receiver,value, signature, timestamp));

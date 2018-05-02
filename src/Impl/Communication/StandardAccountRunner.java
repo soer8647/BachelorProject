@@ -50,10 +50,10 @@ public class StandardAccountRunner implements AccountRunner {
         this.account = account;
         this.transactionHistory = transactionHistory;
         this.eventQueue = new LinkedBlockingQueue<>();
+        pendingTransactionMap = new HashMap<>();
         this.eventHandler = new AccountEventHandler(transactionHistory, eventQueue,listeningPort, udpConnectionsData,pendingTransactionMap);
         this.udpConnectionsData = udpConnectionsData;
         discardedTransactions = new ArrayList<>();
-        pendingTransactionMap = new HashMap<>();
         eventHandler.start();
     }
 
@@ -65,6 +65,11 @@ public class StandardAccountRunner implements AccountRunner {
     @Override
     public TransactionHistory getTransactionHistory() {
         return transactionHistory;
+    }
+
+    @Override
+    public Map<BigInteger, PendingTransaction> getPendingTransactionMap() {
+        return pendingTransactionMap;
     }
 
     @Override
@@ -169,6 +174,7 @@ public class StandardAccountRunner implements AccountRunner {
 
     @Override
     public void updatePendingTransactions() {
+        // Collect all pending older than 1 minute
         List<BigInteger> discarded =pendingTransactionMap.keySet().stream().filter(t->pendingTransactionMap.get(t).getTime().isBefore(LocalDateTime.now().minusMinutes(1))).collect(Collectors.toList());
         // Collect all discarded transactions
         discardedTransactions = discardedTransactions.stream().map(t->pendingTransactionMap.get(t).getTransaction()).collect(Collectors.toList());

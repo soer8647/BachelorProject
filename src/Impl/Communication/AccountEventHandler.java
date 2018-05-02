@@ -69,6 +69,8 @@ public class AccountEventHandler implements EventHandler,Runnable{
                     transactionHistory.getSemaphore().acquire();
                     // TODO confirm or discard pending transactions
                     // Remove all transactions from pending.
+                    System.out.println("Confirmed"+th.getConfirmedTransactions());
+                    System.out.println("Pending" + pendingTransactionHashMap.values());
                     th.getConfirmedTransactions().forEach(t->pendingTransactionHashMap.remove(t.transactionHash()));
                     // TODO mark as confirmed
                     transactionHistory.getConfirmedTransactions().addAll(th.getConfirmedTransactions());
