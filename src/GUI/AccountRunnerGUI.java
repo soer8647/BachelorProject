@@ -5,6 +5,7 @@ import Impl.Communication.NotEnoughMoneyException;
 import Impl.PublicKeyAddress;
 import Impl.TransactionHistory;
 import Impl.Transactions.ConfirmedTransaction;
+import Impl.Transactions.PendingTransaction;
 import Interfaces.Address;
 import Interfaces.CoinBaseTransaction;
 import Interfaces.Communication.AccountRunner;
@@ -13,12 +14,14 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import java.awt.*;
+import java.math.BigInteger;
+import java.util.Map;
 
 public class AccountRunnerGUI{
     private final JList<String> historyText;
     private final DefaultListModel<String> historyModel;
     private final JList<String> pendingText;
-    private final DefaultListModel<String> pendingTransactions;
+    private final DefaultListModel<String> pendingTransactionsModel;
     private final JScrollPane historyBar;
     private final JButton makeButton;
     private final Container historyContainer;
@@ -123,8 +126,8 @@ public class AccountRunnerGUI{
         pendingTextLabel.setHorizontalAlignment(SwingConstants.LEFT);
         pendingTextLabel.setHorizontalTextPosition(SwingConstants.LEFT);
 
-        pendingTransactions = new DefaultListModel<>();
-        pendingText = new JList<>(pendingTransactions);
+        pendingTransactionsModel = new DefaultListModel<>();
+        pendingText = new JList<>(pendingTransactionsModel);
         pendingText.setLayoutOrientation(JList.VERTICAL);
         pendingText.setVisibleRowCount(10);
         pendingBar = new JScrollPane(pendingText);
@@ -150,7 +153,7 @@ public class AccountRunnerGUI{
         errorField = new JLabel();
         errorField.setVisible(false);
 
-        updateHistory();
+        updateGUI();
         //Add to main
 
         //Add money text area
@@ -239,7 +242,7 @@ public class AccountRunnerGUI{
                 accountRunner.updateTransactionHistory();
                 accountRunner.updatePendingTransactions();
                 System.out.println("Updating");
-                SwingUtilities.invokeLater(this::updateHistory);
+                SwingUtilities.invokeLater(this::updateGUI);
                 moneyArea.setText(String.valueOf(accountRunner.getBalance()));
                 try {
                     Thread.sleep(5000);
@@ -251,16 +254,25 @@ public class AccountRunnerGUI{
         t.start();
     }
 
-    private void updateHistory(){
+    private void updateGUI(){
         try {
+            inputPendingTransactionsElements(accountRunner.getPendingTransactionMap());
             inputTransactionHistoryElements(accountRunner.getTransactionHistory());
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
-    private void inputTransactionHistoryElements(TransactionHistory transactionHistory) throws InterruptedException {
+    private void inputPendingTransactionsElements(Map<BigInteger,PendingTransaction> pendingTransactions){
+        pendingTransactionsModel.removeAllElements();
+        for (PendingTransaction t:pendingTransactions.values()){
+            pendingTransactionsModel.addElement("S: "+t.getSenderAddress().getPublicKey().toString().substring(16,22)
+                    +", R: "+t.getReceiverAddress().getPublicKey().toString().substring(16,22)
+                    +", V: "+t.getValue());
+        }
+    }
 
+    private void inputTransactionHistoryElements(TransactionHistory transactionHistory) throws InterruptedException {
         transactionHistory.getSemaphore().acquire();
         historyModel.removeAllElements();
         for (ConfirmedTransaction confirmedTransaction:accountRunner.getTransactionHistory().getConfirmedTransactions()){

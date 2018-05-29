@@ -44,18 +44,8 @@ public class AccountRunnerGUITest {
         Account second = new StandardAccount();
 
         try {
-            UDPConnectionData nodeData = new UDPConnectionData(InetAddress.getLocalHost(),1337);
-
-
-            AccountRunner runner = new StandardAccountRunner(main,t,new ArrayList<UDPConnectionData>(){{
-                add(nodeData);
-            }},8000);
-
-            AccountRunnerGUI gui = new AccountRunnerGUI(runner);
-            gui.addAddress(second.getAddress());
             BlockChainDatabase blockChain = new BlockChainDatabase("ACCOUNTRUNNERTEST",block);
 
-            //Connect accountrunner to noderunner
             Node testNode = new FullNode(blockChain,main.getAddress(),new ConstantHardnessManager(),new DBTransactionManager(blockChain));
 
             BlockingQueue<Event> blockingQueue = new LinkedBlockingQueue<Event>();
@@ -66,6 +56,15 @@ public class AccountRunnerGUITest {
             NodeCommunicationHandler communicationHandler = new StandardNodeCommunicationHandler(nodeRunner,
                     new UDPPublisherNode(InetAddress.getLocalHost(),1337,new ArrayList<UDPConnectionData>()),blockingQueue);
 
+            UDPConnectionData nodeData = new UDPConnectionData(InetAddress.getLocalHost(),1337);
+
+
+            AccountRunner runner = new StandardAccountRunner(main,t,new ArrayList<UDPConnectionData>(){{
+                add(nodeData);
+            }},8000);
+
+            AccountRunnerGUI gui = new AccountRunnerGUI(runner);
+            gui.addAddress(second.getAddress());
         } catch (UnknownHostException e) {
             e.printStackTrace();
         }

@@ -72,7 +72,7 @@ public class DBTransactionManager implements TransactionManager{
     @Override
     public boolean validateTransaction(Transaction transaction) {
 
-        if(!verifyTransactionSignature(transaction) || blockChainDatabase.doesTransactionExist(transaction)) {
+        if(!verifyTransactionSignature(transaction) || transactionQueue.contains(transaction) || blockChainDatabase.doesTransactionExist(transaction)) {
             return false;
         }
 
@@ -101,7 +101,7 @@ public class DBTransactionManager implements TransactionManager{
         Map<Address,ArrayList<Transaction>> sendermap = new HashMap<>();
         for (Transaction t: transactions){
             // Check the signature of the transaction and check if the transaction exists in the block chain.
-            if(!verifyTransactionSignature(t) || blockChainDatabase.doesTransactionExist(t)) {
+            if(!verifyTransactionSignature(t) || transactionQueue.contains(t) || blockChainDatabase.doesTransactionExist(t)) {
                 return false;
             }
             if (sendermap.keySet().contains(t.getSenderAddress())){

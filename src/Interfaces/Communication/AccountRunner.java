@@ -4,10 +4,12 @@ import External.Pair;
 import Impl.Communication.NotEnoughMoneyException;
 import Impl.TransactionHistory;
 import Impl.Transactions.IllegalTransactionException;
+import Impl.Transactions.PendingTransaction;
 import Interfaces.Account;
 import Interfaces.Address;
 
 import java.math.BigInteger;
+import java.util.Map;
 import java.util.concurrent.LinkedBlockingQueue;
 
 public interface AccountRunner {
@@ -21,6 +23,8 @@ public interface AccountRunner {
      * @return      A collection of all transactions for the linked account.
      */
     TransactionHistory getTransactionHistory();
+
+    Map<BigInteger, PendingTransaction> getPendingTransactionMap();
 
     /**
      * @return      The balance of the linked account.
