@@ -56,5 +56,17 @@ public class TestWOTS {
         assertEquals(wots.verify(keys.getPublicKey(),signature,message),true);
     }
 
+    @Test
+    public void ShouldNotValidateTamperedSignature0() {
+        BigInteger message = new BigInteger("102103201123128");
+        Seed seed = new Seed();
+
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+
+        BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
+        signature[0] = signature[0].add(BigInteger.ONE);
+
+        assertEquals(wots.verify(keys.getPublicKey(),signature,message),false);
+    }
 
 }
