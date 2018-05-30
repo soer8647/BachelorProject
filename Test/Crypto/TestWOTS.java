@@ -41,7 +41,7 @@ public class TestWOTS {
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
 
-        assertEquals(wots.verify(keys.getPublicKey(),signature,message),true);
+        assertEquals(true,wots.verify(keys.getPublicKey(),signature,message));
     }
 
     @Test
@@ -53,7 +53,7 @@ public class TestWOTS {
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
 
-        assertEquals(wots.verify(keys.getPublicKey(),signature,message),true);
+        assertEquals(true,wots.verify(keys.getPublicKey(),signature,message));
     }
 
     @Test
@@ -66,7 +66,37 @@ public class TestWOTS {
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         signature[0] = signature[0].add(BigInteger.ONE);
 
-        assertEquals(wots.verify(keys.getPublicKey(),signature,message),false);
+        assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
+    }
+
+    @Test
+    public void ShouldNormalize() {
+        BigInteger message = new BigInteger("102103201123128");
+        // sum is -60
+        byte[] normalized = wots.normalize(message.toByteArray());
+        assertEquals(0,wots.sumArray(normalized));
+
+        message = new BigInteger("1021032011404028");
+        // sum is -206
+        normalized = wots.normalize(message.toByteArray());
+        assertEquals(0,wots.sumArray(normalized));
+
+        message = new BigInteger("998989879");
+        // sum is 93
+        normalized = wots.normalize(message.toByteArray());
+        assertEquals(0,wots.sumArray(normalized));
+
+    }
+
+    @Test
+    public void ShouldSum() {
+        byte[] bytes = new byte[5];
+        bytes[0] = 5;
+        bytes[1] = 7;
+        bytes[2] = 0;
+        bytes[3] = 4;
+        bytes[4] = 10;
+        assertEquals(26,wots.sumArray(bytes));
     }
 
 }

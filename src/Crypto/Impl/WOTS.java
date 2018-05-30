@@ -8,7 +8,7 @@ import java.util.Random;
 
 public class WOTS {
 
-    private int bitLength = 2000;
+    private int bitLength = 180;
 
     public BigInteger[] sign(WotsPrivateKey key, BigInteger message) {
         //TODO confirm sizes match
@@ -27,6 +27,42 @@ public class WOTS {
             result = Configuration.hash(result).toString();
         }
         return new BigInteger(result);
+    }
+
+    public byte[] normalize(byte[] bytes) {
+        int sum = sumArray(bytes);
+        byte[] normalized = bytes.clone();
+        if (sum>0) {
+            for (int i = 0; i < sum; i++) {
+                for (int j = 0; j < bytes.length; j++) {
+                    if (normalized[j] > -127) {
+                        normalized[j]--;
+                        break;
+                    }
+                }
+            }
+            return normalized;
+        } else if (sum<0) {
+            for (int i = 0; i < -sum; i++) {
+                for (int j = 0; j < bytes.length; j++) {
+                    if (normalized[j] < 127) {
+                        normalized[j]++;
+                        break;
+                    }
+                }
+            }
+            return normalized;
+        } else {
+            return normalized;
+        }
+    }
+
+    public int sumArray(byte[] bytes) {
+        int sum = 0;
+        for (int i = 0; i < bytes.length; i++) {
+            sum += bytes[i];
+        }
+        return sum;
     }
 
     public boolean verify(WotsPublicKey key, BigInteger[] signature, BigInteger message) {
