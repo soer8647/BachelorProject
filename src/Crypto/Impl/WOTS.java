@@ -14,9 +14,10 @@ public class WOTS {
         //TODO confirm sizes match
 
         byte[] messageBytes = message.toByteArray();
+        byte[] normalized  = normalize(messageBytes);
         BigInteger[] signature = new BigInteger[messageBytes.length];
         for (int i = 0; i < messageBytes.length; i++) {
-            signature[i] = hash(key.get(i),128 + messageBytes[i]);
+            signature[i] = hash(key.get(i),128 + normalized[i]);
         }
         return signature;
     }
@@ -67,9 +68,9 @@ public class WOTS {
 
     public boolean verify(WotsPublicKey key, BigInteger[] signature, BigInteger message) {
         byte[] messageBytes = message.toByteArray();
+        byte[] normalized  = normalize(messageBytes);
         for (int i = 0; i < messageBytes.length; i++) {
-            int times = 255 - 128 - messageBytes[i];
-            System.out.println(times);
+            int times = 255 - 128 - normalized[i];
             if (!key.get(i).equals(hash(signature[i], times))) {
                 return false;
             }

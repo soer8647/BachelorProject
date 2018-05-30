@@ -57,6 +57,19 @@ public class TestWOTS {
     }
 
     @Test
+    public void ShouldNotValidateTamperedMessage0() {
+        BigInteger message = new BigInteger("102103201123128");
+        Seed seed = new Seed();
+
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+
+        BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
+        message = message.add(BigInteger.ONE);
+
+        assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
+    }
+
+    @Test
     public void ShouldNotValidateTamperedSignature0() {
         BigInteger message = new BigInteger("102103201123128");
         Seed seed = new Seed();
@@ -65,6 +78,54 @@ public class TestWOTS {
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         signature[0] = signature[0].add(BigInteger.ONE);
+
+        assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
+    }
+
+    @Test
+    public void ShouldNotValidateSketchedAttack() {
+        BigInteger message = new BigInteger("102103201123128");
+        Seed seed = new Seed();
+
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+
+        BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
+        byte[] messageBytes = message.toByteArray();
+        messageBytes[0]++;
+        message = new BigInteger(messageBytes);
+
+        signature[0] = wots.hash(signature[0],1);
+
+        assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
+    }
+
+    @Test
+    public void ShouldValidateAntiNormalization() {
+        BigInteger message = new BigInteger("102103201123128");
+        Seed seed = new Seed();
+
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+
+        BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
+        byte[] messageBytes = message.toByteArray();
+        messageBytes[0]++;
+        message = new BigInteger(messageBytes);
+
+        assertEquals(true,wots.verify(keys.getPublicKey(),signature,message));
+    }
+
+    @Test
+    public void ShouldNotValidateSketched2() {
+        BigInteger message = new BigInteger("102103201123128");
+        Seed seed = new Seed();
+
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+
+        BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
+        byte[] messageBytes = message.toByteArray();
+        System.out.println(Arrays.toString(messageBytes));
+        messageBytes[4]++;
+        message = new BigInteger(messageBytes);
 
         assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
     }
@@ -97,6 +158,13 @@ public class TestWOTS {
         bytes[3] = 4;
         bytes[4] = 10;
         assertEquals(26,wots.sumArray(bytes));
+    }
+
+    @Test
+    public void canConvertByteArrayBigInt() {
+        BigInteger message = new BigInteger("102103201123128");
+        byte[] messageBytes = message.toByteArray();
+        assertEquals(message,new BigInteger(messageBytes));
     }
 
 }
