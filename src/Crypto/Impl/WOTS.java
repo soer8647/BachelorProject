@@ -1,6 +1,7 @@
 package Crypto.Impl;
 
 import Configuration.Configuration;
+import Impl.Hashing.SHA256;
 import Interfaces.HashingAlgorithm;
 import java.security.SecureRandom;
 import java.math.BigInteger;
@@ -9,6 +10,11 @@ import java.util.Random;
 public class WOTS {
 
     private int bitLength = 180;
+    private HashingAlgorithm hashingAlgorithm;
+
+    public WOTS(HashingAlgorithm hashingAlgorithm) {
+        this.hashingAlgorithm = hashingAlgorithm;
+    }
 
     public BigInteger[] sign(WotsPrivateKey key, BigInteger message) {
         //TODO confirm sizes match
@@ -25,7 +31,7 @@ public class WOTS {
     public BigInteger hash(BigInteger value, int times) {
         String result = value.toString();
         for (int i = 0; i < times; i++) {
-            result = Configuration.hash(result).toString();
+            result = hashingAlgorithm.hash(result).toString();
         }
         return new BigInteger(result);
     }

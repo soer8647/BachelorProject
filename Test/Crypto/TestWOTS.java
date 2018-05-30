@@ -1,5 +1,6 @@
 package Crypto;
 
+import Configuration.Configuration;
 import Crypto.Impl.Seed;
 import Crypto.Impl.WOTS;
 import Crypto.Impl.WOTSKeyPair;
@@ -17,7 +18,7 @@ public class TestWOTS {
 
     @Before
     public void setUp(){
-        wots = new WOTS();
+        wots = new WOTS(Configuration.getHashingAlgorithm());
     }
 
 
