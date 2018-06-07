@@ -1,6 +1,7 @@
 package Crypto;
 
 import Configuration.Configuration;
+import Crypto.Impl.FragmentArray;
 import Crypto.Impl.Seed;
 import Crypto.Impl.WOTS;
 import Crypto.Impl.WOTSKeyPair;
@@ -15,19 +16,20 @@ import static junit.framework.TestCase.assertEquals;
 public class TestWOTS {
 
     private WOTS wots;
+    private final int wotsParam = 8;
 
     @Before
     public void setUp(){
-        wots = new WOTS(Configuration.getHashingAlgorithm());
+        wots = new WOTS(Configuration.getHashingAlgorithm(),wotsParam);
     }
 
 
     @Test
-    public void PublicKeyShouldBePrivateKeyHashed255() {
+    public void PublicKeyShouldBePrivateKeyHashedWotsParamTimes() {
         Seed seed = new Seed();
 
         WOTSKeyPair keys = wots.generateNewKeys(seed,0,1);
-        assertEquals(keys.getPublicKey().get(0),wots.hash(keys.getPrivateKey().get(0),255));
+        assertEquals(keys.getPublicKey().get(0),wots.hash(keys.getPrivateKey().get(0),(int) Math.pow(2,wotsParam)-1));
     }
 
 
@@ -35,10 +37,10 @@ public class TestWOTS {
     @Test
     public void ShouldValidateSignature0() {
         BigInteger message = new BigInteger("-128");
-        byte[] bytes = message.toByteArray();
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
 
@@ -47,10 +49,13 @@ public class TestWOTS {
 
     @Test
     public void ShouldValidateSignature1() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
+
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
 
@@ -59,10 +64,13 @@ public class TestWOTS {
 
     @Test
     public void ShouldNotValidateTamperedMessage0() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
+
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         message = message.add(BigInteger.ONE);
@@ -72,10 +80,12 @@ public class TestWOTS {
 
     @Test
     public void ShouldNotValidateTamperedSignature0() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         signature[0] = signature[0].add(BigInteger.ONE);
@@ -85,10 +95,12 @@ public class TestWOTS {
 
     @Test
     public void ShouldNotValidateSketchedAttack() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         byte[] messageBytes = message.toByteArray();
@@ -102,10 +114,12 @@ public class TestWOTS {
 
     @Test
     public void ShouldValidateAntiNormalization() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         byte[] messageBytes = message.toByteArray();
@@ -117,15 +131,16 @@ public class TestWOTS {
 
     @Test
     public void ShouldNotValidateSketched2() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger messageSeed = new BigInteger("102103201123128");
+        BigInteger message = wots.hash(messageSeed,1);
         Seed seed = new Seed();
 
-        WOTSKeyPair keys = wots.generateNewKeys(seed,0,message.toByteArray().length);
+        FragmentArray fragmentArray = new FragmentArray(message,wotsParam);
+        WOTSKeyPair keys = wots.generateNewKeys(seed,0,fragmentArray.getLength());
 
         BigInteger[] signature = wots.sign(keys.getPrivateKey(), message);
         byte[] messageBytes = message.toByteArray();
-        System.out.println(Arrays.toString(messageBytes));
-        messageBytes[4]++;
+        messageBytes[10]++;
         message = new BigInteger(messageBytes);
 
         assertEquals(false,wots.verify(keys.getPublicKey(),signature,message));
@@ -133,32 +148,43 @@ public class TestWOTS {
 
     @Test
     public void ShouldNormalize() {
-        BigInteger message = new BigInteger("102103201123128");
+        BigInteger message = new BigInteger("0");
         // sum is -60
-        byte[] normalized = wots.normalize(message.toByteArray());
-        assertEquals(0,wots.sumArray(normalized));
+        FragmentArray frags = new FragmentArray(message,wotsParam);
+        assertEquals(0,wots.sumArray(frags.getFragmentsAsArray()));
 
-        message = new BigInteger("1021032011404028");
+        message = wots.hash(new BigInteger("102103201123128"), 1);
         // sum is -206
-        normalized = wots.normalize(message.toByteArray());
-        assertEquals(0,wots.sumArray(normalized));
+        frags = new FragmentArray(message,wotsParam);
+        wots.normalize(frags);
+        assertEquals( (int) (((Math.pow(2,wotsParam)- 1) / 2) * frags.getLength()),wots.sumArray(frags.getFragmentsAsArray()));
 
-        message = new BigInteger("998989879");
+
+        message =  wots.hash(new BigInteger("1021032011404028"),1);
+        // sum is -206
+        frags = new FragmentArray(message,wotsParam);
+        wots.normalize(frags);
+        assertEquals( (int) (((Math.pow(2,wotsParam)- 1) / 2) * frags.getLength()),wots.sumArray(frags.getFragmentsAsArray()));
+
+
+        message =  wots.hash(new BigInteger("54989898797"),1);
         // sum is 93
-        normalized = wots.normalize(message.toByteArray());
-        assertEquals(0,wots.sumArray(normalized));
+        frags = new FragmentArray(message,wotsParam);
+        wots.normalize(frags);
+        assertEquals( (int) (((Math.pow(2,wotsParam)- 1) / 2) * frags.getLength()),wots.sumArray(frags.getFragmentsAsArray()));
+
 
     }
 
     @Test
     public void ShouldSum() {
-        byte[] bytes = new byte[5];
-        bytes[0] = 5;
-        bytes[1] = 7;
-        bytes[2] = 0;
-        bytes[3] = 4;
-        bytes[4] = 10;
-        assertEquals(26,wots.sumArray(bytes));
+        int[] ints = new int[5];
+        ints[0] = 5;
+        ints[1] = 7;
+        ints[2] = 0;
+        ints[3] = 4;
+        ints[4] = 10;
+        assertEquals(26,wots.sumArray(ints));
     }
 
     @Test

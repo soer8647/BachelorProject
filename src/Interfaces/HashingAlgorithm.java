@@ -7,8 +7,15 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 
 public interface HashingAlgorithm  {
+
+
     /**
-     * @return The corresponding Biginteger of a hash
+     * @return The corresponding Biginteger of a hash (from byte array)
+     */
+    BigInteger hash(byte[] data);
+
+    /**
+     * @return The corresponding Biginteger of a hash (from string)
      */
     BigInteger hash(String data);
     /**

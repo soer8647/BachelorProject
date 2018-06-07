@@ -1,29 +1,30 @@
 package Crypto.Impl;
 
-import Configuration.Configuration;
-import Impl.Hashing.SHA256;
 import Interfaces.HashingAlgorithm;
 import java.security.SecureRandom;
 import java.math.BigInteger;
+import java.util.Arrays;
 import java.util.Random;
 
 public class WOTS {
 
     private int bitLength = 180;
     private HashingAlgorithm hashingAlgorithm;
+    private int wotsParam;
 
-    public WOTS(HashingAlgorithm hashingAlgorithm) {
+    public WOTS(HashingAlgorithm hashingAlgorithm, int wotsParam) {
         this.hashingAlgorithm = hashingAlgorithm;
+        this.wotsParam = wotsParam;
     }
 
     public BigInteger[] sign(WotsPrivateKey key, BigInteger message) {
         //TODO confirm sizes match
 
-        byte[] messageBytes = message.toByteArray();
-        byte[] normalized  = normalize(messageBytes);
-        BigInteger[] signature = new BigInteger[messageBytes.length];
-        for (int i = 0; i < messageBytes.length; i++) {
-            signature[i] = hash(key.get(i),128 + normalized[i]);
+        FragmentArray fragments = new FragmentArray(message,wotsParam);
+        normalize(fragments);
+        BigInteger[] signature = new BigInteger[fragments.getLength()];
+        for (int i = 0; i < fragments.getLength(); i++) {
+            signature[i] = hash(key.get(i),fragments.getFragmentValue(i));
         }
         return signature;
     }
@@ -36,47 +37,47 @@ public class WOTS {
         return new BigInteger(result);
     }
 
-    public byte[] normalize(byte[] bytes) {
-        int sum = sumArray(bytes);
-        byte[] normalized = bytes.clone();
-        if (sum>0) {
-            for (int i = 0; i < sum; i++) {
-                for (int j = 0; j < bytes.length; j++) {
-                    if (normalized[j] > -127) {
-                        normalized[j]--;
+    public void normalize(FragmentArray fragments) {
+        int[] fragmentsArray = fragments.getFragmentsAsArray();
+        int sum = sumArray(fragmentsArray);
+        int target = (int) ((( Math.pow(2,wotsParam)- 1)/2) * fragmentsArray.length);
+        int diff = sum - target;
+        if (diff>0) {
+            for (int i = 0; i < diff; i++) {
+                for (int j = 0; j <  fragments.getLength(); j++) {
+                    if (fragments.decrementFragment(j)) {
                         break;
                     }
                 }
             }
-            return normalized;
-        } else if (sum<0) {
-            for (int i = 0; i < -sum; i++) {
-                for (int j = 0; j < bytes.length; j++) {
-                    if (normalized[j] < 127) {
-                        normalized[j]++;
+            return;
+        } else if (diff<0) {
+            for (int i = 0; i < -diff; i++) {
+                for (int j = 0; j <  fragments.getLength(); j++) {
+                    if (fragments.incrementFragment(j)) {
                         break;
                     }
                 }
             }
-            return normalized;
+            return;
         } else {
-            return normalized;
+            return;
         }
     }
 
-    public int sumArray(byte[] bytes) {
+    public int sumArray(int[] array) {
         int sum = 0;
-        for (int i = 0; i < bytes.length; i++) {
-            sum += bytes[i];
+        for (int i = 0; i < array.length; i++) {
+            sum += array[i];
         }
         return sum;
     }
 
     public boolean verify(WotsPublicKey key, BigInteger[] signature, BigInteger message) {
-        byte[] messageBytes = message.toByteArray();
-        byte[] normalized  = normalize(messageBytes);
-        for (int i = 0; i < messageBytes.length; i++) {
-            int times = 255 - 128 - normalized[i];
+        FragmentArray fragments = new FragmentArray(message, wotsParam);
+        normalize(fragments);
+        for (int i = 0; i < fragments.getLength(); i++) {
+            int times = ((int) Math.pow(2,wotsParam)-1) - fragments.getFragmentValue(i);
             if (!key.get(i).equals(hash(signature[i], times))) {
                 return false;
             }
@@ -97,7 +98,7 @@ public class WOTS {
         //Compute public key
         BigInteger[] publicKeyParts = new BigInteger[length];
         for (int i = 0; i < length; i++) {
-            publicKeyParts[i] = hash(privateKeyParts[i],255);
+            publicKeyParts[i] = hash(privateKeyParts[i],(int) Math.pow(2,wotsParam)-1);
         }
         WotsPublicKey publicKey = new WotsPublicKey(publicKeyParts);
 

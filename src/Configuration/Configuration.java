@@ -36,7 +36,6 @@ public class Configuration {
 
     private static PublicKey secretmanKey = new RSAPublicKey(BigInteger.ONE,BigInteger.valueOf(11));
     public static Block genesisblock = new StandardBlock(BigInteger.ZERO,0,BigInteger.ZERO, new ArrayList<>(),0, new StandardCoinBaseTransaction(new PublicKeyAddress(secretmanKey) , getBlockReward(), 0));
-    private static HashingAlgorithm hashingAlgorithm;
 
 
     /**
@@ -96,6 +95,6 @@ public class Configuration {
     }
 
     public static HashingAlgorithm getHashingAlgorithm() {
-        return hashingAlgorithm;
+        return hasher;
     }
 }

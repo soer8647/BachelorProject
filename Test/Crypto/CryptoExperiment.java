@@ -15,7 +15,8 @@ public class CryptoExperiment {
 
     public static void main(String[] args) {
         try {
-            int iterations = 100;
+            int iterations = 10;
+            System.out.println("iterations: " + iterations);
             if (false) {
                 System.out.println("\n KeyGen");
                 System.out.println("\n short");
@@ -50,29 +51,20 @@ public class CryptoExperiment {
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
     }
 
     public static void runKeyGenTest2(int iterations) {
         long[] rsaArray = new long[iterations];
         long[] wotsArray = new long[iterations];
         for (int i = 0; i < iterations; i++) {
-            System.out.println(i);
             Pair<Long, Long> times = testKeyGeneration2();
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
     }
 
     public static void runSignTest(int iterations) {
@@ -87,7 +79,7 @@ public class CryptoExperiment {
             e.printStackTrace();
         }
 
-        WotsPrivateKey wotsKey = new WOTS(new SHA256()).generateNewKeys(new Seed(), 0, 32).getPrivateKey();
+        WotsPrivateKey wotsKey = new WOTS(new SHA256(),8).generateNewKeys(new Seed(), 0, 32).getPrivateKey();
 
         BigInteger message = new SHA256().hash("Fuck Jacob");
 
@@ -96,12 +88,8 @@ public class CryptoExperiment {
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
 
     }
 
@@ -117,7 +105,7 @@ public class CryptoExperiment {
             e.printStackTrace();
         }
 
-        WotsPrivateKey wotsKey = new WOTS(new SHA512()).generateNewKeys(new Seed(), 0, 65).getPrivateKey();
+        WotsPrivateKey wotsKey = new WOTS(new SHA512(),8).generateNewKeys(new Seed(), 0, 65).getPrivateKey();
 
         BigInteger message = new SHA512().hash("Fuck Jacob");
 
@@ -126,12 +114,8 @@ public class CryptoExperiment {
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
 
     }
 
@@ -140,7 +124,7 @@ public class CryptoExperiment {
         long[] wotsArray = new long[iterations];
 
         RSA rsa = new RSA(3298);
-        WOTS wots = new WOTS(new SHA256());
+        WOTS wots = new WOTS(new SHA256(),8);
 
         // init keys
         KeyPair rSAKeys = ExternalRSA.buildKeyPair();
@@ -157,12 +141,8 @@ public class CryptoExperiment {
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
 
     }
 
@@ -171,7 +151,7 @@ public class CryptoExperiment {
         long[] wotsArray = new long[iterations];
 
         RSA rsa = new RSA(15424);
-        WOTS wots = new WOTS(new SHA512());
+        WOTS wots = new WOTS(new SHA512(),8);
 
         // init keys
         KeyPair rSAKeys = ExternalRSA.buildKeyPair();
@@ -188,12 +168,8 @@ public class CryptoExperiment {
             rsaArray[i] = times.getKey();
             wotsArray[i] = times.getValue();
         }
-        System.out.println("rsa max = " + LongStream.of(rsaArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa min = " + LongStream.of(rsaArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("rsa average = " + (LongStream.of(rsaArray).average().getAsDouble() / Math.pow(10, 9)));
-        System.out.println("wots max = " + LongStream.of(wotsArray).max().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots min = " + LongStream.of(wotsArray).min().getAsLong() / Math.pow(10, 9));
-        System.out.println("wots average = " + (LongStream.of(wotsArray).average().getAsDouble() / Math.pow(10, 9)));
+        printResult("rsa",rsaArray);
+        printResult("wots",wotsArray);
 
     }
 
@@ -208,7 +184,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256());
+        WOTS wots = new WOTS(new SHA256(),8);
         long start2 = System.nanoTime();
         wots.generateNewKeys(new Seed(), 0, 32);
         long end2 = System.nanoTime();
@@ -229,7 +205,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512());
+        WOTS wots = new WOTS(new SHA512(),8);
         long start2 = System.nanoTime();
         wots.generateNewKeys(new Seed(), 0, 64);
         long end2 = System.nanoTime();
@@ -248,7 +224,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256());
+        WOTS wots = new WOTS(new SHA256(),8);
         long start2 = System.nanoTime();
         wots.sign(wotsKey, message);
         long end2 = System.nanoTime();
@@ -268,7 +244,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512());
+        WOTS wots = new WOTS(new SHA512(),8);
         long start2 = System.nanoTime();
         wots.sign(wotsKey, message);
         long end2 = System.nanoTime();
@@ -287,7 +263,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256());
+        WOTS wots = new WOTS(new SHA256(),8);
         long start2 = System.nanoTime();
         wots.verify(wotsKey, WOTSSignature, message);
         long end2 = System.nanoTime();
@@ -306,13 +282,19 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512());
+        WOTS wots = new WOTS(new SHA512(),8);
         long start2 = System.nanoTime();
         wots.verify(wotsKey, WOTSSignature, message);
         long end2 = System.nanoTime();
         long WOTSTime = end2 - start2;
 
         return new Pair<>(RSATime, WOTSTime);
+    }
+
+    private static void printResult(String name,long[] array) {
+        System.out.println(name + " max = " + LongStream.of(array).max().getAsLong() / Math.pow(10, 9));
+        System.out.println(name + " min = " + LongStream.of(array).min().getAsLong() / Math.pow(10, 9));
+        System.out.println(name + " average = " + (LongStream.of(array).average().getAsDouble() / Math.pow(10, 9)));
     }
 
 

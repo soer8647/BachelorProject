@@ -7,29 +7,29 @@ import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
 public class SHA512 implements HashingAlgorithm {
+    private MessageDigest sha512;
 
     public SHA512() {
+        try {
+            sha512 = MessageDigest.getInstance("SHA-512");
+        } catch (NoSuchAlgorithmException e) {
+            throw new UnsupportedOperationException();
+        }
+    }
+
+    @Override
+    public BigInteger hash(byte[] data) {
+        byte[] hash = sha512.digest(data);
+        return new BigInteger(1,hash);
     }
 
     public BigInteger hash(String data) {
-        MessageDigest sha256 = null;
-        try {
-            sha256 = MessageDigest.getInstance("SHA-512");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        byte[] hash = sha256.digest(data.getBytes());
+        byte[] hash = sha512.digest(data.getBytes());
         return new BigInteger(1,hash);
     }
 
     public MessageDigest getHashingAlgorithm() {
-        MessageDigest sha256 = null;
-        try {
-            sha256 = MessageDigest.getInstance("SHA-512");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return sha256;
+        return sha512;
     }
 
     public int getBitSize() {
