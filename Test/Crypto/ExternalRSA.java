@@ -3,8 +3,6 @@ package Crypto;
 import java.math.BigInteger;
 import java.security.*;
 
-import static java.nio.charset.StandardCharsets.UTF_8;
-import javax.crypto.Cipher;
 
 public class ExternalRSA {
     public static int getKeySize() {
@@ -15,7 +13,7 @@ public class ExternalRSA {
         ExternalRSA.keySize = keySize;
     }
 
-    private static int keySize = 2048;
+    private static int keySize = 3298;
 
     public static byte[] sign(BigInteger plainText, PrivateKey privateKey) throws Exception {
         Signature privateSignature = Signature.getInstance("SHA256withRSA");
