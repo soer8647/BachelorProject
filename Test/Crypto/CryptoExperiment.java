@@ -13,30 +13,33 @@ import java.util.stream.LongStream;
 
 public class CryptoExperiment {
 
+
+    private static int packingFactor = 4;
+
     public static void main(String[] args) {
         try {
-            int iterations = 10;
+            int iterations = 10000;
             System.out.println("iterations: " + iterations);
             if (false) {
                 System.out.println("\n KeyGen");
-                System.out.println("\n short");
+   //             System.out.println("\n short");
                 runKeyGenTest(iterations);
-                System.out.println("\n long");
-                runKeyGenTest2(iterations);
+//               System.out.println("\n long");
+//                runKeyGenTest2(iterations);
             }
             if (true) {
                 System.out.println("\n Signing");
-                System.out.println("\n short");
+ //               System.out.println("\n short");
                 runSignTest(iterations);
-                System.out.println("\n long");
-                runSignTest2(iterations);
+ //               System.out.println("\n long");
+//                runSignTest2(iterations);
             }
             if (true) {
                 System.out.println("\n Verifying");
-                System.out.println("\n short");
+     //           System.out.println("\n short");
                 runVerifyTest(iterations);
-                System.out.println("\n long");
-                runVerifyTest2(iterations);
+       //         System.out.println("\n long");
+     //           runVerifyTest2(iterations);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -79,7 +82,7 @@ public class CryptoExperiment {
             e.printStackTrace();
         }
 
-        WotsPrivateKey wotsKey = new WOTS(new SHA256(),8).generateNewKeys(new Seed(), 0, 32).getPrivateKey();
+        WotsPrivateKey wotsKey = new WOTS(new SHA256(),packingFactor).generateNewKeys(new Seed(), 0, 256/packingFactor).getPrivateKey();
 
         BigInteger message = new SHA256().hash("Fuck Jacob");
 
@@ -105,7 +108,7 @@ public class CryptoExperiment {
             e.printStackTrace();
         }
 
-        WotsPrivateKey wotsKey = new WOTS(new SHA512(),8).generateNewKeys(new Seed(), 0, 65).getPrivateKey();
+        WotsPrivateKey wotsKey = new WOTS(new SHA512(),packingFactor ).generateNewKeys(new Seed(), 0, 512/packingFactor).getPrivateKey();
 
         BigInteger message = new SHA512().hash("Fuck Jacob");
 
@@ -124,12 +127,12 @@ public class CryptoExperiment {
         long[] wotsArray = new long[iterations];
 
         RSA rsa = new RSA(3298);
-        WOTS wots = new WOTS(new SHA256(),8);
+        WOTS wots = new WOTS(new SHA256(),packingFactor );
 
         // init keys
         KeyPair rSAKeys = ExternalRSA.buildKeyPair();
 
-        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 32);
+        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 256/packingFactor);
 
         BigInteger message = new SHA256().hash("Fuck Jacob");
 
@@ -151,12 +154,12 @@ public class CryptoExperiment {
         long[] wotsArray = new long[iterations];
 
         RSA rsa = new RSA(15424);
-        WOTS wots = new WOTS(new SHA512(),8);
+        WOTS wots = new WOTS(new SHA512(),packingFactor);
 
         // init keys
         KeyPair rSAKeys = ExternalRSA.buildKeyPair();
 
-        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 65);
+        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 512/packingFactor);
 
         BigInteger message = new SHA512().hash("Fuck Jacob");
 
@@ -184,9 +187,9 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),8);
+        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
-        wots.generateNewKeys(new Seed(), 0, 32);
+        wots.generateNewKeys(new Seed(), 0, 256/packingFactor);
         long end2 = System.nanoTime();
         long WOTSTime = end2 - start2;
 
@@ -205,7 +208,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512(),8);
+        WOTS wots = new WOTS(new SHA512(),packingFactor);
         long start2 = System.nanoTime();
         wots.generateNewKeys(new Seed(), 0, 64);
         long end2 = System.nanoTime();
@@ -224,7 +227,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),8);
+        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
         wots.sign(wotsKey, message);
         long end2 = System.nanoTime();
@@ -244,7 +247,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512(),8);
+        WOTS wots = new WOTS(new SHA512(),packingFactor);
         long start2 = System.nanoTime();
         wots.sign(wotsKey, message);
         long end2 = System.nanoTime();
@@ -263,7 +266,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),8);
+        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
         wots.verify(wotsKey, WOTSSignature, message);
         long end2 = System.nanoTime();
@@ -282,7 +285,7 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA512(),8);
+        WOTS wots = new WOTS(new SHA512(),packingFactor);
         long start2 = System.nanoTime();
         wots.verify(wotsKey, WOTSSignature, message);
         long end2 = System.nanoTime();
