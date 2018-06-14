@@ -53,6 +53,9 @@ private int keyBitLength;
 
         BigInteger n = p.multiply(q);
         BigInteger d = e.modInverse(p.subtract(BigInteger.ONE).multiply(q.subtract(BigInteger.ONE)));
+        if (d.bitLength() < Math.sqrt(keyBitLength)) {
+            System.out.println("d less than sqrt(n)");
+        }
 
         return new RSAKeyPair(new RSAPublicKey(e,n),new RSAPrivateKey(n,d));
 

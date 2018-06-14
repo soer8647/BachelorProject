@@ -5,29 +5,37 @@ import External.Pair;
 import Impl.Hashing.SHA256;
 
 import java.math.BigInteger;
-import java.security.*;
 import java.util.stream.LongStream;
 
 public class CryptoExperiment {
 
 
-    private static int packingFactor = 4;
+    private static int packingFactor = 2;
+    private static int rsaBitLength = 3078;
+    private static int iterations = 1000;
+    private static final boolean doSigning = true;
+    private static final boolean doVerification = true;
+    private static final boolean doKeyGeneration = true;
+
+
     private static BigInteger e = new BigInteger("65537");
-    private static RSA rsa = new RSA(3298);
+    private static RSA rsa = new RSA(rsaBitLength);
+    private static WOTS wots = new WOTS(new SHA256(),packingFactor);
 
     public static void main(String[] args) {
         try {
-            int iterations = 10000;
+            System.out.println("Packing Factor: " + packingFactor);
             System.out.println("iterations: " + iterations);
-            if (false) {
+
+            if (doKeyGeneration ) {
                 System.out.println("\n KeyGen");
                 runKeyGenTest(iterations);
             }
-            if (true) {
+            if (doSigning) {
                 System.out.println("\n Signing");
                 runSignTest(iterations);
             }
-            if (true) {
+            if (doVerification ) {
                 System.out.println("\n Verifying");
                 runVerifyTest(iterations);
             }
@@ -54,9 +62,9 @@ public class CryptoExperiment {
 
         // init keys
         RSAPrivateKey rsaKey = rsa.generateNewKeys(e).getPrivateKey();
-        WotsPrivateKey wotsKey = new WOTS(new SHA256(),packingFactor).generateNewKeys(new Seed(), 0, 256/packingFactor).getPrivateKey();
+        WotsPrivateKey wotsKey = wots.generateNewKeys(new Seed(), 0, 1 + 256/packingFactor).getPrivateKey();
 
-        BigInteger message = new SHA256().hash("Fuck Jacob");
+        BigInteger message = new SHA256().hash("TestMessage");
 
         for (int i = 0; i < iterations; i++) {
             Pair<Long, Long> times = testSignTime(rsaKey, wotsKey, message);
@@ -73,15 +81,12 @@ public class CryptoExperiment {
         long[] rsaArray = new long[iterations];
         long[] wotsArray = new long[iterations];
 
-        RSA rsa = new RSA(3298);
-        WOTS wots = new WOTS(new SHA256(),packingFactor );
-
         // init keys
         RSAKeyPair rSAKeys = rsa.generateNewKeys(e);
 
-        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 256/packingFactor);
+        WOTSKeyPair wOTSKeys = wots.generateNewKeys(new Seed(), 0, 1 + 256/packingFactor);
 
-        BigInteger message = new SHA256().hash("Fuck Jacob");
+        BigInteger message = new SHA256().hash("TestMessage");
 
         BigInteger rsaSignature = rsa.sign(rSAKeys.getPrivateKey(),message);
         BigInteger[] wotsSignature = wots.sign(wOTSKeys.getPrivateKey(), message);
@@ -98,15 +103,10 @@ public class CryptoExperiment {
 
     public static Pair<Long, Long> testKeyGeneration() {
         long start = System.nanoTime();
-        try {
-            ExternalRSA.buildKeyPair();
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        rsa.generateNewKeys(e);
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
         wots.generateNewKeys(new Seed(), 0, 256/packingFactor);
         long end2 = System.nanoTime();
@@ -121,7 +121,6 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
         wots.sign(wotsKey, message);
         long end2 = System.nanoTime();
@@ -136,7 +135,6 @@ public class CryptoExperiment {
         long end = System.nanoTime();
         long RSATime = end - start;
 
-        WOTS wots = new WOTS(new SHA256(),packingFactor);
         long start2 = System.nanoTime();
         wots.verify(wotsKey, WOTSSignature, message);
         long end2 = System.nanoTime();
